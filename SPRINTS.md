@@ -165,21 +165,21 @@
 **Goal:** Allow visitors and students to browse, filter, and view approved teachers.
 
 ### Tasks
-- [ ] Public subjects listing page
-- [ ] Public teacher listing page
-- [ ] Implement filters:
+- [x] Public subjects listing page
+- [x] Public teacher listing page
+- [x] Implement filters:
   - subject
   - grade level
   - price range
   - rating
   - lesson type (one-to-one/group)
-- [ ] Implement keyword search (teacher name, bio, headline)
-- [ ] Build public teacher detail/profile page
-- [ ] Display reviews on teacher profile
-- [ ] Add pagination to listings
-- [ ] Ensure only `approved` teachers appear publicly
-- [ ] Ensure suspended/rejected/pending teachers are hidden
-- [ ] Add "Book" CTA that redirects to login if not authenticated
+- [x] Implement keyword search (teacher name, bio, headline)
+- [x] Build public teacher detail/profile page
+- [ ] Display reviews on teacher profile (review model deferred to Sprint 8; rating summary placeholder shown)
+- [x] Add pagination to listings
+- [x] Ensure only `approved` teachers appear publicly
+- [x] Ensure suspended/rejected/pending teachers are hidden
+- [x] Add "Book" CTA that redirects to login if not authenticated
 
 **Deliverables:**
 - Public discovery pages

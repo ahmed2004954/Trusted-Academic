@@ -5,6 +5,8 @@ from . import views
 app_name = 'teachers'
 
 urlpatterns = [
+    path('', views.teacher_list, name='public_list'),
+    path('<int:pk>/', views.teacher_detail, name='public_detail'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/setup/', views.setup_profile, name='setup_profile'),
     path('certificates/upload/', views.upload_certificate, name='upload_certificate'),

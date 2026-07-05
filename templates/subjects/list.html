@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}المواد - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <div class="page-heading">
+        <h1>استكشف المواد</h1>
+        <p>اختر مادة للعثور على مدرسين معتمدين يناسبون المرحلة التعليمية المطلوبة.</p>
+    </div>
+
+    {% if subjects %}
+        <div class="card-grid">
+            {% for subject in subjects %}
+                <article class="listing-card">
+                    <h2>{{ subject.name }}</h2>
+                    <p>اعرض المدرسين المتاحين لهذه المادة وقارن بين الأسعار وأنواع الحصص.</p>
+                    <a class="btn btn-primary" href="{% url 'teachers:public_list' %}?subject={{ subject.id }}">عرض المدرسين</a>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-state">لا توجد مواد متاحة حالياً.</p>
+    {% endif %}
+</section>
+{% endblock %}

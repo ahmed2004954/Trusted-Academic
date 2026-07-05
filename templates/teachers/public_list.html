@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}المدرسون - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <div class="page-heading">
+        <h1>ابحث عن مدرس</h1>
+        <p>كل المدرسين الظاهرين هنا معتمدون ومتاحون للاكتشاف العام.</p>
+    </div>
+
+    <form class="filter-form" method="get">
+        <div>
+            <label for="q">بحث</label>
+            <input id="q" name="q" type="search" value="{{ selected.q }}" placeholder="اسم المدرس أو نبذة مختصرة">
+        </div>
+        <div>
+            <label for="subject">المادة</label>
+            <select id="subject" name="subject">
+                <option value="">كل المواد</option>
+                {% for subject in subjects %}
+                    <option value="{{ subject.id }}" {% if selected.subject == subject.id|stringformat:'s' %}selected{% endif %}>{{ subject.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="grade_level">المرحلة</label>
+            <select id="grade_level" name="grade_level">
+                <option value="">كل المراحل</option>
+                {% for grade_level in grade_levels %}
+                    <option value="{{ grade_level.id }}" {% if selected.grade_level == grade_level.id|stringformat:'s' %}selected{% endif %}>{{ grade_level.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="lesson_type">نوع الحصة</label>
+            <select id="lesson_type" name="lesson_type">
+                <option value="">كل الأنواع</option>
+                {% for value, label in lesson_types %}
+                    <option value="{{ value }}" {% if selected.lesson_type == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="price_min">أقل سعر</label>
+            <input id="price_min" name="price_min" type="number" min="0" step="0.01" value="{{ selected.price_min }}">
+        </div>
+        <div>
+            <label for="price_max">أعلى سعر</label>
+            <input id="price_max" name="price_max" type="number" min="0" step="0.01" value="{{ selected.price_max }}">
+        </div>
+        <div>
+            <label for="rating">أقل تقييم</label>
+            <input id="rating" name="rating" type="number" min="0" max="5" step="0.1" value="{{ selected.rating }}">
+        </div>
+        <div class="filter-actions">
+            <button class="btn btn-primary" type="submit">تطبيق الفلاتر</button>
+            <a class="btn btn-secondary" href="{% url 'teachers:public_list' %}">إعادة ضبط</a>
+        </div>
+    </form>
+
+    {% if page_obj.object_list %}
+        <div class="card-grid teacher-grid">
+            {% for teacher in page_obj.object_list %}
+                <article class="listing-card teacher-card">
+                    {% if teacher.photo %}
+                        <img class="teacher-photo" src="{{ teacher.photo.url }}" alt="صورة {{ teacher.user.get_full_name }}">
+                    {% endif %}
+                    <h2>{{ teacher.user.get_full_name }}</h2>
+                    <p class="muted">{{ teacher.headline|default:'مدرس معتمد على المنصة' }}</p>
+                    <p>{{ teacher.bio|truncatewords:24 }}</p>
+                    <p><strong>الخبرة:</strong> {{ teacher.experience_years }} سنة</p>
+                    <p><strong>التقييم:</strong> {{ teacher.average_rating }} / 5 ({{ teacher.total_reviews }} مراجعة)</p>
+                    <div class="tag-list">
+                        {% for offering in teacher.subjects.all|slice:':4' %}
+                            {% if offering.is_active %}
+                                <span>{{ offering.subject.name }} - {{ offering.grade_level.name }}</span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <a class="btn btn-primary" href="{% url 'teachers:public_detail' teacher.pk %}">عرض الملف</a>
+                </article>
+            {% endfor %}
+        </div>
+
+        {% if page_obj.has_other_pages %}
+            <nav class="pagination" aria-label="صفحات المدرسين">
+                {% if page_obj.has_previous %}
+                    <a href="?{% if query_string %}{{ query_string }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">السابق</a>
+                {% endif %}
+                <span>صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                    <a href="?{% if query_string %}{{ query_string }}&amp;{% endif %}page={{ page_obj.next_page_number }}">التالي</a>
+                {% endif %}
+            </nav>
+        {% endif %}
+    {% else %}
+        <p class="empty-state">لا توجد نتائج مطابقة للفلاتر الحالية.</p>
+    {% endif %}
+</section>
+{% endblock %}

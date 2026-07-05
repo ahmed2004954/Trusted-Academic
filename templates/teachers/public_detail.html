@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ teacher.user.get_full_name }} - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<article class="page-content teacher-profile">
+    <header class="profile-header">
+        {% if teacher.photo %}
+            <img class="profile-photo" src="{{ teacher.photo.url }}" alt="صورة {{ teacher.user.get_full_name }}">
+        {% endif %}
+        <div>
+            <h1>{{ teacher.user.get_full_name }}</h1>
+            <p class="muted">{{ teacher.headline|default:'مدرس معتمد على المنصة' }}</p>
+            <p><strong>الخبرة:</strong> {{ teacher.experience_years }} سنة</p>
+            <p><strong>التقييم:</strong> {{ teacher.average_rating }} / 5 من {{ teacher.total_reviews }} مراجعة</p>
+            {% if teacher.total_reviews == 0 %}
+                <p class="empty-state compact">لا توجد مراجعات بعد. ستظهر آراء الطلاب هنا عند توفرها.</p>
+            {% endif %}
+            <a class="btn btn-primary" href="{% url booking_url %}">ابدأ الحجز</a>
+        </div>
+    </header>
+
+    <section>
+        <h2>نبذة عن المدرس</h2>
+        <p>{{ teacher.bio|linebreaksbr }}</p>
+    </section>
+
+    <section>
+        <h2>المواد والأسعار</h2>
+        {% if offerings %}
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>المادة</th>
+                            <th>المرحلة</th>
+                            <th>نوع الحصة</th>
+                            <th>السعر الافتراضي</th>
+                            <th>النطاق</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for offering in offerings %}
+                            <tr>
+                                <td>{{ offering.subject.name }}</td>
+                                <td>{{ offering.grade_level.name }}</td>
+                                <td>{{ offering.get_lesson_type_display }}</td>
+                                <td>{{ offering.default_price }}</td>
+                                <td>{{ offering.price_min }} - {{ offering.price_max }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="empty-state compact">لا توجد مواد نشطة معروضة حالياً.</p>
+        {% endif %}
+    </section>
+
+    <section>
+        <h2>المواعيد المتاحة</h2>
+        {% if availability_slots %}
+            <ul class="item-list availability-list">
+                {% for slot in availability_slots %}
+                    <li>{{ slot.get_day_of_week_display }}: {{ slot.start_time|time:'H:i' }} - {{ slot.end_time|time:'H:i' }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="empty-state compact">لم يضف المدرس مواعيد متاحة بعد.</p>
+        {% endif %}
+    </section>
+</article>
+{% endblock %}
