@@ -37,11 +37,9 @@
             </div>
             <div class="dashboard-card">
                 <h3>الإتاحة والأسعار</h3>
-                {% if profile.can_receive_bookings %}
-                    <p>ستتمكن قريباً من إدارة المواعيد والأسعار في Sprint 3.</p>
-                {% else %}
-                    <p>ستتاح إدارة المواعيد والأسعار بعد اعتماد حسابك وفي Sprint 3.</p>
-                {% endif %}
+                <p>أدر المواد والأسعار والمواعيد الأسبوعية التي يمكنك استقبال الدروس خلالها.</p>
+                <a class="btn btn-primary" href="{% url 'teachers:manage_subjects' %}">إدارة المواد</a>
+                <a class="btn btn-primary" href="{% url 'teachers:manage_availability' %}">إدارة الإتاحة</a>
             </div>
         </div>
     {% else %}

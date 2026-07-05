@@ -1,8 +1,9 @@
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from .models import TeacherCertificate, TeacherProfile
+from .models import AvailabilitySlot, LessonType, PlatformPricingRange, TeacherCertificate, TeacherProfile, TeacherSubject
 
 
 class TeacherProfileForm(forms.ModelForm):
@@ -57,3 +58,98 @@ class TeacherReviewForm(forms.ModelForm):
         if action in {'reject', 'suspend'} and not notes:
             raise ValidationError(_('Verification notes are required when rejecting or suspending a teacher.'))
         return cleaned_data
+
+
+class TeacherSubjectForm(forms.ModelForm):
+    class Meta:
+        model = TeacherSubject
+        fields = (
+            'subject',
+            'grade_level',
+            'lesson_type',
+            'price_min',
+            'price_max',
+            'default_price',
+            'group_capacity',
+            'is_active',
+        )
+        widgets = {
+            'subject': forms.Select(attrs={'class': 'form-control'}),
+            'grade_level': forms.Select(attrs={'class': 'form-control'}),
+            'lesson_type': forms.Select(attrs={'class': 'form-control'}),
+            'price_min': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+            'price_max': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+            'default_price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+            'group_capacity': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+        }
+
+    def clean(self) -> dict:
+        cleaned_data = super().clean()
+        subject = cleaned_data.get('subject')
+        grade_level = cleaned_data.get('grade_level')
+        lesson_type = cleaned_data.get('lesson_type')
+        price_min = cleaned_data.get('price_min')
+        price_max = cleaned_data.get('price_max')
+        default_price = cleaned_data.get('default_price')
+        group_capacity = cleaned_data.get('group_capacity')
+
+        if lesson_type == LessonType.ONE_TO_ONE and group_capacity is not None:
+            self.add_error('group_capacity', _('Group capacity is only available for group lessons.'))
+
+        if lesson_type == LessonType.GROUP and not group_capacity:
+            self.add_error('group_capacity', _('Group capacity is required for group lessons.'))
+
+        if group_capacity and group_capacity > settings.PLATFORM_MAX_GROUP_SIZE:
+            self.add_error(
+                'group_capacity',
+                _('Group capacity cannot exceed %(max_size)s students.') % {'max_size': settings.PLATFORM_MAX_GROUP_SIZE},
+            )
+
+        if price_min is not None and price_max is not None and price_min > price_max:
+            self.add_error('price_max', _('Maximum price must be greater than or equal to minimum price.'))
+
+        if (
+            price_min is not None
+            and price_max is not None
+            and default_price is not None
+            and not price_min <= default_price <= price_max
+        ):
+            self.add_error('default_price', _('Default price must be between the teacher minimum and maximum price.'))
+
+        if subject and grade_level and lesson_type and price_min is not None and price_max is not None:
+            pricing_range = PlatformPricingRange.objects.filter(
+                subject=subject,
+                grade_level=grade_level,
+                lesson_type=lesson_type,
+                is_active=True,
+            ).first()
+            if not pricing_range:
+                raise ValidationError(_('No active platform pricing range is configured for this subject and grade.'))
+            if price_min < pricing_range.min_price or price_min > pricing_range.max_price:
+                self.add_error(
+                    'price_min',
+                    _('Minimum price must be between %(min_price)s and %(max_price)s.') % {
+                        'min_price': pricing_range.min_price,
+                        'max_price': pricing_range.max_price,
+                    },
+                )
+            if price_max < pricing_range.min_price or price_max > pricing_range.max_price:
+                self.add_error(
+                    'price_max',
+                    _('Maximum price must be between %(min_price)s and %(max_price)s.') % {
+                        'min_price': pricing_range.min_price,
+                        'max_price': pricing_range.max_price,
+                    },
+                )
+        return cleaned_data
+
+
+class AvailabilitySlotForm(forms.ModelForm):
+    class Meta:
+        model = AvailabilitySlot
+        fields = ('day_of_week', 'start_time', 'end_time', 'is_active')
+        widgets = {
+            'day_of_week': forms.Select(attrs={'class': 'form-control'}),
+            'start_time': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
+            'end_time': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
+        }

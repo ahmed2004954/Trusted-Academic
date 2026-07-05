@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}إدارة المواد والأسعار - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content auth-form">
+    <h1>إدارة المواد والأسعار</h1>
+    <p>حدد المواد والصفوف ونوع الدرس ونطاق السعر الذي تقدمه.</p>
+
+    {% if form %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn btn-primary" type="submit">حفظ المادة</button>
+            <a class="btn" href="{% url 'teachers:manage_subjects' %}">إلغاء</a>
+        </form>
+    {% elif confirm_delete %}
+        <div class="status-card status-rejected">
+            <h2>تأكيد حذف المادة</h2>
+            <p>هل تريد حذف {{ teacher_subject.subject }} - {{ teacher_subject.grade_level }}؟</p>
+            <form method="post">
+                {% csrf_token %}
+                <button class="btn btn-primary" type="submit">نعم، حذف</button>
+                <a class="btn" href="{% url 'teachers:manage_subjects' %}">إلغاء</a>
+            </form>
+        </div>
+    {% else %}
+        <a class="btn btn-primary" href="{% url 'teachers:add_subject' %}">إضافة مادة</a>
+
+        <h2>المواد الحالية</h2>
+        {% if teacher_subjects %}
+            <ul class="item-list">
+                {% for teacher_subject in teacher_subjects %}
+                    <li>
+                        <strong>{{ teacher_subject.subject }} - {{ teacher_subject.grade_level }}</strong>
+                        <span>{{ teacher_subject.get_lesson_type_display }} | {{ teacher_subject.price_min }} - {{ teacher_subject.price_max }} | الافتراضي: {{ teacher_subject.default_price }}</span>
+                        {% if teacher_subject.group_capacity %}
+                            <span>السعة: {{ teacher_subject.group_capacity }}</span>
+                        {% endif %}
+                        <span>{% if teacher_subject.is_active %}نشط{% else %}غير نشط{% endif %}</span>
+                        <a href="{% url 'teachers:edit_subject' teacher_subject.pk %}">تعديل</a>
+                        <a href="{% url 'teachers:delete_subject' teacher_subject.pk %}">حذف</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>لم تقم بإضافة أي مواد بعد.</p>
+        {% endif %}
+        <a class="btn" href="{% url 'teachers:dashboard' %}">العودة للوحة المدرس</a>
+    {% endif %}
+</section>
+{% endblock %}

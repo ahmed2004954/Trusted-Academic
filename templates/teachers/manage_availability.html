@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}إدارة الإتاحة - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content auth-form">
+    <h1>إدارة الإتاحة</h1>
+    <p>أضف المواعيد الأسبوعية التي يمكنك استقبال الدروس خلالها.</p>
+
+    {% if form %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn btn-primary" type="submit">حفظ الموعد</button>
+            <a class="btn" href="{% url 'teachers:manage_availability' %}">إلغاء</a>
+        </form>
+    {% elif confirm_delete %}
+        <div class="status-card status-rejected">
+            <h2>تأكيد حذف الموعد</h2>
+            <p>هل تريد حذف {{ availability_slot.get_day_of_week_display }} من {{ availability_slot.start_time }} إلى {{ availability_slot.end_time }}؟</p>
+            <form method="post">
+                {% csrf_token %}
+                <button class="btn btn-primary" type="submit">نعم، حذف</button>
+                <a class="btn" href="{% url 'teachers:manage_availability' %}">إلغاء</a>
+            </form>
+        </div>
+    {% else %}
+        <a class="btn btn-primary" href="{% url 'teachers:add_availability' %}">إضافة موعد</a>
+
+        <h2>المواعيد الحالية</h2>
+        {% if availability_slots %}
+            <ul class="item-list">
+                {% for availability_slot in availability_slots %}
+                    <li>
+                        <strong>{{ availability_slot.get_day_of_week_display }}</strong>
+                        <span>{{ availability_slot.start_time }} - {{ availability_slot.end_time }}</span>
+                        <span>{% if availability_slot.is_active %}نشط{% else %}غير نشط{% endif %}</span>
+                        <a href="{% url 'teachers:edit_availability' availability_slot.pk %}">تعديل</a>
+                        <a href="{% url 'teachers:delete_availability' availability_slot.pk %}">حذف</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>لم تقم بإضافة أي مواعيد بعد.</p>
+        {% endif %}
+        <a class="btn" href="{% url 'teachers:dashboard' %}">العودة للوحة المدرس</a>
+    {% endif %}
+</section>
+{% endblock %}

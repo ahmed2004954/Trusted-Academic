@@ -130,20 +130,20 @@
 **Goal:** Let approved teachers configure what they teach, how much they charge, and when they are available.
 
 ### Tasks
-- [ ] Create `TeacherSubject` model:
+- [x] Create `TeacherSubject` model:
   - teacher, subject, grade_level, lesson_type
   - price_min, price_max, default_price
   - group_capacity
   - is_active
-- [ ] Enforce platform price ranges per subject/grade/type
-- [ ] Create `PlatformPricingRange` model for admin-managed ranges
-- [ ] Build teacher views to add/edit/remove offered subjects
-- [ ] Build admin views to manage pricing ranges and max group size
-- [ ] Create `AvailabilitySlot` model:
+- [x] Enforce platform price ranges per subject/grade/type
+- [x] Create `PlatformPricingRange` model for admin-managed ranges
+- [x] Build teacher views to add/edit/remove offered subjects
+- [x] Build admin views to manage pricing ranges and max group size
+- [x] Create `AvailabilitySlot` model:
   - teacher, day_of_week, start_time, end_time, is_active
-- [ ] Build weekly availability editor (CRUD)
-- [ ] Add validation: time ranges must not overlap for same teacher
-- [ ] Add timezone support (default to Egypt/Cairo)
+- [x] Build weekly availability editor (CRUD)
+- [x] Add validation: time ranges must not overlap for same teacher
+- [x] Add timezone support (default to Egypt/Cairo)
 
 **Deliverables:**
 - Teacher subject/grade/pricing setup
