@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}معالجة الشكوى - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>معالجة الشكوى #{{ complaint.pk }}</h1>
+    <div class="status-card">
+        <p><strong>الحجز:</strong> #{{ complaint.booking.pk }}</p>
+        <p><strong>مقدم الشكوى:</strong> {{ complaint.created_by.get_full_name }}</p>
+        <p><strong>ضد:</strong> {{ complaint.against_user.get_full_name }}</p>
+        <p><strong>التصنيف:</strong> {{ complaint.get_category_display }}</p>
+        <p><strong>الوصف:</strong> {{ complaint.description|linebreaksbr }}</p>
+    </div>
+    <form method="post" class="form-card">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">حفظ التحديث</button>
+        <a class="btn btn-secondary" href="{% url 'complaints:staff_queue' %}">رجوع</a>
+    </form>
+</section>
+{% endblock %}

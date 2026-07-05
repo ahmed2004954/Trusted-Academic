@@ -34,6 +34,41 @@
         <a class="btn btn-primary" href="{% url 'messaging:booking_thread' booking.pk %}">فتح المحادثة</a>
     </div>
 
+    <div class="status-card">
+        <h2>الشكاوى والنزاعات</h2>
+        <p>تابع الشكاوى المرتبطة بهذا الحجز أو افتح شكوى جديدة عند الحاجة.</p>
+        {% if can_create_complaint %}
+            <a class="btn btn-primary" href="{% url 'complaints:create' booking.pk %}">فتح شكوى</a>
+        {% endif %}
+        <a class="btn btn-secondary" href="{% url 'complaints:list' %}">عرض شكاواي</a>
+        {% if complaints %}
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>رقم الشكوى</th>
+                            <th>التصنيف</th>
+                            <th>الحالة</th>
+                            <th>تاريخ الإنشاء</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for complaint in complaints %}
+                            <tr>
+                                <td>#{{ complaint.pk }}</td>
+                                <td>{{ complaint.get_category_display }}</td>
+                                <td>{{ complaint.get_status_display }}</td>
+                                <td>{{ complaint.created_at|date:'Y-m-d H:i' }}</td>
+                                <td><a class="btn btn-secondary" href="{% url 'complaints:detail' complaint.pk %}">عرض</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+
     {% if not is_teacher_view %}
         {% if booking.booking_status == 'pending_payment' or booking.booking_status == 'awaiting_student_payment' %}
             <div class="status-card">

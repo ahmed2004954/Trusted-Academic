@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}فتح شكوى - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>فتح شكوى</h1>
+    <div class="status-card">
+        <p><strong>الحجز:</strong> #{{ booking.pk }}</p>
+        <p><strong>الطالب:</strong> {{ booking.student.get_full_name }}</p>
+        <p><strong>المدرس:</strong> {{ booking.teacher.user.get_full_name }}</p>
+        <p><strong>المادة:</strong> {{ booking.subject.name }} - {{ booking.grade_level.name }}</p>
+        <p><strong>الموعد:</strong> {{ booking.scheduled_start|date:'Y-m-d H:i' }}</p>
+    </div>
+    <form method="post" class="form-card">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">إرسال الشكوى</button>
+        <a class="btn btn-secondary" href="{% url 'complaints:list' %}">إلغاء</a>
+    </form>
+</section>
+{% endblock %}

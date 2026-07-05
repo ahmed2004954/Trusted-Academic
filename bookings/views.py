@@ -6,6 +6,8 @@ from django.utils.translation import gettext_lazy as _
 
 from parents.models import ParentStudentLink
 from teachers.models import TeacherProfile, TeacherSubject
+from complaints.models import Complaint
+from complaints.services import user_can_create_complaint, visible_complaint_filter
 
 from .forms import BookingCreateForm
 from .models import Booking
@@ -114,7 +116,17 @@ def student_booking_detail(request, pk):
         pk=pk,
         student=request.user,
     )
-    return render(request, 'bookings/detail.html', {'booking': booking, 'is_teacher_view': False})
+    complaints = Complaint.objects.filter(visible_complaint_filter(request.user), booking=booking).distinct()
+    return render(
+        request,
+        'bookings/detail.html',
+        {
+            'booking': booking,
+            'is_teacher_view': False,
+            'can_create_complaint': user_can_create_complaint(request.user, booking),
+            'complaints': complaints,
+        },
+    )
 
 
 @teacher_required
@@ -132,7 +144,17 @@ def teacher_booking_detail(request, pk):
         pk=pk,
         teacher=profile,
     )
-    return render(request, 'bookings/detail.html', {'booking': booking, 'is_teacher_view': True})
+    complaints = Complaint.objects.filter(visible_complaint_filter(request.user), booking=booking).distinct()
+    return render(
+        request,
+        'bookings/detail.html',
+        {
+            'booking': booking,
+            'is_teacher_view': True,
+            'can_create_complaint': user_can_create_complaint(request.user, booking),
+            'complaints': complaints,
+        },
+    )
 
 
 @teacher_required

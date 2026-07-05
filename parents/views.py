@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from bookings.models import Booking
 from reports.models import Report
 from students.models import StudentProfile
+from complaints.services import user_can_create_complaint
 
 from .forms import LinkStudentForm, ManagedStudentCreateForm
 from .models import ParentProfile, ParentStudentLink
@@ -82,4 +83,9 @@ def student_booking_history(request, student_pk):
     profile = get_parent_profile(request.user)
     student = get_object_or_404(profile.students.select_related('student_profile__grade_level'), pk=student_pk)
     bookings = Booking.objects.filter(student=student).select_related('teacher__user', 'subject', 'grade_level', 'report')
-    return render(request, 'parents/student_booking_history.html', {'student': student, 'bookings': bookings})
+    complaint_booking_ids = [booking.pk for booking in bookings if user_can_create_complaint(request.user, booking)]
+    return render(
+        request,
+        'parents/student_booking_history.html',
+        {'student': student, 'bookings': bookings, 'complaint_booking_ids': complaint_booking_ids},
+    )

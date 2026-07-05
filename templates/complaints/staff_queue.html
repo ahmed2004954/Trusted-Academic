@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}إدارة الشكاوى - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>إدارة الشكاوى</h1>
+    {% if complaints %}
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>رقم الشكوى</th>
+                        <th>الحجز</th>
+                        <th>مقدم الشكوى</th>
+                        <th>ضد</th>
+                        <th>التصنيف</th>
+                        <th>الحالة</th>
+                        <th>تاريخ الإنشاء</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for complaint in complaints %}
+                        <tr>
+                            <td>#{{ complaint.pk }}</td>
+                            <td>#{{ complaint.booking.pk }}</td>
+                            <td>{{ complaint.created_by.get_full_name }}</td>
+                            <td>{{ complaint.against_user.get_full_name }}</td>
+                            <td>{{ complaint.get_category_display }}</td>
+                            <td>{{ complaint.get_status_display }}</td>
+                            <td>{{ complaint.created_at|date:'Y-m-d H:i' }}</td>
+                            <td><a class="btn btn-primary" href="{% url 'complaints:staff_detail' complaint.pk %}">معالجة</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="empty-state compact">لا توجد شكاوى.</p>
+    {% endif %}
+</section>
+{% endblock %}

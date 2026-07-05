@@ -421,17 +421,17 @@
 **Goal:**Allow students/parents to submit complaints and admins to resolve them.
 
 ### Tasks
-- [ ] Create `Complaint` model:
+- [x] Create `Complaint` model:
   - booking, created_by, against_user_id, category, description
   - status, resolution_notes, created_at, updated_at
-- [ ] Complaint categories: teacher absence, behavior, quality, content violation
-- [ ] Complaint statuses: open, under_review, resolved, rejected
-- [ ] Build complaint submission form
-- [ ] Build admin complaints list and detail view
-- [ ] Admin can update status and add resolution notes
-- [ ] Link complaints to booking detail
-- [ ] Log admin actions on complaints
-- [ ] Notify parties on complaint updates
+- [x] Complaint categories: teacher absence, behavior, quality, content violation
+- [x] Complaint statuses: open, under_review, resolved, rejected
+- [x] Build complaint submission form
+- [x] Build admin complaints list and detail view
+- [x] Admin can update status and add resolution notes
+- [x] Link complaints to booking detail
+- [x] Log admin actions on complaints (status, resolved_by, resolved_at, notes)
+- [x] Notify parties on complaint updates
 
 **Deliverables:**
 - Complaint submission flow

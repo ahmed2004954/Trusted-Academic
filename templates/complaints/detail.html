@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}تفاصيل الشكوى - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>تفاصيل الشكوى #{{ complaint.pk }}</h1>
+    <div class="status-card">
+        <p><strong>الحجز:</strong> #{{ complaint.booking.pk }}</p>
+        <p><strong>مقدم الشكوى:</strong> {{ complaint.created_by.get_full_name }}</p>
+        <p><strong>ضد:</strong> {{ complaint.against_user.get_full_name }}</p>
+        <p><strong>التصنيف:</strong> {{ complaint.get_category_display }}</p>
+        <p><strong>الحالة:</strong> {{ complaint.get_status_display }}</p>
+        <p><strong>تاريخ الإنشاء:</strong> {{ complaint.created_at|date:'Y-m-d H:i' }}</p>
+        {% if complaint.resolved_at %}
+            <p><strong>تاريخ الإغلاق:</strong> {{ complaint.resolved_at|date:'Y-m-d H:i' }}</p>
+        {% endif %}
+    </div>
+    <div class="status-card">
+        <h2>الوصف</h2>
+        <p>{{ complaint.description|linebreaksbr }}</p>
+    </div>
+    {% if complaint.resolution_notes %}
+        <div class="status-card">
+            <h2>ملاحظات المعالجة</h2>
+            <p>{{ complaint.resolution_notes|linebreaksbr }}</p>
+        </div>
+    {% endif %}
+    <a class="btn btn-secondary" href="{% url 'complaints:list' %}">رجوع للشكاوى</a>
+</section>
+{% endblock %}

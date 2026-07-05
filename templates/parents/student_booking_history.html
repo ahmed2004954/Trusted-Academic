@@ -13,6 +13,9 @@
             <p><strong>الموعد:</strong> {{ booking.scheduled_start|date:'Y-m-d H:i' }}</p>
             <p><strong>الحالة:</strong> {{ booking.get_booking_status_display }}</p>
             <a class="btn btn-secondary" href="{% url 'messaging:booking_thread' booking.pk %}">رسائل الحجز</a>
+            {% if booking.pk in complaint_booking_ids %}
+                <a class="btn btn-primary" href="{% url 'complaints:create' booking.pk %}">فتح شكوى</a>
+            {% endif %}
             {% if booking.report %}
                 <a class="btn btn-primary" href="{% url 'reports:detail' booking.report.pk %}">عرض التقرير</a>
             {% endif %}
