@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}حالة اعتماد المدرس - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content dashboard">
+    <h1>حالة اعتماد البروفايل</h1>
+
+    <div class="status-card status-{{ profile.approval_status }}">
+        <h2>{{ profile.get_approval_status_display }}</h2>
+        {% if profile.approval_status == 'pending' %}
+            <p>طلبك قيد المراجعة. يمكنك تحديث بياناتك أو إضافة شهادات أثناء الانتظار.</p>
+        {% elif profile.approval_status == 'approved' %}
+            <p>تم اعتماد بروفايلك. ستظهر في البحث العام عند بناء Sprint 4.</p>
+        {% else %}
+            <p>لا يمكن عرض بروفايلك للعامة حالياً. راجع ملاحظات الإدارة وحدّث بياناتك عند الحاجة.</p>
+        {% endif %}
+
+        {% if profile.verification_notes %}
+            <p><strong>ملاحظات الإدارة:</strong> {{ profile.verification_notes }}</p>
+        {% endif %}
+    </div>
+
+    <a class="btn btn-primary" href="{% url 'teachers:setup_profile' %}">تحديث البروفايل</a>
+    <a class="btn" href="{% url 'teachers:upload_certificate' %}">إضافة شهادة</a>
+    <a class="btn" href="{% url 'teachers:dashboard' %}">العودة للوحة المدرس</a>
+</section>
+{% endblock %}

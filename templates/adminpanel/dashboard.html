@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}لوحة الإدارة - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content dashboard">
+    <h1>لوحة الإدارة</h1>
+    <p>مرحباً بك في لوحة الإدارة. من هنا يمكنك مراجعة المدرسين والحجوزات والمدفوعات.</p>
+    <p><a href="{% url 'adminpanel:pending_teachers' %}">طلبات المدرسين قيد المراجعة ({{ pending_count }})</a></p>
+    <p><a href="{% url 'admin:index' %}">الدخول إلى Django Admin</a></p>
+</section>
+{% endblock %}

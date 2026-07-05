@@ -1,0 +1,20 @@
+{
+  "providers": {
+    "ollama": {
+      "baseUrl": "https://api.bluesminds.com/v1",
+      "api": "openai-completions",
+      "apiKey": "sk-buHfWR2WkpHKqlbSp7ztLmJh7bxSP14zkVWEsMKF8H3yPgX4",
+      "models": [
+        {
+          "id": "gpt-5.5",
+          "name": "gpt-5.5",
+          "reasoning": true,
+          "input": ["text"],
+          "contextWindow": 128000,
+          "maxTokens": 32000,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}طلبات المدرسين - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content dashboard">
+    <h1>طلبات المدرسين قيد المراجعة</h1>
+
+    {% if profiles %}
+        <ul class="item-list">
+            {% for profile in profiles %}
+                <li>
+                    <strong>{{ profile.user.get_full_name }}</strong>
+                    <span>{{ profile.user.email }}</span>
+                    <span>{{ profile.headline|default:'لم يتم إدخال عنوان مختصر' }}</span>
+                    <a class="btn btn-primary" href="{% url 'adminpanel:review_teacher' profile.pk %}">مراجعة</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>لا توجد طلبات مدرسين قيد المراجعة حالياً.</p>
+    {% endif %}
+
+    <a class="btn" href="{% url 'adminpanel:dashboard' %}">العودة للوحة الإدارة</a>
+</section>
+{% endblock %}

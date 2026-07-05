@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}شهادات المدرس - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content auth-form">
+    <h1>إضافة شهادة</h1>
+    <p>ارفع الشهادات أو المستندات التي تدعم خبرتك التعليمية.</p>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary" type="submit">رفع الشهادة</button>
+        <a class="btn" href="{% url 'teachers:dashboard' %}">العودة للوحة المدرس</a>
+    </form>
+
+    <h2>الشهادات المرفوعة</h2>
+    {% if certificates %}
+        <ul class="item-list">
+            {% for certificate in certificates %}
+                <li>
+                    <strong>{{ certificate.title }}</strong>
+                    <span>{{ certificate.issuing_organization }}</span>
+                    <a href="{{ certificate.file.url }}">عرض الملف</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>لم تقم برفع أي شهادات بعد.</p>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}تسجيل الدخول - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="auth-form page-content">
+    <h1>تسجيل الدخول</h1>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">دخول</button>
+    </form>
+    <p>ليس لديك حساب؟ <a href="{% url 'accounts:register' %}">إنشاء حساب جديد</a></p>
+</section>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}إنشاء حساب - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="auth-form page-content">
+    <h1>إنشاء حساب جديد</h1>
+    {% if role %}
+        <p>التسجيل كـ {% if role == 'student' %}طالب{% elif role == 'teacher' %}مدرس{% elif role == 'parent' %}ولي أمر{% endif %}</p>
+    {% endif %}
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">إنشاء الحساب</button>
+    </form>
+    <p>لديك حساب بالفعل؟ <a href="{% url 'accounts:login' %}">تسجيل الدخول</a></p>
+</section>
+{% endblock %}

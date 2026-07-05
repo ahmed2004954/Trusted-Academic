@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}الملف الشخصي - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>الملف الشخصي</h1>
+    <p><strong>الاسم:</strong> {{ user.full_name }}</p>
+    <p><strong>البريد الإلكتروني:</strong> {{ user.email }}</p>
+    <p><strong>رقم الهاتف:</strong> {{ user.phone|default:"غير متوفر" }}</p>
+    <p><strong>نوع الحساب:</strong> {{ user.get_role_display }}</p>
+</section>
+{% endblock %}

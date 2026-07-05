@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}لوحة المدرس - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content dashboard">
+    <h1>لوحة المدرس</h1>
+    <p>مرحباً بك في حساب المدرس. من هنا يمكنك تجهيز بروفايلك ومتابعة حالة المراجعة.</p>
+
+    {% if profile %}
+        <div class="status-card status-{{ profile.approval_status }}">
+            <h2>حالة الاعتماد: {{ profile.get_approval_status_display }}</h2>
+            {% if profile.verification_notes %}
+                <p><strong>ملاحظات الإدارة:</strong> {{ profile.verification_notes }}</p>
+            {% endif %}
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <h3>اكتمال البروفايل</h3>
+                {% if profile.is_complete %}
+                    <p>بياناتك الأساسية مكتملة وجاهزة للمراجعة.</p>
+                {% else %}
+                    <p>أكمل العنوان المختصر، النبذة، وملف السيرة الذاتية لتحسين فرصة قبولك.</p>
+                {% endif %}
+                <a class="btn btn-primary" href="{% url 'teachers:setup_profile' %}">تحديث البروفايل</a>
+            </div>
+            <div class="dashboard-card">
+                <h3>الشهادات</h3>
+                <p>أضف شهاداتك وخبراتك لدعم طلب الاعتماد.</p>
+                <a class="btn btn-primary" href="{% url 'teachers:upload_certificate' %}">إضافة شهادة</a>
+            </div>
+            <div class="dashboard-card">
+                <h3>حالة المراجعة</h3>
+                <p>تابع قرار الإدارة وملاحظات التحقق من هنا.</p>
+                <a class="btn btn-primary" href="{% url 'teachers:my_status' %}">عرض الحالة</a>
+            </div>
+            <div class="dashboard-card">
+                <h3>الإتاحة والأسعار</h3>
+                {% if profile.can_receive_bookings %}
+                    <p>ستتمكن قريباً من إدارة المواعيد والأسعار في Sprint 3.</p>
+                {% else %}
+                    <p>ستتاح إدارة المواعيد والأسعار بعد اعتماد حسابك وفي Sprint 3.</p>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="status-card status-pending">
+            <h2>لم يتم إنشاء بروفايل المدرس بعد</h2>
+            <p>ابدأ بإكمال بياناتك الأساسية ليدخل طلبك إلى المراجعة.</p>
+            <a class="btn btn-primary" href="{% url 'teachers:setup_profile' %}">إعداد البروفايل</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

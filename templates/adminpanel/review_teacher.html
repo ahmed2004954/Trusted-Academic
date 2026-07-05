@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}مراجعة مدرس - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content dashboard">
+    <h1>مراجعة المدرس: {{ profile.user.get_full_name }}</h1>
+
+    <div class="dashboard-grid">
+        <div class="dashboard-card">
+            <h2>بيانات المدرس</h2>
+            <p><strong>البريد:</strong> {{ profile.user.email }}</p>
+            <p><strong>الهاتف:</strong> {{ profile.user.phone|default:'غير متاح' }}</p>
+            <p><strong>العنوان:</strong> {{ profile.headline|default:'غير مكتمل' }}</p>
+            <p><strong>سنوات الخبرة:</strong> {{ profile.experience_years }}</p>
+            <p><strong>الحالة الحالية:</strong> {{ profile.get_approval_status_display }}</p>
+        </div>
+        <div class="dashboard-card">
+            <h2>المستندات</h2>
+            {% if profile.photo %}<p><a href="{{ profile.photo.url }}">عرض الصورة</a></p>{% endif %}
+            {% if profile.cv_file %}<p><a href="{{ profile.cv_file.url }}">عرض السيرة الذاتية</a></p>{% endif %}
+            {% if profile.intro_video_url %}<p><a href="{{ profile.intro_video_url }}">فيديو التعريف</a></p>{% endif %}
+            {% if not profile.photo and not profile.cv_file and not profile.intro_video_url %}
+                <p>لا توجد مستندات أساسية مرفوعة.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="dashboard-card">
+        <h2>النبذة</h2>
+        <p>{{ profile.bio|linebreaksbr|default:'لم يتم إدخال نبذة.' }}</p>
+    </div>
+
+    <div class="dashboard-card">
+        <h2>الشهادات</h2>
+        {% if profile.certificates.all %}
+            <ul class="item-list">
+                {% for certificate in profile.certificates.all %}
+                    <li>
+                        <strong>{{ certificate.title }}</strong>
+                        <span>{{ certificate.issuing_organization }}</span>
+                        <a href="{{ certificate.file.url }}">عرض الملف</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>لا توجد شهادات مرفوعة.</p>
+        {% endif %}
+    </div>
+
+    <form method="post" class="review-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary" type="submit">حفظ قرار المراجعة</button>
+        <a class="btn" href="{% url 'adminpanel:pending_teachers' %}">العودة للطلبات</a>
+    </form>
+</section>
+{% endblock %}
