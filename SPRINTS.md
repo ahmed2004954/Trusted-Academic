@@ -291,18 +291,18 @@
 **Goal:** Track teacher earnings and allow withdrawal requests.
 
 ### Tasks
-- [ ] Create `Wallet` model:
+- [x] Create `Wallet` model:
   - teacher, available_balance, pending_balance, total_earned
-- [ ] Create `WithdrawalRequest` model:
+- [x] Create `WithdrawalRequest` model:
   - teacher, amount, payment_method, payment_details
   - status, requested_at, processed_at, processed_by, notes
-- [ ] On booking creation: add to pending_balance
-- [ ] On lesson completion: move from pending to available
-- [ ] Build teacher wallet dashboard
-- [ ] Build withdrawal request form (with minimum threshold)
-- [ ] Build admin withdrawal processing view
-- [ ] Deduct available balance on approved withdrawal
-- [ ] Send email on withdrawal status changes
+- [x] On booking creation: add to pending_balance (implemented on payment approval to match paid bookings)
+- [ ] On lesson completion: move from pending to available (deferred to Sprint 8)
+- [x] Build teacher wallet dashboard
+- [x] Build withdrawal request form (with minimum threshold)
+- [x] Build admin withdrawal processing view
+- [x] Deduct available balance on approved withdrawal
+- [x] Send email on withdrawal status changes
 
 **Deliverables:**
 - Wallet tracking

@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from .models import Payment
+from .models import Payment, WithdrawalRequest
 
 
 class PaymentReceiptForm(forms.ModelForm):
@@ -27,5 +27,29 @@ class PaymentReceiptForm(forms.ModelForm):
 class PaymentRejectionForm(forms.Form):
     rejection_reason = forms.CharField(
         label=_('Rejection reason'),
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+    )
+
+
+class WithdrawalRequestForm(forms.ModelForm):
+    class Meta:
+        model = WithdrawalRequest
+        fields = ['amount', 'payment_method', 'payment_details']
+        widgets = {
+            'amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+            'payment_method': forms.TextInput(attrs={'class': 'form-control'}),
+            'payment_details': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+        }
+        labels = {
+            'amount': _('Amount'),
+            'payment_method': _('Payment method'),
+            'payment_details': _('Payment details'),
+        }
+
+
+class WithdrawalActionForm(forms.Form):
+    notes = forms.CharField(
+        label=_('Notes'),
+        required=False,
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
     )

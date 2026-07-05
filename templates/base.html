@@ -25,8 +25,12 @@
                     {% if user.role == 'student' %}
                         <a href="{% url 'payments:history' %}">سجل المدفوعات</a>
                     {% endif %}
+                    {% if user.role == 'teacher' %}
+                        <a href="{% url 'payments:wallet' %}">محفظتي</a>
+                    {% endif %}
                     {% if user.is_staff %}
                         <a href="{% url 'payments:admin_pending' %}">مراجعة المدفوعات</a>
+                        <a href="{% url 'payments:admin_withdrawal_queue' %}">طلبات السحب</a>
                     {% endif %}
                     <a href="{% url 'accounts:profile' %}">مرحباً، {{ user.get_full_name|default:user.email }}</a>
                     <form method="post" action="{% url 'accounts:logout' %}">

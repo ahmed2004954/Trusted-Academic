@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}طلبات السحب - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>طلبات السحب</h1>
+    {% if withdrawals %}
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>المدرس</th>
+                        <th>المبلغ</th>
+                        <th>طريقة الدفع</th>
+                        <th>الحالة</th>
+                        <th>تاريخ الطلب</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for withdrawal in withdrawals %}
+                        <tr>
+                            <td>{{ withdrawal.teacher.user.get_full_name }}</td>
+                            <td>{{ withdrawal.amount }} EGP</td>
+                            <td>{{ withdrawal.payment_method }}</td>
+                            <td>{{ withdrawal.get_status_display }}</td>
+                            <td>{{ withdrawal.requested_at|date:'Y-m-d H:i' }}</td>
+                            <td><a class="btn btn-primary" href="{% url 'payments:admin_withdrawal_detail' withdrawal.pk %}">مراجعة</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="empty-state compact">لا توجد طلبات سحب.</p>
+    {% endif %}
+</section>
+{% endblock %}

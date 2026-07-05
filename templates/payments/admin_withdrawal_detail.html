@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}تفاصيل طلب السحب - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>تفاصيل طلب السحب</h1>
+    <div class="status-card">
+        <p><strong>المدرس:</strong> {{ withdrawal.teacher.user.get_full_name }} ({{ withdrawal.teacher.user.email }})</p>
+        <p><strong>المبلغ:</strong> {{ withdrawal.amount }} EGP</p>
+        <p><strong>طريقة الدفع:</strong> {{ withdrawal.payment_method }}</p>
+        <p><strong>تفاصيل الدفع:</strong> {{ withdrawal.payment_details|linebreaksbr }}</p>
+        <p><strong>الحالة:</strong> {{ withdrawal.get_status_display }}</p>
+        <p><strong>الرصيد المتاح الحالي:</strong> {{ wallet.available_balance }} EGP</p>
+        <p><strong>تم حجز الرصيد:</strong> {% if withdrawal.balance_deducted_at %}نعم{% else %}لا{% endif %}</p>
+        {% if withdrawal.notes %}
+            <p><strong>ملاحظات:</strong> {{ withdrawal.notes }}</p>
+        {% endif %}
+    </div>
+
+    <form method="post" class="form-card">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" formaction="{% url 'payments:admin_withdrawal_action' withdrawal.pk 'approve' %}" class="btn btn-primary">اعتماد وحجز الرصيد</button>
+        <button type="submit" formaction="{% url 'payments:admin_withdrawal_action' withdrawal.pk 'complete' %}" class="btn btn-primary">تعليم كمكتمل</button>
+        <button type="submit" formaction="{% url 'payments:admin_withdrawal_action' withdrawal.pk 'reject' %}" class="btn btn-secondary">رفض</button>
+    </form>
+
+    <a class="btn btn-secondary" href="{% url 'payments:admin_withdrawal_queue' %}">رجوع لقائمة السحب</a>
+</section>
+{% endblock %}

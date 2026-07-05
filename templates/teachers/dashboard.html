@@ -46,6 +46,11 @@
                 <p>راجع طلبات الحجز القادمة واقبل أو ارفض الطلبات اليدوية.</p>
                 <a class="btn btn-primary" href="{% url 'bookings:teacher_list' %}">إدارة الحجوزات</a>
             </div>
+            <div class="dashboard-card">
+                <h3>المحفظة والسحب</h3>
+                <p>تابع الرصيد المتاح والمعلق وأرسل طلبات السحب.</p>
+                <a class="btn btn-primary" href="{% url 'payments:wallet' %}">عرض المحفظة</a>
+            </div>
         </div>
     {% else %}
         <div class="status-card status-pending">
