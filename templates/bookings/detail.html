@@ -28,6 +28,12 @@
         {% endif %}
     </div>
 
+    <div class="status-card">
+        <h2>رسائل الحجز</h2>
+        <p>تواصل مع أطراف الحجز وارفق ملفات عند الحاجة.</p>
+        <a class="btn btn-primary" href="{% url 'messaging:booking_thread' booking.pk %}">فتح المحادثة</a>
+    </div>
+
     {% if not is_teacher_view %}
         {% if booking.booking_status == 'pending_payment' or booking.booking_status == 'awaiting_student_payment' %}
             <div class="status-card">

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}محادثة الحجز - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>محادثة الحجز</h1>
+    {% if thread.booking %}
+        <div class="status-card">
+            <p><strong>الحجز:</strong> #{{ thread.booking.pk }}</p>
+            <p><strong>الطالب:</strong> {{ thread.booking.student.get_full_name }}</p>
+            <p><strong>المدرس:</strong> {{ thread.booking.teacher.user.get_full_name }}</p>
+            <p><strong>المادة:</strong> {{ thread.booking.subject.name }} - {{ thread.booking.grade_level.name }}</p>
+            <p><strong>الموعد:</strong> {{ thread.booking.scheduled_start|date:'Y-m-d H:i' }}</p>
+        </div>
+    {% endif %}
+
+    <div class="message-thread">
+        {% for message in thread_messages %}
+            <article class="status-card {% if message.sender == user %}message-own{% endif %}">
+                <p><strong>{{ message.sender.get_full_name|default:message.sender.email }}</strong> - {{ message.created_at|date:'Y-m-d H:i' }}</p>
+                {% if message.body %}<p>{{ message.body|linebreaksbr }}</p>{% endif %}
+                {% if message.attachment %}
+                    <p><a href="{{ message.attachment.url }}">تحميل المرفق</a></p>
+                {% endif %}
+            </article>
+        {% empty %}
+            <p class="empty-state compact">لا توجد رسائل بعد.</p>
+        {% endfor %}
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="form-card">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">إرسال</button>
+        <a class="btn btn-secondary" href="{% url 'messaging:inbox' %}">رجوع للرسائل</a>
+    </form>
+</section>
+{% endblock %}

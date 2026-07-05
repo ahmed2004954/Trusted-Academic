@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}الرسائل - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>الرسائل</h1>
+    {% if threads %}
+        <div class="thread-list">
+            {% for thread in threads %}
+                <div class="status-card">
+                    {% if thread.booking %}
+                        <h2>حجز #{{ thread.booking.pk }} - {{ thread.booking.subject.name }} {{ thread.booking.grade_level.name }}</h2>
+                        <p>{{ thread.booking.student.get_full_name }} مع {{ thread.booking.teacher.user.get_full_name }}</p>
+                        <p>{{ thread.booking.scheduled_start|date:'Y-m-d H:i' }}</p>
+                    {% else %}
+                        <h2>محادثة #{{ thread.pk }}</h2>
+                    {% endif %}
+                    {% if thread.unread_count %}
+                        <p><strong>رسائل غير مقروءة:</strong> {{ thread.unread_count }}</p>
+                    {% endif %}
+                    <a class="btn btn-primary" href="{% url 'messaging:thread_detail' thread.pk %}">فتح المحادثة</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-state compact">لا توجد محادثات بعد. افتح محادثة من تفاصيل الحجز.</p>
+    {% endif %}
+</section>
+{% endblock %}

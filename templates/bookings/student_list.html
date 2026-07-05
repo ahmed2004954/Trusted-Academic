@@ -28,6 +28,7 @@
                             <td>{{ booking.price }}</td>
                             <td>
                                 <a class="btn btn-secondary" href="{% url 'bookings:student_detail' booking.pk %}">تفاصيل</a>
+                                <a class="btn btn-secondary" href="{% url 'messaging:booking_thread' booking.pk %}">الرسائل</a>
                                 {% if booking.booking_status == 'pending_payment' or booking.booking_status == 'awaiting_student_payment' %}
                                     <a class="btn btn-primary" href="{% url 'payments:instructions' booking.pk %}">الدفع</a>
                                 {% endif %}

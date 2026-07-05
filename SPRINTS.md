@@ -391,15 +391,15 @@
 **Goal:** Enable internal messaging between students/parents and teachers.
 
 ### Tasks
-- [ ] Create `MessageThread` model (optional booking link)
-- [ ] Create `Message` model:
+- [x] Create `MessageThread` model (optional booking link)
+- [x] Create `Message` model:
   - thread, sender, body, attachment, created_at, is_read
-- [ ] Build inbox/list view
-- [ ] Build message thread/detail view
-- [ ] Allow file attachments (homework/resources)
-- [ ] Show unread message count
-- [ ] Restrict messaging to linked booking participants
-- [ ] Send email notification on new message (non-realtime)
+- [x] Build inbox/list view
+- [x] Build message thread/detail view
+- [x] Allow file attachments (homework/resources)
+- [x] Show unread message count
+- [x] Restrict messaging to linked booking participants
+- [x] Send email notification on new message (non-realtime)
 
 **Deliverables:**
 - Internal messaging system

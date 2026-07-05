@@ -47,6 +47,11 @@
                 <a class="btn btn-primary" href="{% url 'bookings:teacher_list' %}">إدارة الحجوزات</a>
             </div>
             <div class="dashboard-card">
+                <h3>الرسائل</h3>
+                <p>تابع محادثات الحجوزات والملفات المرفقة من الطلاب وأولياء الأمور.</p>
+                <a class="btn btn-primary" href="{% url 'messaging:inbox' %}">صندوق الرسائل{% if messaging_unread_count %} ({{ messaging_unread_count }}){% endif %}</a>
+            </div>
+            <div class="dashboard-card">
                 <h3>المحفظة والسحب</h3>
                 <p>تابع الرصيد المتاح والمعلق وأرسل طلبات السحب.</p>
                 <a class="btn btn-primary" href="{% url 'payments:wallet' %}">عرض المحفظة</a>

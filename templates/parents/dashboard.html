@@ -8,6 +8,7 @@
     <p>مرحباً بك في حساب ولي الأمر. من هنا يمكنك متابعة أبنائك وحجوزاتهم.</p>
     <a class="btn btn-primary" href="{% url 'parents:create_student' %}">إنشاء حساب طالب مُدار</a>
     <a class="btn btn-secondary" href="{% url 'parents:link_student' %}">ربط طالب موجود</a>
+    <a class="btn btn-secondary" href="{% url 'messaging:inbox' %}">الرسائل{% if messaging_unread_count %} ({{ messaging_unread_count }}){% endif %}</a>
 
     <div class="dashboard-grid">
         <div class="dashboard-card">
