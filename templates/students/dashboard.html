@@ -7,5 +7,13 @@
     <h1>لوحة الطالب</h1>
     <p>مرحباً بك في حساب الطالب. من هنا يمكنك إدارة حجوزاتك وتقييم المدرسين.</p>
     <a class="btn btn-primary" href="{% url 'bookings:student_list' %}">عرض حجوزاتي</a>
+    <a class="btn btn-secondary" href="{% url 'students:linking_code' %}">كود ربط ولي الأمر</a>
+
+    {% if profile.grade_level or profile.school_name %}
+        <div class="status-card">
+            {% if profile.grade_level %}<p><strong>الصف:</strong> {{ profile.grade_level.name }}</p>{% endif %}
+            {% if profile.school_name %}<p><strong>المدرسة:</strong> {{ profile.school_name }}</p>{% endif %}
+        </div>
+    {% endif %}
 </section>
 {% endblock %}

@@ -25,10 +25,11 @@ class BookingCreateForm(forms.Form):
         widget=forms.Select(attrs={'class': 'form-control'}),
     )
 
-    def __init__(self, *args, teacher=None, student=None, initial_offering=None, **kwargs):
+    def __init__(self, *args, teacher=None, student=None, parent=None, initial_offering=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.teacher = teacher
         self.student = student
+        self.parent = parent
         offerings = TeacherSubject.objects.filter(is_active=True).select_related('subject', 'grade_level', 'teacher_profile')
         if teacher:
             offerings = offerings.filter(teacher_profile=teacher)
@@ -57,4 +58,5 @@ class BookingCreateForm(forms.Form):
             teacher_subject=self.cleaned_data['teacher_subject'],
             scheduled_start=self.cleaned_data['scheduled_start'],
             duration_minutes=self.cleaned_data['duration_minutes'],
+            parent=self.parent,
         )

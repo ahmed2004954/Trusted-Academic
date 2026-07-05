@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}تقرير الحصة - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>تقرير الحصة</h1>
+    <div class="status-card">
+        <p><strong>الطالب:</strong> {{ report.student.get_full_name }}</p>
+        <p><strong>المدرس:</strong> {{ report.teacher.user.get_full_name }}</p>
+        <p><strong>تاريخ التقرير:</strong> {{ report.created_at|date:'Y-m-d H:i' }}</p>
+        <p><strong>المادة:</strong> {{ report.booking.subject.name }} - {{ report.booking.grade_level.name }}</p>
+    </div>
+    <div class="status-card">
+        <h2>ملخص الحصة</h2>
+        <p>{{ report.summary|linebreaksbr }}</p>
+        {% if report.strengths %}<h3>نقاط القوة</h3><p>{{ report.strengths|linebreaksbr }}</p>{% endif %}
+        {% if report.weaknesses %}<h3>نقاط تحتاج لتحسين</h3><p>{{ report.weaknesses|linebreaksbr }}</p>{% endif %}
+        {% if report.homework %}<h3>الواجب</h3><p>{{ report.homework|linebreaksbr }}</p>{% endif %}
+        {% if report.next_steps %}<h3>الخطوات القادمة</h3><p>{{ report.next_steps|linebreaksbr }}</p>{% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -74,6 +74,17 @@
         </form>
     {% endif %}
 
+    {% if is_teacher_view and booking.booking_status == 'completed' %}
+        <div class="status-card">
+            <h2>تقرير ما بعد الحصة</h2>
+            {% if booking.report %}
+                <a class="btn btn-primary" href="{% url 'reports:detail' booking.report.pk %}">عرض التقرير</a>
+            {% else %}
+                <a class="btn btn-primary" href="{% url 'reports:create' booking.pk %}">إنشاء تقرير</a>
+            {% endif %}
+        </div>
+    {% endif %}
+
     {% if is_teacher_view %}
         <a class="btn btn-secondary" href="{% url 'bookings:teacher_list' %}">رجوع للحجوزات</a>
     {% else %}

@@ -25,6 +25,9 @@
                     {% if user.role == 'student' %}
                         <a href="{% url 'payments:history' %}">سجل المدفوعات</a>
                     {% endif %}
+                    {% if user.role == 'parent' %}
+                        <a href="{% url 'parents:dashboard' %}">لوحة ولي الأمر</a>
+                    {% endif %}
                     {% if user.role == 'teacher' %}
                         <a href="{% url 'payments:wallet' %}">محفظتي</a>
                     {% endif %}

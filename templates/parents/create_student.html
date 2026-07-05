@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}إنشاء حساب طالب - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>إنشاء حساب طالب مُدار</h1>
+    <form method="post" class="form-card">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">إنشاء وربط الطالب</button>
+        <a class="btn btn-secondary" href="{% url 'parents:dashboard' %}">رجوع</a>
+    </form>
+</section>
+{% endblock %}

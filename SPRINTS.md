@@ -357,19 +357,19 @@
 **Goal:** Allow parents to manage students and receive lesson reports.
 
 ### Tasks
-- [ ] Create parent dashboard
-- [ ] Parent can create managed student account
-- [ ] Student can generate linking code
-- [ ] Parent can link to existing student via code
-- [ ] Parent booking/payment on behalf of linked student
-- [ ] Parent can view linked student booking history
-- [ ] Parent cannot access unrelated students
-- [ ] Create `Report` model:
+- [x] Create parent dashboard
+- [x] Parent can create managed student account
+- [x] Student can generate linking code
+- [x] Parent can link to existing student via code
+- [x] Parent booking/payment on behalf of linked student
+- [x] Parent can view linked student booking history
+- [x] Parent cannot access unrelated students
+- [x] Create `Report` model:
   - booking, teacher, student, summary, strengths, weaknesses
   - homework, next_steps, sent_to_parent_email
-- [ ] Teacher can write post-lesson report
-- [ ] Send report to parent email
-- [ ] Parent can view reports in dashboard
+- [x] Teacher can write post-lesson report
+- [x] Send report to parent email
+- [x] Parent can view reports in dashboard
 
 **Deliverables:**
 - Parent linkage flow (create + link)

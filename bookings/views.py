@@ -4,6 +4,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
 
+from parents.models import ParentStudentLink
 from teachers.models import TeacherProfile, TeacherSubject
 
 from .forms import BookingCreateForm
@@ -23,6 +24,15 @@ def teacher_required(view_func):
     @login_required
     def wrapper(request, *args, **kwargs):
         if request.user.role != 'teacher':
+            raise PermissionDenied
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+def parent_required(view_func):
+    @login_required
+    def wrapper(request, *args, **kwargs):
+        if request.user.role != 'parent':
             raise PermissionDenied
         return view_func(request, *args, **kwargs)
     return wrapper
@@ -56,6 +66,37 @@ def booking_create(request, teacher_pk):
         form = BookingCreateForm(teacher=teacher, student=request.user, initial_offering=initial_offering)
 
     return render(request, 'bookings/create.html', {'form': form, 'teacher': teacher})
+
+
+@parent_required
+def parent_booking_create(request, teacher_pk, student_pk):
+    link = get_object_or_404(ParentStudentLink.objects.select_related('student'), parent__user=request.user, student_id=student_pk)
+    teacher = get_object_or_404(
+        TeacherProfile.objects.select_related('user').prefetch_related('subjects__subject', 'subjects__grade_level'),
+        pk=teacher_pk,
+    )
+    if not teacher.can_receive_bookings:
+        raise PermissionDenied
+
+    initial_offering = None
+    offering_id = request.GET.get('offering')
+    if offering_id and offering_id.isdigit():
+        initial_offering = TeacherSubject.objects.filter(pk=offering_id, teacher_profile=teacher, is_active=True).first()
+
+    if request.method == 'POST':
+        form = BookingCreateForm(request.POST, teacher=teacher, student=link.student, parent=request.user)
+        if form.is_valid():
+            try:
+                booking = form.save()
+            except ValidationError as exc:
+                form.add_error(None, exc)
+            else:
+                messages.success(request, _('Booking request created for linked student.'))
+                return redirect('parents:student_booking_history', student_pk=link.student_id)
+    else:
+        form = BookingCreateForm(teacher=teacher, student=link.student, parent=request.user, initial_offering=initial_offering)
+
+    return render(request, 'bookings/create.html', {'form': form, 'teacher': teacher, 'parent_student': link.student})
 
 
 @student_required

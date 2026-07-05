@@ -19,7 +19,7 @@ def calculate_booking_amounts(teacher_subject: TeacherSubject) -> tuple[Decimal,
 
 
 @transaction.atomic
-def create_booking(*, student, teacher_subject: TeacherSubject, scheduled_start, duration_minutes: int) -> Booking:
+def create_booking(*, student, teacher_subject: TeacherSubject, scheduled_start, duration_minutes: int, parent=None) -> Booking:
     teacher = teacher_subject.teacher_profile
     if not teacher.can_receive_bookings:
         raise ValidationError({'teacher': 'This teacher cannot receive bookings yet.'})
@@ -48,6 +48,7 @@ def create_booking(*, student, teacher_subject: TeacherSubject, scheduled_start,
         teacher_payout=teacher_payout,
         booking_status=booking_status,
         booking_mode=booking_mode,
+        parent=parent,
     )
     booking.save()
     return booking

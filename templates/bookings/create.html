@@ -5,6 +5,9 @@
 {% block content %}
 <section class="page-content">
     <h1>إنشاء حجز مع {{ teacher.user.get_full_name }}</h1>
+    {% if parent_student %}
+        <p class="muted">سيتم إنشاء الحجز للطالب: {{ parent_student.get_full_name }}</p>
+    {% endif %}
     <p class="muted">اختر العرض والوقت المناسب. سيتم تحديد حالة الحجز حسب طريقة قبول المدرس للحجوزات.</p>
 
     <form method="post" class="form-card">

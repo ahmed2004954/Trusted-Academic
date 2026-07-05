@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}ربط طالب موجود - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>ربط طالب موجود</h1>
+    <p>أدخل كود الربط الذي يظهر في لوحة الطالب.</p>
+    <form method="post" class="form-card">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">ربط الطالب</button>
+        <a class="btn btn-secondary" href="{% url 'parents:dashboard' %}">رجوع</a>
+    </form>
+</section>
+{% endblock %}
