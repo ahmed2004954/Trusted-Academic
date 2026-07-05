@@ -254,21 +254,21 @@
 **Goal:** Handle local manual payment, admin receipt verification, and booking confirmation notifications.
 
 ### Tasks
-- [ ] Create `Payment` model:
+- [x] Create `Payment` model:
   - booking, amount, currency, payment_method
   - payment_status, receipt_image, transaction_reference
   - verified_by, verified_at, paid_at, refunded_at
-- [ ] Payment methods: vodafone_cash, instapay, ewallet
-- [ ] Payment statuses: pending, awaiting_verification, paid, failed, refunded, partially_refunded
-- [ ] Build payment instructions view (account/wallet numbers)
-- [ ] Build receipt upload view
-- [ ] Build admin payment verification view (approve/reject)
-- [ ] Update booking status on payment verification
-- [ ] Send confirmation email after payment approval
-- [ ] Send payment rejection email with reason
-- [ ] Create platform commission settings (default 15%)
-- [ ] Prevent booking confirmation before successful payment
-- [ ] Add payment history for student/parent
+- [x] Payment methods: vodafone_cash, instapay, ewallet
+- [x] Payment statuses: pending, awaiting_verification, paid, failed, refunded, partially_refunded
+- [x] Build payment instructions view (account/wallet numbers)
+- [x] Build receipt upload view
+- [x] Build admin payment verification view (approve/reject)
+- [x] Update booking status on payment verification
+- [x] Send confirmation email after payment approval
+- [x] Send payment rejection email with reason
+- [x] Create platform commission settings (default 15%)
+- [x] Prevent booking confirmation before successful payment
+- [x] Add payment history for student/parent
 
 **Deliverables:**
 - Manual payment flow

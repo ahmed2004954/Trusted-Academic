@@ -195,6 +195,15 @@ TEACHER_WITHDRAWAL_MINIMUM_THRESHOLD = float(os.getenv('TEACHER_WITHDRAWAL_MINIM
 PLATFORM_MAX_GROUP_SIZE = int(os.getenv('PLATFORM_MAX_GROUP_SIZE', '10'))
 
 
+# Manual payment settings
+MANUAL_PAYMENT_VODAFONE_CASH_NUMBER = os.getenv('MANUAL_PAYMENT_VODAFONE_CASH_NUMBER', '+20 100 000 0000')
+MANUAL_PAYMENT_INSTAPAY_HANDLE = os.getenv('MANUAL_PAYMENT_INSTAPAY_HANDLE', 'tutorsmarketplace@instapay')
+MANUAL_PAYMENT_EWALLET_INSTRUCTIONS = os.getenv(
+    'MANUAL_PAYMENT_EWALLET_INSTRUCTIONS',
+    'Transfer the exact booking amount to the listed wallet, then upload a clear receipt image.',
+)
+
+
 # Logging
 LOGS_DIR = BASE_DIR / 'logs'
 LOGS_DIR.mkdir(exist_ok=True)

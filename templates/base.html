@@ -22,6 +22,12 @@
             </ul>
             <div class="nav-auth">
                 {% if user.is_authenticated %}
+                    {% if user.role == 'student' %}
+                        <a href="{% url 'payments:history' %}">سجل المدفوعات</a>
+                    {% endif %}
+                    {% if user.is_staff %}
+                        <a href="{% url 'payments:admin_pending' %}">مراجعة المدفوعات</a>
+                    {% endif %}
                     <a href="{% url 'accounts:profile' %}">مرحباً، {{ user.get_full_name|default:user.email }}</a>
                     <form method="post" action="{% url 'accounts:logout' %}">
                         {% csrf_token %}

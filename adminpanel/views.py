@@ -5,12 +5,18 @@ from django.utils.translation import gettext_lazy as _
 
 from teachers.forms import TeacherReviewForm
 from teachers.models import TeacherProfile
+from payments.models import Payment
 
 
 @staff_member_required
 def dashboard(request):
     pending_count = TeacherProfile.objects.filter(approval_status=TeacherProfile.ApprovalStatus.PENDING).count()
-    return render(request, 'adminpanel/dashboard.html', {'pending_count': pending_count})
+    pending_payment_count = Payment.objects.filter(payment_status=Payment.PaymentStatus.AWAITING_VERIFICATION).count()
+    return render(
+        request,
+        'adminpanel/dashboard.html',
+        {'pending_count': pending_count, 'pending_payment_count': pending_payment_count},
+    )
 
 
 @staff_member_required

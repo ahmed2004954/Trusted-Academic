@@ -26,7 +26,12 @@
                             <td>{{ booking.scheduled_start|date:'Y-m-d H:i' }}</td>
                             <td>{{ booking.get_booking_status_display }}</td>
                             <td>{{ booking.price }}</td>
-                            <td><a class="btn btn-secondary" href="{% url 'bookings:student_detail' booking.pk %}">تفاصيل</a></td>
+                            <td>
+                                <a class="btn btn-secondary" href="{% url 'bookings:student_detail' booking.pk %}">تفاصيل</a>
+                                {% if booking.booking_status == 'pending_payment' or booking.booking_status == 'awaiting_student_payment' %}
+                                    <a class="btn btn-primary" href="{% url 'payments:instructions' booking.pk %}">الدفع</a>
+                                {% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>

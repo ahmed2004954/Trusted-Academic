@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}تعليمات الدفع - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>تعليمات الدفع</h1>
+    <div class="status-card">
+        <p><strong>الحجز:</strong> #{{ booking.pk }}</p>
+        <p><strong>المدرس:</strong> {{ booking.teacher.user.get_full_name }}</p>
+        <p><strong>المادة:</strong> {{ booking.subject.name }} - {{ booking.grade_level.name }}</p>
+        <p><strong>المبلغ المطلوب:</strong> {{ booking.price }} EGP</p>
+    </div>
+
+    <div class="status-card">
+        <h2>بيانات التحويل اليدوي</h2>
+        <p><strong>Vodafone Cash:</strong> {{ manual_payment_details.vodafone_cash_number }}</p>
+        <p><strong>Instapay:</strong> {{ manual_payment_details.instapay_handle }}</p>
+        <p><strong>محفظة إلكترونية:</strong> {{ manual_payment_details.ewallet_instructions }}</p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="form-card">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">رفع الإيصال</button>
+    </form>
+
+    <a class="btn btn-secondary" href="{% url 'bookings:student_detail' booking.pk %}">رجوع للحجز</a>
+</section>
+{% endblock %}

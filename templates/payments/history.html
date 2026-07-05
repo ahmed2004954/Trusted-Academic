@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}سجل المدفوعات - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>سجل المدفوعات</h1>
+    {% if payments %}
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>الحجز</th>
+                        <th>المدرس</th>
+                        <th>المبلغ</th>
+                        <th>طريقة الدفع</th>
+                        <th>الحالة</th>
+                        <th>المرجع</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                        <tr>
+                            <td>#{{ payment.booking.pk }}</td>
+                            <td>{{ payment.booking.teacher.user.get_full_name }}</td>
+                            <td>{{ payment.amount }} {{ payment.currency }}</td>
+                            <td>{{ payment.get_payment_method_display }}</td>
+                            <td>{{ payment.get_payment_status_display }}</td>
+                            <td>{{ payment.transaction_reference|default:'-' }}</td>
+                            <td><a class="btn btn-secondary" href="{% url 'bookings:student_detail' payment.booking.pk %}">تفاصيل الحجز</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="empty-state compact">لا توجد مدفوعات بعد.</p>
+    {% endif %}
+</section>
+{% endblock %}

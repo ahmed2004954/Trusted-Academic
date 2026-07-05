@@ -25,6 +25,16 @@
         {% endif %}
     </div>
 
+    {% if not is_teacher_view %}
+        {% if booking.booking_status == 'pending_payment' or booking.booking_status == 'awaiting_student_payment' %}
+            <div class="status-card">
+                <h2>الدفع مطلوب</h2>
+                <p>يرجى فتح تعليمات الدفع ورفع إيصال التحويل لتأكيد الحجز.</p>
+                <a class="btn btn-primary" href="{% url 'payments:instructions' booking.pk %}">تعليمات الدفع ورفع الإيصال</a>
+            </div>
+        {% endif %}
+    {% endif %}
+
     {% if is_teacher_view and booking.booking_status == 'pending_teacher_acceptance' %}
         <form method="post" action="{% url 'bookings:teacher_action' booking.pk 'accept' %}" class="inline-form">
             {% csrf_token %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}تفاصيل الدفع - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>تفاصيل الدفع</h1>
+    <div class="status-card">
+        <p><strong>الحجز:</strong> #{{ payment.booking.pk }}</p>
+        <p><strong>الطالب:</strong> {{ payment.booking.student.get_full_name }} ({{ payment.booking.student.email }})</p>
+        <p><strong>المدرس:</strong> {{ payment.booking.teacher.user.get_full_name }}</p>
+        <p><strong>المادة:</strong> {{ payment.booking.subject.name }} - {{ payment.booking.grade_level.name }}</p>
+        <p><strong>المبلغ:</strong> {{ payment.amount }} {{ payment.currency }}</p>
+        <p><strong>طريقة الدفع:</strong> {{ payment.get_payment_method_display }}</p>
+        <p><strong>الحالة:</strong> {{ payment.get_payment_status_display }}</p>
+        <p><strong>مرجع العملية:</strong> {{ payment.transaction_reference|default:'-' }}</p>
+        {% if payment.receipt_image %}
+            <p><a class="btn btn-secondary" href="{{ payment.receipt_image.url }}" target="_blank" rel="noopener">فتح الإيصال</a></p>
+        {% endif %}
+        {% if payment.rejection_reason %}
+            <p><strong>سبب الرفض:</strong> {{ payment.rejection_reason }}</p>
+        {% endif %}
+    </div>
+
+    {% if payment.payment_status == 'awaiting_verification' %}
+        <form method="post" action="{% url 'payments:admin_approve' payment.pk %}" class="inline-form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">قبول الدفع وتأكيد الحجز</button>
+        </form>
+        <form method="post" action="{% url 'payments:admin_reject' payment.pk %}" class="form-card">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-secondary">رفض الدفع</button>
+        </form>
+    {% endif %}
+
+    <a class="btn btn-secondary" href="{% url 'payments:admin_pending' %}">رجوع لقائمة المراجعة</a>
+</section>
+{% endblock %}
