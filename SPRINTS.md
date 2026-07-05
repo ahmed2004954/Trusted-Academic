@@ -94,21 +94,21 @@
 **Goal:** Allow teachers to register, complete profile, upload documents, and get approved.
 
 ### Tasks
-- [ ] Create `TeacherProfile` model:
+- [x] Create `TeacherProfile` model:
   - bio, experience_years, headline
   - photo, cv_file, intro_video_url
   - approval_status (pending/approved/rejected/suspended)
   - average_rating, total_reviews, total_lessons
   - verification_notes
-- [ ] Create `TeacherCertificate` model
-- [ ] Build teacher profile form
-- [ ] Add document upload views (CV, certificates)
-- [ ] Add intro video URL field
-- [ ] Build admin review/approve/reject flow with notes
-- [ ] Prevent unapproved teachers from appearing publicly
-- [ ] Show teacher approval status in their dashboard
-- [ ] Add email notification for approval status changes
-- [ ] Add validation: teacher cannot receive bookings until approved
+- [x] Create `TeacherCertificate` model
+- [x] Build teacher profile form
+- [x] Add document upload views (CV, certificates)
+- [x] Add intro video URL field
+- [x] Build admin review/approve/reject flow with notes
+- [x] Prevent unapproved teachers from appearing publicly
+- [x] Show teacher approval status in their dashboard
+- [ ] Add email notification for approval status changes (deferred to Sprint 13/notifications)
+- [x] Add validation: teacher cannot receive bookings until approved
 
 **Deliverables:**
 - Teacher onboarding flow
