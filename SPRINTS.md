@@ -201,13 +201,13 @@
 **Goal:** Allow students to book lessons with automatic or manual acceptance.
 
 ### Tasks
-- [ ] Create `Booking` model:
+- [x] Create `Booking` model:
   - student, parent (optional), teacher, subject, grade_level
   - lesson_type, scheduled_start, scheduled_end, duration_minutes
   - price, platform_fee, teacher_payout, booking_status
   - meeting_url, attendance_code, attendance_confirmed_at
   - cancellation_reason, created_at/updated_at
-- [ ] Define booking status choices:
+- [x] Define booking status choices:
   - `pending_payment`
   - `awaiting_receipt_verification`
   - `confirmed`
@@ -219,19 +219,19 @@
   - `no_show_student`
   - `no_show_teacher`
   - `disputed`
-- [ ] Add booking mode flag on teacher profile: auto vs manual acceptance
-- [ ] Build slot selection from teacher availability
-- [ ] Prevent overlapping confirmed bookings for same teacher
-- [ ] Snapshot lesson price and platform fee at booking time
-- [ ] Generate attendance_code automatically on confirmed booking
-- [ ] Implement manual booking request flow:
+- [x] Add booking mode flag on teacher profile: auto vs manual acceptance
+- [ ] Build slot selection from teacher availability (date/time form implemented; availability UI validation deferred)
+- [x] Prevent overlapping confirmed bookings for same teacher
+- [x] Snapshot lesson price and platform fee at booking time
+- [ ] Generate attendance_code automatically on confirmed booking (deferred to payment/attendance sprints)
+- [x] Implement manual booking request flow:
   - student requests
   - teacher accepts/rejects
   - if accepted, student pays within deadline
-- [ ] Implement automatic booking flow:
+- [x] Implement automatic booking flow:
   - booking created, awaiting payment
-- [ ] Build booking detail page
-- [ ] Build "My Bookings" pages for student and teacher
+- [x] Build booking detail page
+- [x] Build "My Bookings" pages for student and teacher
 
 **Deliverables:**
 - Booking creation flow

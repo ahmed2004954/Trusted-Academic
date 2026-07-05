@@ -16,7 +16,13 @@
             {% if teacher.total_reviews == 0 %}
                 <p class="empty-state compact">لا توجد مراجعات بعد. ستظهر آراء الطلاب هنا عند توفرها.</p>
             {% endif %}
-            <a class="btn btn-primary" href="{% url booking_url %}">ابدأ الحجز</a>
+            {% if offerings %}
+                {% if user.is_authenticated %}
+                    <a class="btn btn-primary" href="{% url 'bookings:create' teacher.pk %}?offering={{ offerings.0.pk }}">ابدأ الحجز</a>
+                {% else %}
+                    <a class="btn btn-primary" href="{% url 'accounts:login' %}">سجل الدخول للحجز</a>
+                {% endif %}
+            {% endif %}
         </div>
     </header>
 
@@ -37,6 +43,7 @@
                             <th>نوع الحصة</th>
                             <th>السعر الافتراضي</th>
                             <th>النطاق</th>
+                            <th>الحجز</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -47,6 +54,13 @@
                                 <td>{{ offering.get_lesson_type_display }}</td>
                                 <td>{{ offering.default_price }}</td>
                                 <td>{{ offering.price_min }} - {{ offering.price_max }}</td>
+                                <td>
+                                    {% if user.is_authenticated %}
+                                        <a class="btn btn-secondary" href="{% url 'bookings:create' teacher.pk %}?offering={{ offering.pk }}">احجز</a>
+                                    {% else %}
+                                        <a class="btn btn-secondary" href="{% url 'accounts:login' %}">تسجيل الدخول</a>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}تفاصيل الحجز - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>تفاصيل الحجز</h1>
+    <div class="status-card">
+        <p><strong>الحالة:</strong> {{ booking.get_booking_status_display }}</p>
+        <p><strong>طريقة الحجز:</strong> {{ booking.get_booking_mode_display }}</p>
+        <p><strong>الطالب:</strong> {{ booking.student.get_full_name }}</p>
+        <p><strong>المدرس:</strong> {{ booking.teacher.user.get_full_name }}</p>
+        <p><strong>المادة:</strong> {{ booking.subject.name }} - {{ booking.grade_level.name }}</p>
+        <p><strong>نوع الحصة:</strong> {{ booking.get_lesson_type_display }}</p>
+        <p><strong>الموعد:</strong> {{ booking.scheduled_start|date:'Y-m-d H:i' }} - {{ booking.scheduled_end|date:'H:i' }}</p>
+        <p><strong>المدة:</strong> {{ booking.duration_minutes }} دقيقة</p>
+        <p><strong>السعر:</strong> {{ booking.price }}</p>
+        <p><strong>رسوم المنصة:</strong> {{ booking.platform_fee }}</p>
+        <p><strong>مستحق المدرس:</strong> {{ booking.teacher_payout }}</p>
+        {% if booking.payment_deadline %}
+            <p><strong>مهلة الدفع:</strong> {{ booking.payment_deadline|date:'Y-m-d H:i' }}</p>
+        {% endif %}
+        {% if booking.cancellation_reason %}
+            <p><strong>سبب الرفض/الإلغاء:</strong> {{ booking.cancellation_reason }}</p>
+        {% endif %}
+    </div>
+
+    {% if is_teacher_view and booking.booking_status == 'pending_teacher_acceptance' %}
+        <form method="post" action="{% url 'bookings:teacher_action' booking.pk 'accept' %}" class="inline-form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">قبول الطلب</button>
+        </form>
+        <form method="post" action="{% url 'bookings:teacher_action' booking.pk 'reject' %}" class="form-card">
+            {% csrf_token %}
+            <label for="reason">سبب الرفض اختياري</label>
+            <textarea id="reason" name="reason" class="form-control" rows="3"></textarea>
+            <button type="submit" class="btn btn-secondary">رفض الطلب</button>
+        </form>
+    {% endif %}
+
+    {% if is_teacher_view %}
+        <a class="btn btn-secondary" href="{% url 'bookings:teacher_list' %}">رجوع للحجوزات</a>
+    {% else %}
+        <a class="btn btn-secondary" href="{% url 'bookings:student_list' %}">رجوع لحجوزاتي</a>
+    {% endif %}
+</section>
+{% endblock %}

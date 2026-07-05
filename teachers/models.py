@@ -9,6 +9,11 @@ class LessonType(models.TextChoices):
     GROUP = 'group', _('Group')
 
 
+class BookingMode(models.TextChoices):
+    AUTOMATIC = 'automatic', _('Automatic')
+    MANUAL = 'manual', _('Manual')
+
+
 class TeacherProfile(models.Model):
     class ApprovalStatus(models.TextChoices):
         PENDING = 'pending', _('Pending')
@@ -32,6 +37,11 @@ class TeacherProfile(models.Model):
         max_length=20,
         choices=ApprovalStatus.choices,
         default=ApprovalStatus.PENDING,
+    )
+    booking_mode = models.CharField(
+        max_length=20,
+        choices=BookingMode.choices,
+        default=BookingMode.AUTOMATIC,
     )
     average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     total_reviews = models.PositiveIntegerField(default=0)

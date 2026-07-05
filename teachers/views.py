@@ -88,7 +88,6 @@ def teacher_detail(request, pk):
     teacher = get_object_or_404(public_teacher_queryset(), pk=pk)
     offerings = teacher.subjects.filter(is_active=True).select_related('subject', 'grade_level')
     availability_slots = teacher.availability_slots.filter(is_active=True)
-    booking_url = 'accounts:login' if not request.user.is_authenticated else 'core:dashboard'
 
     return render(
         request,
@@ -97,7 +96,6 @@ def teacher_detail(request, pk):
             'teacher': teacher,
             'offerings': offerings,
             'availability_slots': availability_slots,
-            'booking_url': booking_url,
         },
     )
 

@@ -3,18 +3,19 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from .models import AvailabilitySlot, LessonType, PlatformPricingRange, TeacherCertificate, TeacherProfile, TeacherSubject
+from .models import AvailabilitySlot, BookingMode, LessonType, PlatformPricingRange, TeacherCertificate, TeacherProfile, TeacherSubject
 
 
 class TeacherProfileForm(forms.ModelForm):
     class Meta:
         model = TeacherProfile
-        fields = ('headline', 'bio', 'experience_years', 'photo', 'cv_file', 'intro_video_url')
+        fields = ('headline', 'bio', 'experience_years', 'photo', 'cv_file', 'intro_video_url', 'booking_mode')
         widgets = {
             'headline': forms.TextInput(attrs={'class': 'form-control'}),
             'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
             'experience_years': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
             'intro_video_url': forms.URLInput(attrs={'class': 'form-control'}),
+            'booking_mode': forms.Select(attrs={'class': 'form-control'}, choices=BookingMode.choices),
         }
 
     def clean_experience_years(self) -> int:

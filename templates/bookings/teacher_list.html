@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}حجوزات المدرس - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>حجوزاتي كمدرس</h1>
+    <p class="muted">وضع قبول الحجوزات الحالي: {{ profile.get_booking_mode_display }}</p>
+    {% if bookings %}
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>الطالب</th>
+                        <th>المادة</th>
+                        <th>الموعد</th>
+                        <th>الحالة</th>
+                        <th>مستحق المدرس</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                        <tr>
+                            <td>{{ booking.student.get_full_name }}</td>
+                            <td>{{ booking.subject.name }} - {{ booking.grade_level.name }}</td>
+                            <td>{{ booking.scheduled_start|date:'Y-m-d H:i' }}</td>
+                            <td>{{ booking.get_booking_status_display }}</td>
+                            <td>{{ booking.teacher_payout }}</td>
+                            <td><a class="btn btn-secondary" href="{% url 'bookings:teacher_detail' booking.pk %}">تفاصيل</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="empty-state compact">لا توجد حجوزات بعد.</p>
+    {% endif %}
+</section>
+{% endblock %}

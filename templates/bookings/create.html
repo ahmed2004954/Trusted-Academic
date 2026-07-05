@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}إنشاء حجز - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>إنشاء حجز مع {{ teacher.user.get_full_name }}</h1>
+    <p class="muted">اختر العرض والوقت المناسب. سيتم تحديد حالة الحجز حسب طريقة قبول المدرس للحجوزات.</p>
+
+    <form method="post" class="form-card">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="form-group">
+            {{ form.teacher_subject.label_tag }}
+            {{ form.teacher_subject }}
+            {{ form.teacher_subject.errors }}
+        </div>
+        <div class="form-group">
+            {{ form.scheduled_start.label_tag }}
+            {{ form.scheduled_start }}
+            {{ form.scheduled_start.errors }}
+        </div>
+        <div class="form-group">
+            {{ form.duration_minutes.label_tag }}
+            {{ form.duration_minutes }}
+            {{ form.duration_minutes.errors }}
+        </div>
+        <button type="submit" class="btn btn-primary">تأكيد طلب الحجز</button>
+        <a class="btn btn-secondary" href="{% url 'teachers:public_detail' teacher.pk %}">رجوع</a>
+    </form>
+</section>
+{% endblock %}

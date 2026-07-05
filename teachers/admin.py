@@ -10,8 +10,8 @@ class TeacherCertificateInline(admin.TabularInline):
 
 @admin.register(TeacherProfile)
 class TeacherProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'approval_status', 'experience_years', 'average_rating', 'created_at')
-    list_filter = ('approval_status', 'created_at')
+    list_display = ('user', 'approval_status', 'booking_mode', 'experience_years', 'average_rating', 'created_at')
+    list_filter = ('approval_status', 'booking_mode', 'created_at')
     search_fields = ('user__email', 'user__full_name', 'headline')
     inlines = [TeacherCertificateInline]
 

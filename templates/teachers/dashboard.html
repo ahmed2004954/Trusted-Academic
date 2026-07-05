@@ -41,6 +41,11 @@
                 <a class="btn btn-primary" href="{% url 'teachers:manage_subjects' %}">إدارة المواد</a>
                 <a class="btn btn-primary" href="{% url 'teachers:manage_availability' %}">إدارة الإتاحة</a>
             </div>
+            <div class="dashboard-card">
+                <h3>الحجوزات</h3>
+                <p>راجع طلبات الحجز القادمة واقبل أو ارفض الطلبات اليدوية.</p>
+                <a class="btn btn-primary" href="{% url 'bookings:teacher_list' %}">إدارة الحجوزات</a>
+            </div>
         </div>
     {% else %}
         <div class="status-card status-pending">
