@@ -26,7 +26,34 @@
         {% if booking.attendance_confirmed_at %}
             <p><strong>تأكيد الحضور:</strong> {{ booking.attendance_confirmed_at|date:'Y-m-d H:i' }}</p>
         {% endif %}
+        {% if booking.cancelled_at %}
+            <p><strong>وقت الإلغاء:</strong> {{ booking.cancelled_at|date:'Y-m-d H:i' }}</p>
+        {% endif %}
+        {% if booking.reschedule_count %}
+            <p><strong>عدد مرات إعادة الجدولة:</strong> {{ booking.reschedule_count }}</p>
+        {% endif %}
+        {% if booking.reschedule_reason %}
+            <p><strong>سبب إعادة الجدولة:</strong> {{ booking.reschedule_reason }}</p>
+        {% endif %}
     </div>
+
+    {% if not is_teacher_view and booking.booking_status == 'confirmed' or not is_teacher_view and booking.booking_status == 'pending_payment' or not is_teacher_view and booking.booking_status == 'awaiting_student_payment' or not is_teacher_view and booking.booking_status == 'awaiting_receipt_verification' %}
+        <div class="status-card">
+            <h2>الإلغاء وإعادة الجدولة</h2>
+            <p>يمكنك إلغاء الحجز قبل بداية الحصة. إعادة الجدولة متاحة مرة واحدة فقط للطالب.</p>
+            <a class="btn btn-secondary" href="{% url 'bookings:student_cancel' booking.pk %}">إلغاء الحجز</a>
+            <a class="btn btn-primary" href="{% url 'bookings:student_reschedule' booking.pk %}">إعادة الجدولة</a>
+        </div>
+    {% endif %}
+
+    {% if is_teacher_view and booking.booking_status == 'confirmed' %}
+        <div class="status-card">
+            <h2>الإلغاء وإعادة الجدولة</h2>
+            <p>إلغاء أو إعادة جدولة المدرس يسجل مخالفة مرتبطة بالحجز.</p>
+            <a class="btn btn-secondary" href="{% url 'bookings:teacher_cancel' booking.pk %}">إلغاء الحجز</a>
+            <a class="btn btn-primary" href="{% url 'bookings:teacher_reschedule' booking.pk %}">إعادة الجدولة</a>
+        </div>
+    {% endif %}
 
     <div class="status-card">
         <h2>رسائل الحجز</h2>

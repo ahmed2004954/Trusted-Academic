@@ -9,8 +9,15 @@ from teachers.models import TeacherProfile, TeacherSubject
 from complaints.models import Complaint
 from complaints.services import user_can_create_complaint, visible_complaint_filter
 
-from .forms import BookingCreateForm
+from .forms import BookingCancellationForm, BookingCreateForm, BookingRescheduleForm
 from .models import Booking
+from .services import (
+    cancel_booking_by_student,
+    cancel_booking_by_teacher,
+    estimate_student_refund,
+    reschedule_booking_by_student,
+    reschedule_booking_by_teacher,
+)
 
 
 def student_required(view_func):
@@ -191,6 +198,105 @@ def student_confirm_attendance(request, pk):
         messages.error(request, _('Attendance can only be confirmed during the lesson attendance window.'))
         return redirect('bookings:student_detail', pk=booking.pk)
     return render(request, 'bookings/student_confirm_attendance.html', {'booking': booking})
+
+
+@student_required
+def student_cancel_booking(request, pk):
+    booking = get_object_or_404(
+        Booking.objects.select_related('student', 'teacher__user', 'subject', 'grade_level'),
+        pk=pk,
+        student=request.user,
+    )
+    refund_estimate = estimate_student_refund(booking)
+    if request.method == 'POST':
+        form = BookingCancellationForm(request.POST)
+        if form.is_valid():
+            try:
+                cancel_booking_by_student(booking.pk, form.cleaned_data['reason'])
+            except ValidationError as exc:
+                form.add_error(None, exc)
+            else:
+                messages.success(request, _('Booking cancelled. Refund amount has been recorded.'))
+                return redirect('bookings:student_detail', pk=booking.pk)
+    else:
+        form = BookingCancellationForm()
+    return render(
+        request,
+        'bookings/cancel.html',
+        {'booking': booking, 'form': form, 'refund_estimate': refund_estimate, 'is_teacher_view': False},
+    )
+
+
+@student_required
+def student_reschedule_booking(request, pk):
+    booking = get_object_or_404(
+        Booking.objects.select_related('student', 'teacher__user', 'subject', 'grade_level'),
+        pk=pk,
+        student=request.user,
+    )
+    if request.method == 'POST':
+        form = BookingRescheduleForm(request.POST)
+        if form.is_valid():
+            try:
+                reschedule_booking_by_student(booking.pk, form.cleaned_data['scheduled_start'], form.cleaned_data['reason'])
+            except ValidationError as exc:
+                form.add_error(None, exc)
+            else:
+                messages.success(request, _('Booking rescheduled.'))
+                return redirect('bookings:student_detail', pk=booking.pk)
+    else:
+        form = BookingRescheduleForm()
+    return render(request, 'bookings/reschedule.html', {'booking': booking, 'form': form, 'is_teacher_view': False})
+
+
+@teacher_required
+def teacher_cancel_booking(request, pk):
+    profile = get_object_or_404(TeacherProfile, user=request.user)
+    booking = get_object_or_404(
+        Booking.objects.select_related('student', 'teacher__user', 'subject', 'grade_level'),
+        pk=pk,
+        teacher=profile,
+    )
+    if request.method == 'POST':
+        form = BookingCancellationForm(request.POST)
+        if form.is_valid():
+            try:
+                cancel_booking_by_teacher(booking.pk, form.cleaned_data['reason'])
+            except ValidationError as exc:
+                form.add_error(None, exc)
+            else:
+                messages.success(request, _('Booking cancelled and teacher violation recorded.'))
+                return redirect('bookings:teacher_detail', pk=booking.pk)
+    else:
+        form = BookingCancellationForm()
+    return render(
+        request,
+        'bookings/cancel.html',
+        {'booking': booking, 'form': form, 'refund_estimate': booking.price, 'is_teacher_view': True},
+    )
+
+
+@teacher_required
+def teacher_reschedule_booking(request, pk):
+    profile = get_object_or_404(TeacherProfile, user=request.user)
+    booking = get_object_or_404(
+        Booking.objects.select_related('student', 'teacher__user', 'subject', 'grade_level'),
+        pk=pk,
+        teacher=profile,
+    )
+    if request.method == 'POST':
+        form = BookingRescheduleForm(request.POST)
+        if form.is_valid():
+            try:
+                reschedule_booking_by_teacher(booking.pk, form.cleaned_data['scheduled_start'], form.cleaned_data['reason'])
+            except ValidationError as exc:
+                form.add_error(None, exc)
+            else:
+                messages.success(request, _('Booking rescheduled and teacher violation recorded.'))
+                return redirect('bookings:teacher_detail', pk=booking.pk)
+    else:
+        form = BookingRescheduleForm()
+    return render(request, 'bookings/reschedule.html', {'booking': booking, 'form': form, 'is_teacher_view': True})
 
 
 @teacher_required

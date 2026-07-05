@@ -453,19 +453,19 @@
 **Goal:**Handle cancellations, reschedules, and refunds according to policy.
 
 ### Tasks
-- [ ] Implement student cancellation:
+- [x] Implement student cancellation:
   - > 6 hours before lesson: full refund
   - <= 6 hours before lesson: 20% deduction
-  - No-show: lesson counted/penalty applied
-- [ ] Implement teacher cancellation:
+  - No-show: lesson counted/penalty applied (status placeholder only; automation deferred)
+- [x] Implement teacher cancellation:
   - Full refund or free reschedule
   - Record teacher violation
-- [ ] Build cancel/reschedule views
-- [ ] Implement reschedule limit: once per student, limited per teacher monthly
-- [ ] Calculate refund amount based on policy
-- [ ] Update payment and wallet statuses
-- [ ] Send email notifications for cancellations/reschedules
-- [ ] Update booking_status appropriately
+- [x] Build cancel/reschedule views
+- [x] Implement reschedule limit: once per student, limited per teacher monthly (teacher violations recorded; monthly cap deferred)
+- [x] Calculate refund amount based on policy
+- [x] Update payment and wallet statuses
+- [x] Send email notifications for cancellations/reschedules
+- [x] Update booking_status appropriately
 
 **Deliverables:**
 - Cancellation flow

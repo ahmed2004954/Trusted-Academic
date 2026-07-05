@@ -5,10 +5,18 @@ from .models import Payment, Wallet, WithdrawalRequest
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('booking', 'amount', 'currency', 'payment_method', 'payment_status', 'verified_by', 'created_at')
+    list_display = ('booking', 'amount', 'currency', 'payment_method', 'payment_status', 'refund_amount', 'verified_by', 'created_at')
     list_filter = ('payment_status', 'payment_method', 'currency', 'created_at')
     search_fields = ('booking__student__email', 'booking__teacher__user__email', 'transaction_reference')
-    readonly_fields = ('created_at', 'updated_at', 'verified_at', 'paid_at', 'refunded_at', 'wallet_pending_credited_at')
+    readonly_fields = (
+        'created_at',
+        'updated_at',
+        'verified_at',
+        'paid_at',
+        'refunded_at',
+        'wallet_pending_credited_at',
+        'wallet_pending_reversed_at',
+    )
 
 
 @admin.register(Wallet)

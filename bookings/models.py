@@ -84,6 +84,16 @@ class Booking(models.Model):
     attendance_confirmed_at = models.DateTimeField(blank=True, null=True)
     wallet_settled_at = models.DateTimeField(blank=True, null=True)
     cancellation_reason = models.TextField(blank=True)
+    reschedule_reason = models.TextField(blank=True)
+    cancelled_at = models.DateTimeField(blank=True, null=True)
+    rescheduled_from = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        related_name='rescheduled_bookings',
+        blank=True,
+        null=True,
+    )
+    reschedule_count = models.PositiveSmallIntegerField(default=0)
     payment_deadline = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -194,3 +204,25 @@ class Booking(models.Model):
         self.booking_status = self.BookingStatus.TEACHER_REJECTED
         self.cancellation_reason = reason
         self.save(update_fields=['booking_status', 'cancellation_reason', 'updated_at'])
+
+
+class TeacherBookingViolation(models.Model):
+    class ViolationType(models.TextChoices):
+        CANCELLATION = 'cancellation', _('Cancellation')
+        RESCHEDULE = 'reschedule', _('Reschedule')
+
+    teacher = models.ForeignKey('teachers.TeacherProfile', on_delete=models.PROTECT, related_name='booking_violations')
+    booking = models.ForeignKey(Booking, on_delete=models.PROTECT, related_name='teacher_violations')
+    violation_type = models.CharField(max_length=20, choices=ViolationType.choices)
+    reason = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['teacher', 'created_at']),
+            models.Index(fields=['booking', 'violation_type']),
+        ]
+
+    def __str__(self) -> str:
+        return f'{self.teacher} - {self.violation_type} - booking #{self.booking_id}'

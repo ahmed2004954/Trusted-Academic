@@ -60,3 +60,29 @@ class BookingCreateForm(forms.Form):
             duration_minutes=self.cleaned_data['duration_minutes'],
             parent=self.parent,
         )
+
+
+class BookingCancellationForm(forms.Form):
+    reason = forms.CharField(
+        label=_('Reason'),
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+    )
+
+
+class BookingRescheduleForm(forms.Form):
+    scheduled_start = forms.DateTimeField(
+        label=_('New start time'),
+        widget=forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+    )
+    reason = forms.CharField(
+        label=_('Reason'),
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+    )
+
+    def clean_scheduled_start(self):
+        scheduled_start = self.cleaned_data['scheduled_start']
+        if scheduled_start <= timezone.now():
+            raise ValidationError(_('New lesson start time must be in the future.'))
+        return scheduled_start
