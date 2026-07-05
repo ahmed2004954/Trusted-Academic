@@ -29,7 +29,7 @@ def public_teacher_queryset():
     return (
         TeacherProfile.objects.filter(approval_status=TeacherProfile.ApprovalStatus.APPROVED)
         .select_related('user')
-        .prefetch_related('subjects__subject', 'subjects__grade_level', 'availability_slots')
+        .prefetch_related('subjects__subject', 'subjects__grade_level', 'availability_slots', 'reviews__student')
     )
 
 
@@ -88,6 +88,7 @@ def teacher_detail(request, pk):
     teacher = get_object_or_404(public_teacher_queryset(), pk=pk)
     offerings = teacher.subjects.filter(is_active=True).select_related('subject', 'grade_level')
     availability_slots = teacher.availability_slots.filter(is_active=True)
+    reviews = teacher.reviews.filter(is_visible=True).select_related('student', 'booking')
 
     return render(
         request,
@@ -96,6 +97,7 @@ def teacher_detail(request, pk):
             'teacher': teacher,
             'offerings': offerings,
             'availability_slots': availability_slots,
+            'reviews': reviews,
         },
     )
 

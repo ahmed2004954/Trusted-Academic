@@ -95,6 +95,42 @@ def teacher_booking_detail(request, pk):
 
 
 @teacher_required
+def teacher_attendance_code(request, pk):
+    profile = get_object_or_404(TeacherProfile, user=request.user)
+    booking = get_object_or_404(
+        Booking.objects.select_related('student', 'subject', 'grade_level', 'teacher__user'),
+        pk=pk,
+        teacher=profile,
+    )
+    if not booking.can_use_attendance_code():
+        messages.error(request, _('Attendance code is available only during the lesson attendance window.'))
+        return redirect('bookings:teacher_detail', pk=booking.pk)
+    return render(request, 'bookings/teacher_attendance_code.html', {'booking': booking})
+
+
+@student_required
+def student_confirm_attendance(request, pk):
+    booking = get_object_or_404(
+        Booking.objects.select_related('teacher__user', 'subject', 'grade_level'),
+        pk=pk,
+        student=request.user,
+    )
+    if request.method == 'POST':
+        code = request.POST.get('attendance_code', '')
+        try:
+            booking.complete_with_attendance(code)
+        except ValidationError as exc:
+            messages.error(request, exc.messages[0] if hasattr(exc, 'messages') else str(exc))
+        else:
+            messages.success(request, _('Attendance confirmed and lesson completed.'))
+            return redirect('bookings:student_detail', pk=booking.pk)
+    elif not booking.can_use_attendance_code():
+        messages.error(request, _('Attendance can only be confirmed during the lesson attendance window.'))
+        return redirect('bookings:student_detail', pk=booking.pk)
+    return render(request, 'bookings/student_confirm_attendance.html', {'booking': booking})
+
+
+@teacher_required
 def teacher_booking_action(request, pk, action):
     if request.method != 'POST':
         raise PermissionDenied

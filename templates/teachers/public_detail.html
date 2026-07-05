@@ -83,5 +83,22 @@
             <p class="empty-state compact">لم يضف المدرس مواعيد متاحة بعد.</p>
         {% endif %}
     </section>
+
+    <section>
+        <h2>مراجعات الطلاب</h2>
+        {% if reviews %}
+            <ul class="item-list">
+                {% for review in reviews %}
+                    <li>
+                        <strong>{{ review.rating }} / 5</strong>
+                        <span>{{ review.student.get_full_name }}</span>
+                        {% if review.comment %}<p>{{ review.comment|linebreaksbr }}</p>{% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="empty-state compact">لا توجد مراجعات ظاهرة بعد.</p>
+        {% endif %}
+    </section>
 </article>
 {% endblock %}

@@ -82,6 +82,7 @@ class Booking(models.Model):
     meeting_url = models.URLField(blank=True)
     attendance_code = models.CharField(max_length=20, blank=True)
     attendance_confirmed_at = models.DateTimeField(blank=True, null=True)
+    wallet_settled_at = models.DateTimeField(blank=True, null=True)
     cancellation_reason = models.TextField(blank=True)
     payment_deadline = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -160,6 +161,25 @@ class Booking(models.Model):
         if not self.attendance_code:
             self.attendance_code = get_random_string(8).upper()
         return self.attendance_code
+
+    def is_attendance_window_open(self, at_time=None) -> bool:
+        at_time = at_time or timezone.now()
+        return self.scheduled_start <= at_time <= self.attendance_window_closes_at
+
+    @property
+    def attendance_window_closes_at(self):
+        return self.scheduled_end + timedelta(hours=3)
+
+    def can_use_attendance_code(self) -> bool:
+        return self.booking_status in {
+            self.BookingStatus.CONFIRMED,
+            self.BookingStatus.IN_PROGRESS,
+        } and self.is_attendance_window_open()
+
+    def complete_with_attendance(self, attendance_code: str) -> bool:
+        from payments.services import complete_booking_with_attendance
+
+        return complete_booking_with_attendance(self.pk, attendance_code)
 
     def accept_by_teacher(self) -> None:
         if self.booking_status != self.BookingStatus.PENDING_TEACHER_ACCEPTANCE:

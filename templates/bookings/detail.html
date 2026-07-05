@@ -23,6 +23,9 @@
         {% if booking.cancellation_reason %}
             <p><strong>سبب الرفض/الإلغاء:</strong> {{ booking.cancellation_reason }}</p>
         {% endif %}
+        {% if booking.attendance_confirmed_at %}
+            <p><strong>تأكيد الحضور:</strong> {{ booking.attendance_confirmed_at|date:'Y-m-d H:i' }}</p>
+        {% endif %}
     </div>
 
     {% if not is_teacher_view %}
@@ -33,6 +36,29 @@
                 <a class="btn btn-primary" href="{% url 'payments:instructions' booking.pk %}">تعليمات الدفع ورفع الإيصال</a>
             </div>
         {% endif %}
+    {% endif %}
+
+    {% if is_teacher_view and booking.booking_status == 'confirmed' or is_teacher_view and booking.booking_status == 'in_progress' %}
+        <div class="status-card">
+            <h2>كود الحضور</h2>
+            <p>يظهر الكود خلال وقت الحصة وحتى 3 ساعات بعد انتهائها.</p>
+            <a class="btn btn-primary" href="{% url 'bookings:teacher_attendance_code' booking.pk %}">عرض كود الحضور</a>
+        </div>
+    {% endif %}
+
+    {% if not is_teacher_view and booking.booking_status == 'confirmed' or not is_teacher_view and booking.booking_status == 'in_progress' %}
+        <div class="status-card">
+            <h2>تأكيد حضور الحصة</h2>
+            <p>أدخل كود الحضور من المدرس خلال وقت الحصة وحتى 3 ساعات بعد انتهائها.</p>
+            <a class="btn btn-primary" href="{% url 'bookings:student_confirm_attendance' booking.pk %}">إدخال كود الحضور</a>
+        </div>
+    {% endif %}
+
+    {% if not is_teacher_view and booking.booking_status == 'completed' %}
+        <div class="status-card">
+            <h2>مراجعة المدرس</h2>
+            <a class="btn btn-primary" href="{% url 'reviews:create' booking.pk %}">إضافة مراجعة</a>
+        </div>
     {% endif %}
 
     {% if is_teacher_view and booking.booking_status == 'pending_teacher_acceptance' %}

@@ -324,17 +324,17 @@
 **Goal:** Confirm attendance via code, complete lessons, and allow reviews.
 
 ### Tasks
-- [ ] Teacher view to see attendance code at lesson time
-- [ ] Student view to enter attendance code
-- [ ] Validate attendance code within lesson + 3-hour window
-- [ ] Mark booking as completed on successful code
-- [ ] Auto-complete fallback after 24 hours (with dispute window)
-- [ ] Prevent review before completed booking
-- [ ] Create `Review` model (booking, student, teacher, rating, comment, is_visible)
-- [ ] Build review submission form
-- [ ] Update teacher average_rating and total_reviews
-- [ ] Allow admin to hide inappropriate reviews
-- [ ] Display reviews on teacher profile
+- [x] Teacher view to see attendance code at lesson time
+- [x] Student view to enter attendance code
+- [x] Validate attendance code within lesson + 3-hour window
+- [x] Mark booking as completed on successful code
+- [x] Auto-complete fallback after 24 hours (with dispute window)
+- [x] Prevent review before completed booking
+- [x] Create `Review` model (booking, student, teacher, rating, comment, is_visible)
+- [x] Build review submission form
+- [x] Update teacher average_rating and total_reviews
+- [x] Allow admin to hide inappropriate reviews
+- [x] Display reviews on teacher profile
 
 **Deliverables:**
 - Attendance code flow

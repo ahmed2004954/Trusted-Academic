@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}كود الحضور - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>كود الحضور</h1>
+    <div class="status-card">
+        <p><strong>الحجز:</strong> {{ booking.student.get_full_name }} - {{ booking.subject.name }}</p>
+        <p><strong>الموعد:</strong> {{ booking.scheduled_start|date:'Y-m-d H:i' }} - {{ booking.scheduled_end|date:'H:i' }}</p>
+        <p><strong>الكود:</strong> <span class="attendance-code">{{ booking.attendance_code }}</span></p>
+        <p class="muted">شارك هذا الكود مع الطالب لتأكيد حضور الحصة.</p>
+    </div>
+    <a class="btn btn-secondary" href="{% url 'bookings:teacher_detail' booking.pk %}">رجوع للحجز</a>
+</section>
+{% endblock %}

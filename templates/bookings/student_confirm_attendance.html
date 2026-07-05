@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}تأكيد الحضور - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <h1>تأكيد حضور الحصة</h1>
+    <div class="status-card">
+        <p><strong>المدرس:</strong> {{ booking.teacher.user.get_full_name }}</p>
+        <p><strong>المادة:</strong> {{ booking.subject.name }} - {{ booking.grade_level.name }}</p>
+        <p><strong>الموعد:</strong> {{ booking.scheduled_start|date:'Y-m-d H:i' }} - {{ booking.scheduled_end|date:'H:i' }}</p>
+    </div>
+    <form method="post" class="form-card">
+        {% csrf_token %}
+        <label for="attendance_code">كود الحضور</label>
+        <input id="attendance_code" name="attendance_code" class="form-control" maxlength="20" required>
+        <button type="submit" class="btn btn-primary">تأكيد الحضور</button>
+    </form>
+    <a class="btn btn-secondary" href="{% url 'bookings:student_detail' booking.pk %}">رجوع للحجز</a>
+</section>
+{% endblock %}

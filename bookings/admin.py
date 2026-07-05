@@ -15,6 +15,8 @@ class BookingAdmin(admin.ModelAdmin):
         'booking_status',
         'booking_mode',
         'price',
+        'attendance_confirmed_at',
+        'wallet_settled_at',
     )
     list_filter = ('booking_status', 'booking_mode', 'lesson_type', 'subject', 'grade_level', 'scheduled_start')
     search_fields = (
@@ -24,4 +26,4 @@ class BookingAdmin(admin.ModelAdmin):
         'teacher__user__full_name',
         'subject__name',
     )
-    readonly_fields = ('created_at', 'updated_at')
+    readonly_fields = ('created_at', 'updated_at', 'attendance_code', 'attendance_confirmed_at', 'wallet_settled_at')
