@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}بحث المستخدمين - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content dashboard">
+    <h1>بحث المستخدمين</h1>
+
+    <form method="get" class="filter-form">
+        <label>بحث
+            <input type="search" name="q" value="{{ filters.q }}" placeholder="البريد أو الاسم أو الهاتف">
+        </label>
+        <label>الدور
+            <select name="role">
+                <option value="">كل الأدوار</option>
+                {% for value, label in role_choices %}
+                    <option value="{{ value }}" {% if filters.role == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <button class="btn btn-primary" type="submit">بحث</button>
+    </form>
+
+    <ul class="item-list">
+        {% for account in users %}
+            <li>
+                <strong>{{ account.get_full_name|default:account.email }}</strong>
+                <span>{{ account.email }} - {{ account.get_role_display }} - {{ account.phone|default:'-' }}</span>
+                <a class="btn" href="{% url 'admin:accounts_user_change' account.pk %}">فتح في Django Admin</a>
+            </li>
+        {% empty %}
+            <li>لا يوجد مستخدمون مطابقون.</li>
+        {% endfor %}
+    </ul>
+
+    <a class="btn" href="{% url 'adminpanel:dashboard' %}">العودة للوحة الإدارة</a>
+</section>
+{% endblock %}

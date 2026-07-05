@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}مراقبة الحجوزات - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content dashboard">
+    <h1>مراقبة الحجوزات</h1>
+
+    <form method="get" class="filter-form">
+        <label>الحالة
+            <select name="status">
+                <option value="">كل الحالات</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>المدرس
+            <input type="search" name="teacher" value="{{ filters.teacher }}" placeholder="البريد أو الاسم">
+        </label>
+        <label>الطالب
+            <input type="search" name="student" value="{{ filters.student }}" placeholder="البريد أو الاسم">
+        </label>
+        <label>من
+            <input type="date" name="date_from" value="{{ filters.date_from }}">
+        </label>
+        <label>إلى
+            <input type="date" name="date_to" value="{{ filters.date_to }}">
+        </label>
+        <button class="btn btn-primary" type="submit">تصفية</button>
+    </form>
+
+    <ul class="item-list">
+        {% for booking in bookings %}
+            <li>
+                <strong>#{{ booking.pk }} - {{ booking.get_booking_status_display }}</strong>
+                <span>{{ booking.student.get_full_name }} ({{ booking.student.email }})</span>
+                <span>{{ booking.teacher.user.get_full_name }} - {{ booking.scheduled_start }}</span>
+                <a class="btn" href="{% url 'admin:bookings_booking_change' booking.pk %}">فتح في Django Admin</a>
+            </li>
+        {% empty %}
+            <li>لا توجد حجوزات مطابقة.</li>
+        {% endfor %}
+    </ul>
+
+    <a class="btn" href="{% url 'adminpanel:dashboard' %}">العودة للوحة الإدارة</a>
+</section>
+{% endblock %}

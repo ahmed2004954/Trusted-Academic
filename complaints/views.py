@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
 
 from bookings.models import Booking
+from adminpanel.models import record_audit_log
 
 from .forms import ComplaintCreateForm, ComplaintStaffUpdateForm
 from .models import Complaint
@@ -144,6 +145,13 @@ def staff_complaint_detail(request, pk):
                     complaint.save()
                     if complaint.status in {Complaint.Status.OPEN, Complaint.Status.UNDER_REVIEW}:
                         mark_booking_disputed_if_needed(complaint.booking)
+                    if old_status != complaint.status:
+                        record_audit_log(
+                            request.user,
+                            'complaint.status_update',
+                            complaint,
+                            {'old_status': old_status, 'new_status': complaint.status},
+                        )
             except ValidationError as exc:
                 form.add_error(None, exc)
             else:

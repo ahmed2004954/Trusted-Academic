@@ -13,6 +13,7 @@ from django.utils.translation import gettext_lazy as _
 
 from bookings.models import Booking
 from teachers.models import BookingMode, TeacherProfile
+from adminpanel.models import record_audit_log
 
 from .forms import PaymentReceiptForm, PaymentRejectionForm, WithdrawalActionForm, WithdrawalRequestForm
 from .models import Payment, WithdrawalRequest
@@ -174,6 +175,7 @@ def approve_payment(request, payment_pk):
         booking.booking_status = Booking.BookingStatus.CONFIRMED
         booking.save(update_fields=['booking_status', 'attendance_code', 'updated_at'])
         add_pending_earning(booking)
+        record_audit_log(request.user, 'payment.approve', payment, {'booking_id': booking.pk})
 
     _send_payment_email(
         payment,
@@ -207,6 +209,12 @@ def reject_payment(request, payment_pk):
             else Booking.BookingStatus.PENDING_PAYMENT
         )
         booking.save(update_fields=['booking_status', 'updated_at'])
+        record_audit_log(
+            request.user,
+            'payment.reject',
+            payment,
+            {'booking_id': booking.pk, 'reason': payment.rejection_reason},
+        )
 
     _send_payment_email(
         payment,
@@ -296,6 +304,12 @@ def process_withdrawal(request, withdrawal_pk, action):
                 withdrawal.complete_with_reserved_balance(request.user, notes)
             else:
                 raise PermissionDenied
+            record_audit_log(
+                request.user,
+                f'withdrawal.{action}',
+                withdrawal,
+                {'notes': notes, 'amount': str(withdrawal.amount)},
+            )
     except ValidationError as exc:
         messages.error(request, ' '.join(exc.messages))
         return redirect('payments:admin_withdrawal_detail', withdrawal_pk=withdrawal.pk)

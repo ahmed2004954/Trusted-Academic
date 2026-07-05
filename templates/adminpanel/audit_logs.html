@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}سجل تدقيق الإدارة - منصة الدروس الخصوصية{% endblock %}
+
+{% block content %}
+<section class="page-content dashboard">
+    <h1>سجل تدقيق الإدارة</h1>
+
+    <ul class="item-list">
+        {% for log in logs %}
+            <li>
+                <strong>{{ log.created_at }} - {{ log.action }}</strong>
+                <span>{{ log.actor|default:'system' }} - {{ log.target_label }}</span>
+                {% if log.target_url %}<a class="btn" href="{{ log.target_url }}">فتح الهدف</a>{% endif %}
+            </li>
+        {% empty %}
+            <li>لا توجد سجلات تدقيق بعد.</li>
+        {% endfor %}
+    </ul>
+
+    <a class="btn" href="{% url 'adminpanel:dashboard' %}">العودة للوحة الإدارة</a>
+</section>
+{% endblock %}

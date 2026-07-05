@@ -1,22 +1,86 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from bookings.models import Booking
+from complaints.models import Complaint
 from teachers.forms import TeacherReviewForm
 from teachers.models import TeacherProfile
-from payments.models import Payment
+from payments.models import Payment, WithdrawalRequest
+
+from .models import AuditLog, record_audit_log
 
 
 @staff_member_required
 def dashboard(request):
-    pending_count = TeacherProfile.objects.filter(approval_status=TeacherProfile.ApprovalStatus.PENDING).count()
-    pending_payment_count = Payment.objects.filter(payment_status=Payment.PaymentStatus.AWAITING_VERIFICATION).count()
+    metrics = dashboard_metrics()
+    quick_actions = dashboard_quick_actions(metrics)
+
     return render(
         request,
         'adminpanel/dashboard.html',
-        {'pending_count': pending_count, 'pending_payment_count': pending_payment_count},
+        {
+            'metrics': metrics,
+            'quick_actions': quick_actions,
+            'pending_count': metrics['teacher_counts']['pending'],
+            'pending_payment_count': metrics['pending_payments'],
+        },
     )
+
+
+def dashboard_metrics():
+    today = timezone.localdate()
+    week_start = today - timezone.timedelta(days=today.weekday())
+    week_end = week_start + timezone.timedelta(days=7)
+    User = get_user_model()
+
+    users_by_role = User.objects.values('role').annotate(count=Count('id')).order_by('role')
+    teacher_counts = dict(
+        TeacherProfile.objects.values_list('approval_status').annotate(count=Count('id'))
+    )
+    pending_teacher_count = teacher_counts.get(TeacherProfile.ApprovalStatus.PENDING, 0)
+    pending_payment_count = Payment.objects.filter(payment_status=Payment.PaymentStatus.AWAITING_VERIFICATION).count()
+    open_complaint_count = Complaint.objects.filter(status__in=[Complaint.Status.OPEN, Complaint.Status.UNDER_REVIEW]).count()
+    pending_withdrawal_count = WithdrawalRequest.objects.filter(status=WithdrawalRequest.Status.PENDING).count()
+
+    return {
+        'total_users': User.objects.count(),
+        'users_by_role': users_by_role,
+        'teacher_counts': {
+            'pending': pending_teacher_count,
+            'approved': teacher_counts.get(TeacherProfile.ApprovalStatus.APPROVED, 0),
+            'rejected': teacher_counts.get(TeacherProfile.ApprovalStatus.REJECTED, 0),
+            'suspended': teacher_counts.get(TeacherProfile.ApprovalStatus.SUSPENDED, 0),
+        },
+        'today_bookings': Booking.objects.filter(scheduled_start__date=today).count(),
+        'week_bookings': Booking.objects.filter(scheduled_start__date__gte=week_start, scheduled_start__date__lt=week_end).count(),
+        'pending_payments': pending_payment_count,
+        'open_complaints': open_complaint_count,
+        'pending_withdrawals': pending_withdrawal_count,
+        'completed_bookings': Booking.objects.filter(booking_status=Booking.BookingStatus.COMPLETED).count(),
+    }
+
+
+def dashboard_quick_actions(metrics):
+    return [
+        {
+            'label': _('Pending teacher review queue'),
+            'url': reverse('adminpanel:pending_teachers'),
+            'count': metrics['teacher_counts']['pending'],
+        },
+        {'label': _('Payment verification queue'), 'url': reverse('payments:admin_pending'), 'count': metrics['pending_payments']},
+        {'label': _('Complaint queue'), 'url': reverse('complaints:staff_queue'), 'count': metrics['open_complaints']},
+        {'label': _('Withdrawal queue'), 'url': reverse('payments:admin_withdrawal_queue'), 'count': metrics['pending_withdrawals']},
+        {'label': _('Booking monitor'), 'url': reverse('adminpanel:booking_monitor'), 'count': None},
+        {'label': _('User list/search'), 'url': reverse('adminpanel:user_list'), 'count': None},
+        {'label': _('Django admin'), 'url': reverse('admin:index'), 'count': None},
+        {'label': _('Audit log'), 'url': reverse('adminpanel:audit_logs'), 'count': None},
+    ]
 
 
 @staff_member_required
@@ -41,15 +105,99 @@ def review_teacher(request, profile_id):
             notes = form.cleaned_data.get('verification_notes', '').strip()
             if action == 'approve':
                 profile.approve(notes)
+                record_audit_log(request.user, 'teacher.approve', profile, {'notes': notes})
                 messages.success(request, _('Teacher profile approved.'))
             elif action == 'reject':
                 profile.reject(notes)
+                record_audit_log(request.user, 'teacher.reject', profile, {'notes': notes})
                 messages.success(request, _('Teacher profile rejected.'))
             elif action == 'suspend':
                 profile.suspend(notes)
+                record_audit_log(request.user, 'teacher.suspend', profile, {'notes': notes})
                 messages.success(request, _('Teacher profile suspended.'))
             return redirect('adminpanel:review_teacher', profile_id=profile.pk)
     else:
         form = TeacherReviewForm(instance=profile)
 
     return render(request, 'adminpanel/review_teacher.html', {'profile': profile, 'form': form})
+
+
+@staff_member_required
+def booking_monitor(request):
+    bookings = filtered_bookings(request.GET)
+    filters = {
+        'status': request.GET.get('status', '').strip(),
+        'teacher': request.GET.get('teacher', '').strip(),
+        'student': request.GET.get('student', '').strip(),
+        'date_from': request.GET.get('date_from', '').strip(),
+        'date_to': request.GET.get('date_to', '').strip(),
+    }
+
+    return render(
+        request,
+        'adminpanel/booking_monitor.html',
+        {'bookings': bookings[:100], 'status_choices': Booking.BookingStatus.choices, 'filters': filters},
+    )
+
+
+def filtered_bookings(filters):
+    bookings = Booking.objects.select_related(
+        'student',
+        'parent',
+        'teacher__user',
+        'subject',
+        'grade_level',
+    )
+    status = filters.get('status', '').strip()
+    teacher = filters.get('teacher', '').strip()
+    student = filters.get('student', '').strip()
+    date_from = filters.get('date_from', '').strip()
+    date_to = filters.get('date_to', '').strip()
+
+    if status:
+        bookings = bookings.filter(booking_status=status)
+    if teacher:
+        bookings = bookings.filter(
+            Q(teacher__user__email__icontains=teacher) | Q(teacher__user__full_name__icontains=teacher)
+        )
+    if student:
+        bookings = bookings.filter(Q(student__email__icontains=student) | Q(student__full_name__icontains=student))
+    if date_from:
+        bookings = bookings.filter(scheduled_start__date__gte=date_from)
+    if date_to:
+        bookings = bookings.filter(scheduled_start__date__lte=date_to)
+    return bookings
+
+
+@staff_member_required
+def user_list(request):
+    User = get_user_model()
+    query = request.GET.get('q', '').strip()
+    role = request.GET.get('role', '').strip()
+
+    return render(
+        request,
+        'adminpanel/user_list.html',
+        {
+            'users': filtered_users(query, role)[:100],
+            'role_choices': User.Role.choices,
+            'filters': {'q': query, 'role': role},
+        },
+    )
+
+
+def filtered_users(query, role):
+    User = get_user_model()
+    users = User.objects.all()
+
+    if query:
+        users = users.filter(Q(email__icontains=query) | Q(full_name__icontains=query) | Q(phone__icontains=query))
+    if role:
+        users = users.filter(role=role)
+    return users
+
+
+@staff_member_required
+def audit_logs(request):
+    logs = AuditLog.objects.select_related('actor')[:100]
+    return render(request, 'adminpanel/audit_logs.html', {'logs': logs})

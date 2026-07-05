@@ -6,8 +6,43 @@
 <section class="page-content dashboard">
     <h1>لوحة الإدارة</h1>
     <p>مرحباً بك في لوحة الإدارة. من هنا يمكنك مراجعة المدرسين والحجوزات والمدفوعات.</p>
-    <p><a href="{% url 'adminpanel:pending_teachers' %}">طلبات المدرسين قيد المراجعة ({{ pending_count }})</a></p>
-    <p><a href="{% url 'payments:admin_pending' %}">مدفوعات بانتظار التحقق ({{ pending_payment_count }})</a></p>
-    <p><a href="{% url 'admin:index' %}">الدخول إلى Django Admin</a></p>
+
+    <h2>ملخص التشغيل</h2>
+    <div class="dashboard-grid">
+        <div class="card"><strong>إجمالي المستخدمين</strong><span>{{ metrics.total_users }}</span></div>
+        <div class="card"><strong>حجوزات اليوم</strong><span>{{ metrics.today_bookings }}</span></div>
+        <div class="card"><strong>حجوزات هذا الأسبوع</strong><span>{{ metrics.week_bookings }}</span></div>
+        <div class="card"><strong>الحجوزات المكتملة</strong><span>{{ metrics.completed_bookings }}</span></div>
+        <div class="card"><strong>مدفوعات بانتظار التحقق</strong><span>{{ metrics.pending_payments }}</span></div>
+        <div class="card"><strong>شكاوى مفتوحة/قيد المراجعة</strong><span>{{ metrics.open_complaints }}</span></div>
+        <div class="card"><strong>طلبات سحب معلقة</strong><span>{{ metrics.pending_withdrawals }}</span></div>
+    </div>
+
+    <h2>المستخدمون حسب الدور</h2>
+    <ul class="item-list">
+        {% for row in metrics.users_by_role %}
+            <li><strong>{{ row.role }}</strong><span>{{ row.count }}</span></li>
+        {% empty %}
+            <li>لا يوجد مستخدمون بعد.</li>
+        {% endfor %}
+    </ul>
+
+    <h2>حالات المدرسين</h2>
+    <div class="dashboard-grid">
+        <div class="card"><strong>قيد المراجعة</strong><span>{{ metrics.teacher_counts.pending }}</span></div>
+        <div class="card"><strong>معتمد</strong><span>{{ metrics.teacher_counts.approved }}</span></div>
+        <div class="card"><strong>مرفوض</strong><span>{{ metrics.teacher_counts.rejected }}</span></div>
+        <div class="card"><strong>موقوف</strong><span>{{ metrics.teacher_counts.suspended }}</span></div>
+    </div>
+
+    <h2>إجراءات سريعة</h2>
+    <div class="dashboard-grid">
+        {% for action in quick_actions %}
+            <a class="card" href="{{ action.url }}">
+                <strong>{{ action.label }}</strong>
+                {% if action.count != None %}<span>{{ action.count }}</span>{% endif %}
+            </a>
+        {% endfor %}
+    </div>
 </section>
 {% endblock %}

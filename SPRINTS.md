@@ -487,19 +487,19 @@
 **Goal:**Give admins visibility and control over platform operations.
 
 ### Tasks
-- [ ] Build admin summary dashboard with metrics:
+- [x] Build admin summary dashboard with metrics:
   - total users
   - pending/approved teacher counts
   - today's/this week's bookings
   - pending payment verifications
   - open complaints
-- [ ] Admin quick actions from dashboard
-- [ ] Teacher review queue
-- [ ] Payment verification queue
-- [ ] Booking monitor with filters
-- [ ] User list/search
-- [ ] Audit log view for sensitive actions
-- [ ] Add admin notifications for new teachers, payments, complaints
+- [x] Admin quick actions from dashboard
+- [x] Teacher review queue
+- [x] Payment verification queue
+- [x] Booking monitor with filters
+- [x] User list/search
+- [x] Audit log view for sensitive actions
+- [x] Add admin notifications for new teachers, payments, complaints
 
 **Deliverables:**
 - Admin operations dashboard
