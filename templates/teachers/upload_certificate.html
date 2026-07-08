@@ -1,32 +1,120 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}شهادات المدرس - منصة الدروس الخصوصية{% endblock %}
+{% block title %}مستندات وشهادات المعلم - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content auth-form">
-    <h1>إضافة شهادة</h1>
-    <p>ارفع الشهادات أو المستندات التي تدعم خبرتك التعليمية.</p>
+<style>
+    input[type="text"], input[type="file"] {
+        width: 100%;
+        background-color: #faf9f6;
+        border: 1px solid #bec9c2;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        font-family: 'IBM Plex Sans Arabic', sans-serif;
+        font-size: 14px;
+        color: #1a1c1a;
+        transition: all 0.2s ease;
+    }
+    input:focus {
+        border-color: #004532;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 69, 50, 0.1);
+    }
+</style>
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button class="btn btn-primary" type="submit">رفع الشهادة</button>
-        <a class="btn" href="{% url 'teachers:dashboard' %}">العودة للوحة المدرس</a>
-    </form>
+<main class="flex-grow pt-4 pb-xl px-margin-mobile md:px-margin-desktop text-right">
+    <div class="max-w-6xl mx-auto space-y-lg">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md border-b border-outline-variant/30 pb-6">
+            <div>
+                <p class="font-label-md text-label-md text-primary font-bold mb-xs">اعتماد المعلم</p>
+                <h1 class="font-headline-lg text-headline-lg text-on-background">المستندات والشهادات</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant mt-xs">ارفع شهاداتك الأكاديمية وخبراتك المهنية لتعزيز الثقة في ملفك.</p>
+            </div>
+            <a href="{% url 'teachers:dashboard' %}" class="inline-flex items-center gap-2 border border-outline-variant text-on-surface px-md py-2 rounded-lg font-label-md hover:bg-surface-container transition-colors">
+                <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                العودة للوحة المعلم
+            </a>
+        </header>
 
-    <h2>الشهادات المرفوعة</h2>
-    {% if certificates %}
-        <ul class="item-list">
-            {% for certificate in certificates %}
-                <li>
-                    <strong>{{ certificate.title }}</strong>
-                    <span>{{ certificate.issuing_organization }}</span>
-                    <a href="{{ certificate.file.url }}">عرض الملف</a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>لم تقم برفع أي شهادات بعد.</p>
-    {% endif %}
-</section>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+            <section class="lg:col-span-5 bg-surface-container-lowest rounded-xl border border-outline-variant/60 shadow-sm p-md md:p-lg">
+                <div class="flex items-center gap-sm mb-md">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined">upload_file</span>
+                    </div>
+                    <div>
+                        <h2 class="font-title-lg text-title-lg text-on-surface">رفع شهادة جديدة</h2>
+                        <p class="font-label-sm text-label-sm text-on-surface-variant">PDF أو صورة واضحة للمستند</p>
+                    </div>
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="mb-md bg-error-container text-on-error-container rounded-lg p-sm font-label-md">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data" class="space-y-sm">
+                    {% csrf_token %}
+                    <div class="flex flex-col gap-base">
+                        <label for="{{ form.title.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.title.label }}</label>
+                        {{ form.title }}
+                        {% for error in form.title.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                    </div>
+                    <div class="flex flex-col gap-base">
+                        <label for="{{ form.issuing_organization.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.issuing_organization.label }}</label>
+                        {{ form.issuing_organization }}
+                        {% for error in form.issuing_organization.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                    </div>
+                    <div class="flex flex-col gap-base">
+                        <label for="{{ form.file.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.file.label }}</label>
+                        {{ form.file }}
+                        {% for error in form.file.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                    </div>
+                    <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-lg py-3 rounded-lg font-label-md font-bold hover:bg-surface-tint transition-all active:scale-[0.98]">
+                        <span class="material-symbols-outlined text-[18px]">cloud_upload</span>
+                        رفع الشهادة
+                    </button>
+                </form>
+            </section>
+
+            <section class="lg:col-span-7 space-y-md">
+                <div class="flex items-center justify-between">
+                    <h2 class="font-title-lg text-title-lg text-on-background">الشهادات الحالية</h2>
+                    <span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-sm py-xs rounded-full">{{ certificates|length }} مستند</span>
+                </div>
+
+                <div class="space-y-sm">
+                    {% for cert in certificates %}
+                        <article class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 shadow-sm p-md flex flex-col sm:flex-row sm:items-center justify-between gap-sm">
+                            <div class="flex items-start gap-sm">
+                                <div class="w-11 h-11 rounded-lg bg-secondary-container/10 text-secondary flex items-center justify-center shrink-0">
+                                    <span class="material-symbols-outlined">workspace_premium</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-title-lg text-title-lg text-on-surface">{{ cert.title }}</h3>
+                                    <p class="font-body-md text-body-md text-on-surface-variant">{{ cert.issuing_organization }}</p>
+                                    <p class="font-label-sm text-label-sm text-on-surface-variant mt-base">تم الرفع: {{ cert.created_at|date:"Y-m-d" }}</p>
+                                </div>
+                            </div>
+                            {% if cert.file %}
+                                <a href="{{ cert.file.url }}" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 border border-outline-variant text-primary px-md py-2 rounded-lg font-label-md hover:bg-surface-container transition-colors">
+                                    <span class="material-symbols-outlined text-[18px]">visibility</span>
+                                    عرض الملف
+                                </a>
+                            {% endif %}
+                        </article>
+                    {% empty %}
+                        <div class="text-center py-12 bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                            <span class="material-symbols-outlined text-[48px] text-on-surface-variant mb-2">folder_open</span>
+                            <h3 class="font-title-lg font-bold text-on-surface">لا توجد شهادات مرفوعة</h3>
+                            <p class="font-body-md text-on-surface-variant mt-2 max-w-md mx-auto">ابدأ برفع شهادتك الأساسية أو مستند خبرة واضح ليظهر ضمن ملفك بعد المراجعة.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
 {% endblock %}

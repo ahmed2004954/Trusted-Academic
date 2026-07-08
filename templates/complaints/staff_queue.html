@@ -1,43 +1,79 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}إدارة الشكاوى - منصة الدروس الخصوصية{% endblock %}
+{% block title %}إدارة الشكاوى - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>إدارة الشكاوى</h1>
-    {% if complaints %}
-        <div class="table-wrap">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>رقم الشكوى</th>
-                        <th>الحجز</th>
-                        <th>مقدم الشكوى</th>
-                        <th>ضد</th>
-                        <th>التصنيف</th>
-                        <th>الحالة</th>
-                        <th>تاريخ الإنشاء</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for complaint in complaints %}
-                        <tr>
-                            <td>#{{ complaint.pk }}</td>
-                            <td>#{{ complaint.booking.pk }}</td>
-                            <td>{{ complaint.created_by.get_full_name }}</td>
-                            <td>{{ complaint.against_user.get_full_name }}</td>
-                            <td>{{ complaint.get_category_display }}</td>
-                            <td>{{ complaint.get_status_display }}</td>
-                            <td>{{ complaint.created_at|date:'Y-m-d H:i' }}</td>
-                            <td><a class="btn btn-primary" href="{% url 'complaints:staff_detail' complaint.pk %}">معالجة</a></td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <p class="empty-state compact">لا توجد شكاوى.</p>
-    {% endif %}
-</section>
+<main class="flex-grow pt-4 pb-xl px-margin-mobile md:px-margin-desktop text-right">
+    <div class="max-w-7xl mx-auto space-y-lg">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md border-b border-outline-variant/30 pb-6">
+            <div>
+                <p class="font-label-md text-label-md text-primary font-bold mb-xs">لوحة الإدارة</p>
+                <h1 class="font-headline-lg text-headline-lg text-on-background">إدارة الشكاوى والنزاعات</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant mt-xs">راجع الشكاوى المفتوحة أو قيد المراجعة واتخذ إجراءً واضحاً من صفحة التفاصيل.</p>
+            </div>
+            <a href="{% url 'adminpanel:dashboard' %}" class="inline-flex items-center gap-2 border border-outline-variant text-on-surface px-md py-2 rounded-lg font-label-md hover:bg-surface-container transition-colors">
+                <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                لوحة الإدارة
+            </a>
+        </header>
+
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+            <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                <span class="material-symbols-outlined text-primary text-[28px]">report</span>
+                <p class="font-label-md text-label-md text-on-surface-variant mt-sm">شكاوى في الطابور</p>
+                <h2 class="font-headline-md text-headline-md text-on-background mt-base">{{ complaints|length }}</h2>
+            </div>
+            <div class="md:col-span-2 bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm flex items-center gap-sm">
+                <span class="material-symbols-outlined text-secondary text-[28px]">support_agent</span>
+                <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">افتح الشكوى لمراجعة الوصف، أطراف الحجز، وتوثيق قرار الإدارة أو تحديث حالة النزاع.</p>
+            </div>
+        </section>
+
+        <section class="space-y-sm">
+            {% for complaint in complaints %}
+                <article class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm transition-all hover:border-primary/40">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-sm items-center">
+                        <div class="lg:col-span-4">
+                            <div class="flex flex-wrap items-center gap-sm mb-xs">
+                                <span class="inline-flex items-center gap-1 rounded-full bg-error-container text-on-error-container px-sm py-xs font-label-sm text-label-sm font-bold">
+                                    <span class="material-symbols-outlined text-[14px]">priority_high</span>
+                                    {{ complaint.get_status_display }}
+                                </span>
+                                <span class="font-label-sm text-label-sm text-on-surface-variant">#{{ complaint.pk }}</span>
+                            </div>
+                            <h2 class="font-title-lg text-title-lg text-on-surface">{{ complaint.get_category_display }}</h2>
+                            <p class="font-label-md text-label-md text-on-surface-variant">{{ complaint.created_at|date:"Y-m-d H:i" }}</p>
+                        </div>
+
+                        <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                            <div class="bg-surface-container rounded-lg p-sm border border-outline-variant/30">
+                                <p class="font-label-sm text-label-sm text-on-surface-variant">الطالب</p>
+                                <p class="font-label-md text-label-md text-on-surface font-bold">{{ complaint.booking.student.get_full_name|default:complaint.booking.student.email }}</p>
+                            </div>
+                            <div class="bg-surface-container rounded-lg p-sm border border-outline-variant/30">
+                                <p class="font-label-sm text-label-sm text-on-surface-variant">المعلم / المادة</p>
+                                <p class="font-label-md text-label-md text-on-surface font-bold">{{ complaint.booking.teacher.user.get_full_name|default:complaint.booking.teacher.user.email }} - {{ complaint.booking.subject.name }}</p>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-3 flex flex-col gap-sm">
+                            <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">{{ complaint.description }}</p>
+                            <a href="{% url 'complaints:staff_detail' pk=complaint.pk %}" class="inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-md py-2 rounded-lg font-label-md font-bold hover:bg-surface-tint transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">manage_search</span>
+                                معالجة
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="text-center py-12 bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                    <span class="material-symbols-outlined text-[48px] text-on-surface-variant mb-2">task_alt</span>
+                    <h3 class="font-title-lg font-bold text-on-surface">لا توجد شكاوى مفتوحة</h3>
+                    <p class="font-body-md text-on-surface-variant mt-2 max-w-md mx-auto">كل الشكاوى الحالية تمت معالجتها أو لا توجد بلاغات جديدة.</p>
+                </div>
+            {% endfor %}
+        </section>
+    </div>
+</main>
 {% endblock %}

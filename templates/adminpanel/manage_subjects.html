@@ -1,0 +1,213 @@
+{% extends 'base_identity.html' %}
+{% load static %}
+
+{% block title %}إدارة المواد والتسعير - ثقة أكاديمية{% endblock %}
+
+{% block content %}
+<style>
+    input[type="text"], input[type="number"], select {
+        width: 100%;
+        background-color: #faf9f6;
+        border: 1px solid #bec9c2;
+        border-radius: 0.5rem;
+        padding: 0.65rem 0.75rem;
+        font-family: 'IBM Plex Sans Arabic', sans-serif;
+        font-size: 14px;
+        color: #1a1c1a;
+        transition: all 0.2s ease;
+    }
+    input:focus, select:focus {
+        border-color: #004532;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 69, 50, 0.1);
+    }
+    input[type="checkbox"] {
+        width: 1rem;
+        height: 1rem;
+        accent-color: #004532;
+    }
+</style>
+
+<main class="flex-grow pt-4 pb-xl px-margin-mobile md:px-margin-desktop text-right">
+    <div class="max-w-7xl mx-auto space-y-lg">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md border-b border-outline-variant/30 pb-6">
+            <div>
+                <p class="font-label-md text-label-md text-primary font-bold mb-xs">لوحة الإدارة</p>
+                <h1 class="font-headline-lg text-headline-lg text-on-background">إدارة المواد والمراحل والتسعير</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant mt-xs">اضبط القوائم التي يعتمد عليها المعلمون والطلاب في البحث والحجز.</p>
+            </div>
+            <a href="{% url 'adminpanel:dashboard' %}" class="inline-flex items-center gap-2 border border-outline-variant text-on-surface px-md py-2 rounded-lg font-label-md hover:bg-surface-container transition-colors">
+                <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                لوحة الإدارة
+            </a>
+        </header>
+
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+            <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                <span class="material-symbols-outlined text-primary text-[28px]">menu_book</span>
+                <p class="font-label-md text-label-md text-on-surface-variant mt-sm">المواد</p>
+                <h2 class="font-headline-md text-headline-md text-on-background mt-base">{{ subjects|length }}</h2>
+            </div>
+            <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                <span class="material-symbols-outlined text-secondary text-[28px]">school</span>
+                <p class="font-label-md text-label-md text-on-surface-variant mt-sm">المراحل</p>
+                <h2 class="font-headline-md text-headline-md text-on-background mt-base">{{ grade_levels|length }}</h2>
+            </div>
+            <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                <span class="material-symbols-outlined text-primary text-[28px]">payments</span>
+                <p class="font-label-md text-label-md text-on-surface-variant mt-sm">نطاقات الأسعار</p>
+                <h2 class="font-headline-md text-headline-md text-on-background mt-base">{{ pricing_ranges|length }}</h2>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 xl:grid-cols-12 gap-gutter">
+            <div class="xl:col-span-4 space-y-md">
+                <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                    <h2 class="font-title-lg text-title-lg text-on-surface mb-sm">إضافة مادة</h2>
+                    <form method="post" action="{% url 'adminpanel:add_subject' %}" class="flex flex-col gap-sm">
+                        {% csrf_token %}
+                        <input name="name" placeholder="اسم المادة" required>
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-md py-2.5 rounded-lg font-label-md font-bold hover:bg-surface-tint transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">add</span>
+                            إضافة مادة
+                        </button>
+                    </form>
+                </div>
+
+                <div class="space-y-sm">
+                    {% for subject in subjects %}
+                        <form method="post" action="{% url 'adminpanel:edit_subject' subject_id=subject.pk %}" class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-sm shadow-sm space-y-sm">
+                            {% csrf_token %}
+                            <input name="name" value="{{ subject.name }}" required>
+                            <div class="flex items-center justify-between gap-sm">
+                                <label class="inline-flex items-center gap-2 font-label-md text-label-md text-on-surface-variant">
+                                    <input type="checkbox" name="is_active" {% if subject.is_active %}checked{% endif %}>
+                                    نشطة
+                                </label>
+                                <button type="submit" class="inline-flex items-center gap-1 border border-outline-variant text-on-surface px-sm py-2 rounded-lg font-label-md hover:bg-surface-container transition-colors">
+                                    <span class="material-symbols-outlined text-[16px]">save</span>
+                                    حفظ
+                                </button>
+                            </div>
+                        </form>
+                    {% empty %}
+                        <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md text-center text-on-surface-variant">لا توجد مواد بعد.</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="xl:col-span-4 space-y-md">
+                <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                    <h2 class="font-title-lg text-title-lg text-on-surface mb-sm">إضافة مرحلة</h2>
+                    <form method="post" action="{% url 'adminpanel:add_grade_level' %}" class="grid grid-cols-1 gap-sm">
+                        {% csrf_token %}
+                        <input name="name" placeholder="اسم المرحلة" required>
+                        <select name="category" required>
+                            <option value="primary">ابتدائي</option>
+                            <option value="preparatory">إعدادي</option>
+                            <option value="secondary" selected>ثانوي</option>
+                        </select>
+                        <input name="order" type="number" min="0" value="0" placeholder="الترتيب">
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-md py-2.5 rounded-lg font-label-md font-bold hover:bg-surface-tint transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">add</span>
+                            إضافة مرحلة
+                        </button>
+                    </form>
+                </div>
+
+                <div class="space-y-sm">
+                    {% for gl in grade_levels %}
+                        <form method="post" action="{% url 'adminpanel:edit_grade_level' gl_id=gl.pk %}" class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-sm shadow-sm space-y-sm">
+                            {% csrf_token %}
+                            <input name="name" value="{{ gl.name }}" required>
+                            <div class="grid grid-cols-2 gap-sm">
+                                <select name="category" required>
+                                    <option value="primary" {% if gl.category == 'primary' %}selected{% endif %}>ابتدائي</option>
+                                    <option value="preparatory" {% if gl.category == 'preparatory' %}selected{% endif %}>إعدادي</option>
+                                    <option value="secondary" {% if gl.category == 'secondary' %}selected{% endif %}>ثانوي</option>
+                                </select>
+                                <input name="order" type="number" min="0" value="{{ gl.order }}">
+                            </div>
+                            <div class="flex items-center justify-between gap-sm">
+                                <label class="inline-flex items-center gap-2 font-label-md text-label-md text-on-surface-variant">
+                                    <input type="checkbox" name="is_active" {% if gl.is_active %}checked{% endif %}>
+                                    نشطة
+                                </label>
+                                <button type="submit" class="inline-flex items-center gap-1 border border-outline-variant text-on-surface px-sm py-2 rounded-lg font-label-md hover:bg-surface-container transition-colors">
+                                    <span class="material-symbols-outlined text-[16px]">save</span>
+                                    حفظ
+                                </button>
+                            </div>
+                        </form>
+                    {% empty %}
+                        <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md text-center text-on-surface-variant">لا توجد مراحل بعد.</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="xl:col-span-4 space-y-md">
+                <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                    <h2 class="font-title-lg text-title-lg text-on-surface mb-sm">إضافة نطاق سعر</h2>
+                    <form method="post" action="{% url 'adminpanel:add_pricing_range' %}" class="grid grid-cols-1 gap-sm">
+                        {% csrf_token %}
+                        <select name="subject" required>
+                            <option value="">اختر المادة</option>
+                            {% for subject in subjects %}
+                                <option value="{{ subject.pk }}">{{ subject.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <select name="grade_level" required>
+                            <option value="">اختر المرحلة</option>
+                            {% for gl in grade_levels %}
+                                <option value="{{ gl.pk }}">{{ gl.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <select name="lesson_type" required>
+                            <option value="">نوع الحصة</option>
+                            {% for value, label in lesson_types %}
+                                <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="grid grid-cols-2 gap-sm">
+                            <input name="min_price" type="number" step="0.01" min="0" placeholder="أقل سعر" required>
+                            <input name="max_price" type="number" step="0.01" min="0" placeholder="أعلى سعر" required>
+                        </div>
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-md py-2.5 rounded-lg font-label-md font-bold hover:bg-surface-tint transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">add</span>
+                            إضافة نطاق
+                        </button>
+                    </form>
+                </div>
+
+                <div class="space-y-sm">
+                    {% for pr in pricing_ranges %}
+                        <form method="post" action="{% url 'adminpanel:edit_pricing_range' pr_id=pr.pk %}" class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-sm shadow-sm space-y-sm">
+                            {% csrf_token %}
+                            <div>
+                                <h3 class="font-label-md text-label-md text-on-surface font-bold">{{ pr.subject.name }} - {{ pr.grade_level.name }}</h3>
+                                <p class="font-label-sm text-label-sm text-on-surface-variant">{{ pr.get_lesson_type_display }}</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-sm">
+                                <input name="min_price" type="number" step="0.01" min="0" value="{{ pr.min_price }}">
+                                <input name="max_price" type="number" step="0.01" min="0" value="{{ pr.max_price }}">
+                            </div>
+                            <div class="flex items-center justify-between gap-sm">
+                                <label class="inline-flex items-center gap-2 font-label-md text-label-md text-on-surface-variant">
+                                    <input type="checkbox" name="is_active" {% if pr.is_active %}checked{% endif %}>
+                                    نشط
+                                </label>
+                                <button type="submit" class="inline-flex items-center gap-1 border border-outline-variant text-on-surface px-sm py-2 rounded-lg font-label-md hover:bg-surface-container transition-colors">
+                                    <span class="material-symbols-outlined text-[16px]">save</span>
+                                    حفظ
+                                </button>
+                            </div>
+                        </form>
+                    {% empty %}
+                        <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md text-center text-on-surface-variant">لا توجد نطاقات أسعار بعد.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+{% endblock %}

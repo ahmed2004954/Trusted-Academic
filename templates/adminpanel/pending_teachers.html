@@ -1,42 +1,79 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}طلبات المدرسين - ثقة أكاديمية{% endblock %}
+{% block title %}مراجعة واعتماد المعلمين - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content text-right">
-    <div class="border-b border-outline-variant/30 pb-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-            <h1 class="font-display-lg text-primary font-bold">طلبات الاعتماد قيد المراجعة</h1>
-            <p class="text-xs text-on-surface-variant mt-1">تفعيل ومراجعة طلبات الانضمام الجديدة لمعلمي منصة ثقة أكاديمية.</p>
-        </div>
-        <a class="btn btn-secondary text-xs" href="{% url 'adminpanel:dashboard' %}">العودة للوحة الإدارة</a>
-    </div>
+<main class="flex-grow pt-4 pb-xl px-margin-mobile md:px-margin-desktop text-right">
+    <div class="max-w-7xl mx-auto space-y-lg">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md border-b border-outline-variant/30 pb-6">
+            <div>
+                <p class="font-label-md text-label-md text-primary font-bold mb-xs">لوحة الإدارة</p>
+                <h1 class="font-headline-lg text-headline-lg text-on-background">مراجعة واعتماد المعلمين</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant mt-xs">راجع ملفات المعلمين المنتظرة قبل السماح لهم بالظهور واستقبال الحجوزات.</p>
+            </div>
+            <a href="{% url 'adminpanel:dashboard' %}" class="inline-flex items-center gap-2 border border-outline-variant text-on-surface px-md py-2 rounded-lg font-label-md hover:bg-surface-container transition-colors">
+                <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                لوحة الإدارة
+            </a>
+        </header>
 
-    {% if profiles %}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+            <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                <span class="material-symbols-outlined text-primary text-[28px]">pending_actions</span>
+                <p class="font-label-md text-label-md text-on-surface-variant mt-sm">طلبات بانتظار القرار</p>
+                <h2 class="font-headline-md text-headline-md text-on-background mt-base">{{ profiles|length }}</h2>
+            </div>
+            <div class="md:col-span-2 bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm flex items-center gap-sm">
+                <span class="material-symbols-outlined text-secondary text-[28px]">verified_user</span>
+                <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">افتح ملف كل معلم لمراجعة البيانات، الشهادات، والملاحظات قبل قرار الاعتماد أو الرفض.</p>
+            </div>
+        </section>
+
+        <section class="space-y-sm">
             {% for profile in profiles %}
-                <div class="bg-surface border border-outline-variant/50 rounded-2xl p-5 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
-                    <div>
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <h3 class="font-bold text-sm text-on-surface">{{ profile.user.get_full_name }}</h3>
-                                <span class="text-[10px] text-on-surface-variant font-medium block mt-0.5">{{ profile.user.email }}</span>
+                <article class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm transition-all hover:border-primary/40 hover:-translate-y-0.5">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-md items-center">
+                        <div class="lg:col-span-5 flex items-start gap-sm">
+                            <div class="w-14 h-14 rounded-xl bg-primary-container/10 text-primary flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-[32px]">account_circle</span>
                             </div>
-                            {% include 'partials/_badge.html' with text='قيد المراجعة' type='warning' %}
+                            <div>
+                                <h2 class="font-title-lg text-title-lg text-on-surface">{{ profile.user.get_full_name|default:profile.user.email }}</h2>
+                                <p class="font-label-md text-label-md text-on-surface-variant">{{ profile.user.email }}</p>
+                                {% if profile.headline %}
+                                    <p class="font-body-md text-body-md text-on-surface-variant mt-xs">{{ profile.headline }}</p>
+                                {% endif %}
+                            </div>
                         </div>
-                        <p class="text-xs text-on-surface-variant leading-relaxed h-8 overflow-hidden mt-3">
-                            {{ profile.headline|default:'لم يتم إدخال عنوان مختصر بعد.' }}
-                        </p>
+
+                        <div class="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                            <div class="bg-surface-container rounded-lg p-sm border border-outline-variant/30">
+                                <p class="font-label-sm text-label-sm text-on-surface-variant">تاريخ الطلب</p>
+                                <p class="font-label-md text-label-md text-on-surface font-bold">{{ profile.created_at|date:"Y-m-d" }}</p>
+                            </div>
+                            <div class="bg-surface-container rounded-lg p-sm border border-outline-variant/30">
+                                <p class="font-label-sm text-label-sm text-on-surface-variant">الحالة</p>
+                                <p class="font-label-md text-label-md text-secondary font-bold">{{ profile.get_approval_status_display }}</p>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-3 flex justify-end">
+                            <a href="{% url 'adminpanel:review_teacher' profile_id=profile.pk %}" class="inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-md py-2.5 rounded-lg font-label-md font-bold hover:bg-surface-tint transition-all active:scale-[0.98] w-full sm:w-auto">
+                                <span class="material-symbols-outlined text-[18px]">fact_check</span>
+                                مراجعة الملف
+                            </a>
+                        </div>
                     </div>
-                    
-                    <div class="mt-5 pt-3 border-t border-outline-variant/30 flex justify-end">
-                        <a class="btn btn-primary text-xs py-2 px-6" href="{% url 'adminpanel:review_teacher' profile.pk %}">مراجعة الملف والشهادات</a>
-                    </div>
+                </article>
+            {% empty %}
+                <div class="text-center py-12 bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                    <span class="material-symbols-outlined text-[48px] text-on-surface-variant mb-2">task_alt</span>
+                    <h3 class="font-title-lg font-bold text-on-surface">لا توجد طلبات معلقة</h3>
+                    <p class="font-body-md text-on-surface-variant mt-2 max-w-md mx-auto">قائمة مراجعة المعلمين فارغة حالياً. أي طلب جديد سيظهر هنا تلقائياً.</p>
                 </div>
             {% endfor %}
-        </div>
-    {% else %}
-        {% include 'partials/_empty_state.html' with icon='checklist' title='لا توجد طلبات معلقة' desc='جميع طلبات المعلمين الحالية تمت معالجتها واعتمادها بنجاح.' action_url='/adminpanel/' action_text='لوحة الإدارة' %}
-    {% endif %}
-</section>
+        </section>
+    </div>
+</main>
 {% endblock %}

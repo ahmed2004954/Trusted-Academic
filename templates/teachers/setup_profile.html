@@ -1,17 +1,135 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}إعداد بروفايل المدرس - منصة الدروس الخصوصية{% endblock %}
+{% block title %}تعديل بروفايل المعلم - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content auth-form">
-    <h1>إعداد بروفايل المدرس</h1>
-    <p>أكمل بياناتك المهنية ليتمكن فريق الإدارة من مراجعة طلبك.</p>
+<style>
+    input[type="text"], input[type="number"], input[type="url"], input[type="file"], select, textarea {
+        width: 100%;
+        background-color: #faf9f6;
+        border: 1px solid #bec9c2;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        font-family: 'IBM Plex Sans Arabic', sans-serif;
+        font-size: 14px;
+        color: #1a1c1a;
+        transition: all 0.2s ease;
+    }
+    input:focus, select:focus, textarea:focus {
+        border-color: #004532;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 69, 50, 0.1);
+    }
+</style>
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button class="btn btn-primary" type="submit">حفظ البروفايل</button>
-        <a class="btn" href="{% url 'teachers:dashboard' %}">العودة للوحة المدرس</a>
-    </form>
-</section>
+<main class="flex-grow pt-4 pb-xl px-margin-mobile md:px-margin-desktop text-right">
+    <div class="max-w-5xl mx-auto space-y-lg">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md border-b border-outline-variant/30 pb-6">
+            <div>
+                <p class="font-label-md text-label-md text-primary font-bold mb-xs">إدارة حساب المعلم</p>
+                <h1 class="font-headline-lg text-headline-lg text-on-background">تعديل بروفايل المعلم</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant mt-xs">حدّث نبذتك وخبراتك ومواد التعريف التي تظهر للطلاب وأولياء الأمور.</p>
+            </div>
+            <a href="{% url 'teachers:dashboard' %}" class="inline-flex items-center gap-2 border border-outline-variant text-on-surface px-md py-2 rounded-lg font-label-md hover:bg-surface-container transition-colors">
+                <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                العودة للوحة المعلم
+            </a>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+            <aside class="lg:col-span-4 space-y-md">
+                <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 p-md shadow-sm">
+                    <div class="flex items-center gap-sm mb-sm">
+                        <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                            <span class="material-symbols-outlined icon-fill">verified_user</span>
+                        </div>
+                        <div>
+                            <h2 class="font-title-lg text-title-lg text-on-surface">بيانات موثوقة</h2>
+                            <p class="font-label-sm text-label-sm text-on-surface-variant">تظهر في صفحة المعلم العامة</p>
+                        </div>
+                    </div>
+                    <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">اكتب وصفاً واضحاً يشرح تخصصك وطريقتك في التدريس. الملفات المرفوعة تساعد الإدارة والطلاب على تقييم مصداقية الحساب.</p>
+                </div>
+
+                {% if profile %}
+                    <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 p-md shadow-sm space-y-sm">
+                        <h3 class="font-title-lg text-title-lg text-on-surface">حالة الملف</h3>
+                        <span class="inline-flex items-center gap-1 rounded-full bg-surface-container px-sm py-xs text-primary font-label-sm text-label-sm font-bold">
+                            <span class="material-symbols-outlined text-[16px]">pending_actions</span>
+                            {{ profile.get_approval_status_display }}
+                        </span>
+                        {% if profile.verification_notes %}
+                            <p class="font-body-md text-body-md text-on-surface-variant"><strong>ملاحظات الإدارة:</strong> {{ profile.verification_notes }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </aside>
+
+            <section class="lg:col-span-8 bg-surface-container-lowest rounded-xl border border-outline-variant/60 shadow-sm p-md md:p-lg">
+                {% if form.non_field_errors %}
+                    <div class="mb-md bg-error-container text-on-error-container rounded-lg p-sm font-label-md">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data" class="space-y-md">
+                    {% csrf_token %}
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+                        <div class="md:col-span-2 flex flex-col gap-base">
+                            <label for="{{ form.headline.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.headline.label }}</label>
+                            {{ form.headline }}
+                            {% for error in form.headline.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+
+                        <div class="flex flex-col gap-base">
+                            <label for="{{ form.experience_years.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.experience_years.label }}</label>
+                            {{ form.experience_years }}
+                            {% for error in form.experience_years.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+
+                        <div class="flex flex-col gap-base">
+                            <label for="{{ form.booking_mode.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.booking_mode.label }}</label>
+                            {{ form.booking_mode }}
+                            {% for error in form.booking_mode.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+
+                        <div class="flex flex-col gap-base">
+                            <label for="{{ form.photo.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.photo.label }}</label>
+                            {{ form.photo }}
+                            {% for error in form.photo.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+
+                        <div class="flex flex-col gap-base">
+                            <label for="{{ form.cv_file.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.cv_file.label }}</label>
+                            {{ form.cv_file }}
+                            {% for error in form.cv_file.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+
+                        <div class="md:col-span-2 flex flex-col gap-base">
+                            <label for="{{ form.intro_video_url.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.intro_video_url.label }}</label>
+                            {{ form.intro_video_url }}
+                            {% for error in form.intro_video_url.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+
+                        <div class="md:col-span-2 flex flex-col gap-base">
+                            <label for="{{ form.bio.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.bio.label }}</label>
+                            {{ form.bio }}
+                            {% for error in form.bio.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-sm justify-end border-t border-outline-variant/30 pt-md">
+                        <a href="{% url 'teachers:dashboard' %}" class="text-center border border-outline-variant text-on-surface px-lg py-3 rounded-lg font-label-md hover:bg-surface-container transition-colors">إلغاء</a>
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-lg py-3 rounded-lg font-label-md font-bold hover:bg-surface-tint transition-all active:scale-[0.98]">
+                            <span class="material-symbols-outlined text-[18px]">save</span>
+                            حفظ وتحديث البروفايل
+                        </button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+</main>
 {% endblock %}

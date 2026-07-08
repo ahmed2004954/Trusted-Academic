@@ -1,48 +1,124 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}مراقبة الحجوزات - منصة الدروس الخصوصية{% endblock %}
+{% block title %}مراقبة الحجوزات - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content dashboard">
-    <h1>مراقبة الحجوزات</h1>
+<style>
+    select, input[type="text"], input[type="date"] {
+        width: 100%;
+        background-color: #faf9f6;
+        border: 1px solid #bec9c2;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        font-family: 'IBM Plex Sans Arabic', sans-serif;
+        font-size: 14px;
+        color: #1a1c1a;
+        transition: all 0.2s ease;
+    }
+    select:focus, input:focus {
+        border-color: #004532;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 69, 50, 0.1);
+    }
+</style>
 
-    <form method="get" class="filter-form">
-        <label>الحالة
-            <select name="status">
-                <option value="">كل الحالات</option>
-                {% for value, label in status_choices %}
-                    <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-            </select>
-        </label>
-        <label>المدرس
-            <input type="search" name="teacher" value="{{ filters.teacher }}" placeholder="البريد أو الاسم">
-        </label>
-        <label>الطالب
-            <input type="search" name="student" value="{{ filters.student }}" placeholder="البريد أو الاسم">
-        </label>
-        <label>من
-            <input type="date" name="date_from" value="{{ filters.date_from }}">
-        </label>
-        <label>إلى
-            <input type="date" name="date_to" value="{{ filters.date_to }}">
-        </label>
-        <button class="btn btn-primary" type="submit">تصفية</button>
-    </form>
+<main class="flex-grow pt-4 pb-xl px-margin-mobile md:px-margin-desktop text-right">
+    <div class="max-w-7xl mx-auto space-y-lg">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md border-b border-outline-variant/30 pb-6">
+            <div>
+                <p class="font-label-md text-label-md text-primary font-bold mb-xs">لوحة الإدارة</p>
+                <h1 class="font-headline-lg text-headline-lg text-on-background">مراقبة الحجوزات</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant mt-xs">فلترة ومراجعة آخر 100 حجز حسب الحالة والأطراف والتاريخ.</p>
+            </div>
+            <a href="{% url 'adminpanel:dashboard' %}" class="inline-flex items-center gap-2 border border-outline-variant text-on-surface px-md py-2 rounded-lg font-label-md hover:bg-surface-container transition-colors">
+                <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                لوحة الإدارة
+            </a>
+        </header>
 
-    <ul class="item-list">
-        {% for booking in bookings %}
-            <li>
-                <strong>#{{ booking.pk }} - {{ booking.get_booking_status_display }}</strong>
-                <span>{{ booking.student.get_full_name }} ({{ booking.student.email }})</span>
-                <span>{{ booking.teacher.user.get_full_name }} - {{ booking.scheduled_start }}</span>
-                <a class="btn" href="{% url 'admin:bookings_booking_change' booking.pk %}">فتح في Django Admin</a>
-            </li>
-        {% empty %}
-            <li>لا توجد حجوزات مطابقة.</li>
-        {% endfor %}
-    </ul>
+        <section class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+            <form method="get" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-sm items-end">
+                <div class="flex flex-col gap-base">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant">الحالة</label>
+                    <select name="status">
+                        <option value="">كل الحالات</option>
+                        {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="flex flex-col gap-base">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant">المعلم</label>
+                    <input name="teacher" value="{{ filters.teacher }}" placeholder="اسم أو بريد المعلم">
+                </div>
+                <div class="flex flex-col gap-base">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant">الطالب</label>
+                    <input name="student" value="{{ filters.student }}" placeholder="اسم أو بريد الطالب">
+                </div>
+                <div class="flex flex-col gap-base">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant">من تاريخ</label>
+                    <input name="date_from" type="date" value="{{ filters.date_from }}">
+                </div>
+                <div class="flex flex-col gap-base">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant">إلى تاريخ</label>
+                    <input name="date_to" type="date" value="{{ filters.date_to }}">
+                </div>
+                <div class="flex gap-sm">
+                    <button type="submit" class="flex-1 inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-md py-3 rounded-lg font-label-md font-bold hover:bg-surface-tint transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">search</span>
+                        بحث
+                    </button>
+                    <a href="{% url 'adminpanel:booking_monitor' %}" class="inline-flex items-center justify-center border border-outline-variant text-on-surface px-sm py-3 rounded-lg hover:bg-surface-container transition-colors" title="إعادة تعيين">
+                        <span class="material-symbols-outlined text-[18px]">restart_alt</span>
+                    </a>
+                </div>
+            </form>
+        </section>
 
-    <a class="btn" href="{% url 'adminpanel:dashboard' %}">العودة للوحة الإدارة</a>
-</section>
+        <section class="space-y-sm">
+            {% for booking in bookings %}
+                <article class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm transition-all hover:border-primary/40">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-sm items-center">
+                        <div class="lg:col-span-4">
+                            <div class="flex items-center gap-sm mb-xs">
+                                <span class="inline-flex items-center gap-1 rounded-full bg-surface-container px-sm py-xs font-label-sm text-label-sm text-primary font-bold">
+                                    <span class="material-symbols-outlined text-[14px]">confirmation_number</span>
+                                    #{{ booking.pk }}
+                                </span>
+                                <span class="font-label-sm text-label-sm text-on-surface-variant">{{ booking.get_booking_status_display }}</span>
+                            </div>
+                            <h2 class="font-title-lg text-title-lg text-on-surface">{{ booking.subject.name }} - {{ booking.grade_level.name }}</h2>
+                            <p class="font-label-md text-label-md text-on-surface-variant">{{ booking.scheduled_start|date:"Y-m-d H:i" }}</p>
+                        </div>
+
+                        <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                            <div class="bg-surface-container rounded-lg p-sm border border-outline-variant/30">
+                                <p class="font-label-sm text-label-sm text-on-surface-variant">الطالب</p>
+                                <p class="font-label-md text-label-md text-on-surface font-bold">{{ booking.student.get_full_name|default:booking.student.email }}</p>
+                            </div>
+                            <div class="bg-surface-container rounded-lg p-sm border border-outline-variant/30">
+                                <p class="font-label-sm text-label-sm text-on-surface-variant">المعلم</p>
+                                <p class="font-label-md text-label-md text-on-surface font-bold">{{ booking.teacher.user.get_full_name|default:booking.teacher.user.email }}</p>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-3 flex flex-col sm:flex-row lg:flex-col xl:flex-row justify-end gap-sm">
+                            <a href="{% url 'bookings:teacher_detail' pk=booking.pk %}" class="inline-flex items-center justify-center gap-2 border border-outline-variant text-on-surface px-md py-2 rounded-lg font-label-md hover:bg-surface-container transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">visibility</span>
+                                تفاصيل
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="text-center py-12 bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                    <span class="material-symbols-outlined text-[48px] text-on-surface-variant mb-2">event_busy</span>
+                    <h3 class="font-title-lg font-bold text-on-surface">لا توجد حجوزات مطابقة</h3>
+                    <p class="font-body-md text-on-surface-variant mt-2 max-w-md mx-auto">غيّر الفلاتر أو أعد التعيين لعرض أحدث الحجوزات.</p>
+                </div>
+            {% endfor %}
+        </section>
+    </div>
+</main>
 {% endblock %}

@@ -1,20 +1,125 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}تقرير ما بعد الحصة - منصة الدروس الخصوصية{% endblock %}
+{% block title %}تقرير ما بعد الحصة - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>إنشاء تقرير ما بعد الحصة</h1>
-    <div class="status-card">
-        <p><strong>الطالب:</strong> {{ booking.student.get_full_name }}</p>
-        <p><strong>المادة:</strong> {{ booking.subject.name }} - {{ booking.grade_level.name }}</p>
-        <p><strong>الموعد:</strong> {{ booking.scheduled_start|date:'Y-m-d H:i' }}</p>
+<style>
+    textarea {
+        width: 100%;
+        background-color: #faf9f6;
+        border: 1px solid #bec9c2;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        font-family: 'IBM Plex Sans Arabic', sans-serif;
+        font-size: 14px;
+        color: #1a1c1a;
+        transition: all 0.2s ease;
+    }
+    textarea:focus {
+        border-color: #004532;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 69, 50, 0.1);
+    }
+</style>
+
+<main class="flex-grow pt-4 pb-xl px-margin-mobile md:px-margin-desktop text-right">
+    <div class="max-w-6xl mx-auto space-y-lg">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md border-b border-outline-variant/30 pb-6">
+            <div>
+                <p class="font-label-md text-label-md text-primary font-bold mb-xs">متابعة التعلم</p>
+                <h1 class="font-headline-lg text-headline-lg text-on-background">تقرير ما بعد الحصة</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant mt-xs">سجل ملخص الأداء والخطوات التالية ليصل الطالب وولي الأمر لصورة واضحة.</p>
+            </div>
+            <a href="{% url 'bookings:teacher_detail' pk=booking.pk %}" class="inline-flex items-center gap-2 border border-outline-variant text-on-surface px-md py-2 rounded-lg font-label-md hover:bg-surface-container transition-colors">
+                <span class="material-symbols-outlined text-[18px]">assignment</span>
+                تفاصيل الحجز
+            </a>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+            <aside class="lg:col-span-4 space-y-md">
+                <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 shadow-sm p-md">
+                    <h2 class="font-title-lg text-title-lg text-on-surface mb-sm">بيانات الحصة</h2>
+                    <div class="space-y-xs">
+                        <div class="flex justify-between gap-sm border-b border-outline-variant/30 pb-xs">
+                            <span class="font-body-md text-on-surface-variant">الطالب</span>
+                            <span class="font-body-md text-on-surface font-bold">{{ booking.student.get_full_name|default:booking.student.email }}</span>
+                        </div>
+                        <div class="flex justify-between gap-sm border-b border-outline-variant/30 pb-xs">
+                            <span class="font-body-md text-on-surface-variant">المادة</span>
+                            <span class="font-body-md text-on-surface font-bold">{{ booking.subject.name }}</span>
+                        </div>
+                        <div class="flex justify-between gap-sm border-b border-outline-variant/30 pb-xs">
+                            <span class="font-body-md text-on-surface-variant">المرحلة</span>
+                            <span class="font-body-md text-on-surface font-bold">{{ booking.grade_level.name }}</span>
+                        </div>
+                        <div class="flex justify-between gap-sm">
+                            <span class="font-body-md text-on-surface-variant">موعد الحصة</span>
+                            <span class="font-body-md text-on-surface font-bold">{{ booking.scheduled_start|date:"Y-m-d H:i" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 shadow-sm p-md">
+                    <div class="flex items-start gap-sm">
+                        <span class="material-symbols-outlined text-primary">fact_check</span>
+                        <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">اجعل التقرير عملياً: ما الذي تم شرحه، أين تحسن الطالب، وما المطلوب قبل الحصة القادمة.</p>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="lg:col-span-8 bg-surface-container-lowest rounded-xl border border-outline-variant/60 shadow-sm p-md md:p-lg">
+                {% if form.non_field_errors %}
+                    <div class="mb-md bg-error-container text-on-error-container rounded-lg p-sm font-label-md">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <form method="post" class="space-y-sm">
+                    {% csrf_token %}
+
+                    <div class="flex flex-col gap-base">
+                        <label for="{{ form.summary.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.summary.label }}</label>
+                        {{ form.summary }}
+                        {% for error in form.summary.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+                        <div class="flex flex-col gap-base">
+                            <label for="{{ form.strengths.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.strengths.label }}</label>
+                            {{ form.strengths }}
+                            {% for error in form.strengths.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+                        <div class="flex flex-col gap-base">
+                            <label for="{{ form.weaknesses.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.weaknesses.label }}</label>
+                            {{ form.weaknesses }}
+                            {% for error in form.weaknesses.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+                        <div class="flex flex-col gap-base">
+                            <label for="{{ form.homework.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.homework.label }}</label>
+                            {{ form.homework }}
+                            {% for error in form.homework.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+                        <div class="flex flex-col gap-base">
+                            <label for="{{ form.next_steps.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.next_steps.label }}</label>
+                            {{ form.next_steps }}
+                            {% for error in form.next_steps.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end border-t border-outline-variant/30 pt-md">
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-lg py-3 rounded-lg font-label-md font-bold hover:bg-surface-tint transition-all active:scale-[0.98]">
+                            <span class="material-symbols-outlined text-[18px]">send</span>
+                            إرسال التقرير
+                        </button>
+                    </div>
+                </form>
+            </section>
+        </div>
     </div>
-    <form method="post" class="form-card">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">حفظ التقرير وإرساله</button>
-        <a class="btn btn-secondary" href="{% url 'bookings:teacher_detail' booking.pk %}">رجوع</a>
-    </form>
-</section>
+</main>
 {% endblock %}
