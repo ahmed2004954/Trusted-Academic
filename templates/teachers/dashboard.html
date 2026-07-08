@@ -1,150 +1,227 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}لوحة التحكم للمعلم - ثقة أكاديمية{% endblock %}
+{% block title %}لوحة تحكم المعلم - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content dashboard text-right">
-    <!-- Welcome Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 border-b border-outline-variant/30 pb-6">
-        <div>
-            <h1 class="font-display-lg text-primary font-bold mb-1">لوحة تحكم المعلم</h1>
-            <p class="text-sm text-on-surface-variant">مرحباً بك في بوابتك الأكاديمية. يمكنك هنا التحكم بملفك العام، مواعيد حصصك، والمحفظة المالية.</p>
-        </div>
-        <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                {{ user.first_name|first }}
-            </div>
-            <div>
-                <span class="font-semibold block text-on-surface">{{ user.get_full_name }}</span>
-                {% if profile %}
-                    <span class="text-xs text-on-surface-variant">معلم {{ profile.get_approval_status_display }}</span>
-                {% else %}
-                    <span class="text-xs text-on-surface-variant">عضو جديد</span>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    {% if profile %}
-        <!-- Status card Alert -->
-        <div class="status-card border rounded-2xl p-5 mb-8 flex items-start gap-4 shadow-sm bg-surface
-            {% if profile.approval_status == 'approved' %}
-                border-success/30 bg-success-container/10 text-success-ink
-            {% elif profile.approval_status == 'rejected' or profile.approval_status == 'suspended' %}
-                border-error/30 bg-error-container/10 text-error-ink
-            {% else %}
-                border-warning/30 bg-warning-container/10 text-warning-ink
-            {% endif %}">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
-                {% if profile.approval_status == 'approved' %} bg-success/15 {% else %} bg-warning/15 {% endif %}">
-                <span class="material-symbols-outlined">
-                    {% if profile.approval_status == 'approved' %}verified{% else %}pending_actions{% endif %}
-                </span>
-            </div>
-            <div>
-                <h2 class="font-bold text-sm mb-1">حالة الاعتماد: {{ profile.get_approval_status_display }}</h2>
-                {% if profile.verification_notes %}
-                    <p class="text-xs opacity-85"><strong>ملاحظات الإدارة:</strong> {{ profile.verification_notes }}</p>
-                {% else %}
-                    <p class="text-xs opacity-85">
-                        {% if profile.approval_status == 'approved' %}
-                            تهانينا، تم اعتماد ملفك الشخصي وهو معروض حالياً للطلاب في محركات البحث.
-                        {% else %}
-                            ملفك قيد المراجعة حالياً من قبل الإدارة وسوف يظهر للطلاب فور تفعيله.
-                        {% endif %}
-                    </p>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- Quick Action Buttons -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <a class="btn btn-primary text-xs py-3" href="{% url 'teachers:setup_profile' %}">
-                <span class="material-symbols-outlined text-[16px]">edit_note</span> تحديث البروفايل
-            </a>
-            <a class="btn btn-secondary text-xs py-3" href="{% url 'teachers:manage_subjects' %}">
-                <span class="material-symbols-outlined text-[16px]">book</span> المواد والأسعار
-            </a>
-            <a class="btn btn-secondary text-xs py-3" href="{% url 'teachers:manage_availability' %}">
-                <span class="material-symbols-outlined text-[16px]">calendar_month</span> مواعيد المتاحة
-            </a>
-            <a class="btn btn-secondary text-xs py-3" href="{% url 'bookings:teacher_list' %}">
-                <span class="material-symbols-outlined text-[16px]">event_note</span> إدارة الحجوزات
-            </a>
-        </div>
-
-        <!-- Dashboard Widgets Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Col 1: Profile Completeness -->
-            <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+<!-- Main Canvas -->
+<main class="flex-grow pt-4 pb-xl px-margin-mobile md:px-margin-desktop text-right">
+    <div class="max-w-7xl mx-auto space-y-lg">
+        
+        {% if profile %}
+            <!-- Page Header -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-sm">
                 <div>
-                    <h3 class="font-bold text-primary mb-3 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
-                        <span class="material-symbols-outlined text-[18px]">verified_user</span> حالة الملف العام
-                    </h3>
-                    <p class="text-xs text-on-surface-variant leading-relaxed">
-                        {% if profile.is_complete %}
-                            بياناتك الأساسية مكتملة وجاهزة للمراجعة الأكاديمية من فريق الإدارة.
-                        {% else %}
-                            أكمل العنوان المختصر، النبذة الذاتية، وصورة الملف الشخصي لتسريع عملية قبول حسابك.
-                        {% endif %}
-                    </p>
+                    <h1 class="font-headline-lg text-headline-lg text-on-background">مرحباً، {{ user.get_full_name|default:user.email }}</h1>
+                    <p class="font-body-md text-body-md text-on-surface-variant mt-xs">مراجعة أداءك الأكاديمي والجدول الزمني لليوم.</p>
                 </div>
-                <div class="mt-4 pt-3 border-t border-outline-variant/30 flex justify-between items-center">
-                    <span class="text-xs font-semibold text-on-surface-variant">الملف التعريفي</span>
-                    {% if profile.is_complete %}
-                        {% include 'partials/_badge.html' with text='مكتمل' type='success' %}
+                <div class="flex gap-sm">
+                    <span class="bg-secondary-fixed text-on-secondary-fixed px-sm py-xs rounded-full font-label-sm text-label-sm flex items-center gap-xs">
+                        <span class="material-symbols-outlined fill text-[16px] text-secondary">verified</span>
+                        معلم {{ profile.get_approval_status_display }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Approval Status Alert Card -->
+            <div class="border rounded-2xl p-5 flex items-start gap-4 shadow-sm
+                {% if profile.approval_status == 'approved' %}
+                    border-primary/30 bg-primary-container/10 text-primary
+                {% elif profile.approval_status == 'rejected' or profile.approval_status == 'suspended' %}
+                    border-error/30 bg-error-container/10 text-error
+                {% else %}
+                    border-secondary-container/30 bg-secondary-container/10 text-secondary
+                {% endif %}">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
+                    {% if profile.approval_status == 'approved' %} bg-primary/10 {% else %} bg-secondary-container/10 {% endif %}">
+                    <span class="material-symbols-outlined">
+                        {% if profile.approval_status == 'approved' %}verified{% else %}pending_actions{% endif %}
+                    </span>
+                </div>
+                <div>
+                    <h2 class="font-bold text-sm mb-1">حالة الاعتماد: {{ profile.get_approval_status_display }}</h2>
+                    {% if profile.verification_notes %}
+                        <p class="text-xs opacity-85"><strong>ملاحظات الإدارة:</strong> {{ profile.verification_notes }}</p>
                     {% else %}
-                        {% include 'partials/_badge.html' with text='ناقص' type='warning' %}
+                        <p class="text-xs opacity-85">
+                            {% if profile.approval_status == 'approved' %}
+                                تهانينا، تم اعتماد ملفك الشخصي وهو معروض حالياً للطلاب في محركات البحث.
+                            {% else %}
+                                ملفك قيد المراجعة حالياً من قبل الإدارة وسوف يظهر للطلاب فور تفعيله.
+                            {% endif %}
+                        </p>
                     {% endif %}
                 </div>
             </div>
 
-            <!-- Col 2: Wallet and Balance -->
-            <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
-                <div>
-                    <h3 class="font-bold text-primary mb-3 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
-                        <span class="material-symbols-outlined text-[18px]">payments</span> المحفظة المالية
-                    </h3>
-                    <p class="text-xs text-on-surface-variant leading-relaxed">
-                        تابع رصيد حصصك المكتملة والمعلقة، وقم بتقديم طلبات سحب الأرباح بسهولة.
-                    </p>
+            <!-- Bento Grid: Stats & Quick Actions -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+                <!-- Stats Column -->
+                <div class="md:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-gutter">
+                    <!-- Total Earnings -->
+                    <div class="bg-surface-container-lowest rounded-lg p-md shadow-ambient border border-outline-variant/30 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="material-symbols-outlined text-primary text-[28px]">account_balance_wallet</span>
+                            <span class="font-label-sm text-label-sm text-primary bg-primary-fixed-dim/20 px-xs py-base rounded">+12% هذا الشهر</span>
+                        </div>
+                        <div class="mt-md">
+                            <p class="font-label-md text-label-md text-on-surface-variant">إجمالي الأرباح (المحفظة)</p>
+                            <h2 class="font-headline-md text-headline-md text-on-background mt-base">4,250 <span class="font-body-md text-body-md text-on-surface-variant">ج.م</span></h2>
+                        </div>
+                    </div>
+                    <!-- Active Bookings -->
+                    <div class="bg-surface-container-lowest rounded-lg p-md shadow-ambient border border-outline-variant/30 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="material-symbols-outlined text-secondary text-[28px]">calendar_today</span>
+                            <span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container-high px-xs py-base rounded">الأسبوع الجاري</span>
+                        </div>
+                        <div class="mt-md">
+                            <p class="font-label-md text-label-md text-on-surface-variant">الحجوزات النشطة</p>
+                            <h2 class="font-headline-md text-headline-md text-on-background mt-base">18</h2>
+                        </div>
+                    </div>
+                    <!-- Total Reviews -->
+                    <div class="bg-surface-container-lowest rounded-lg p-md shadow-ambient border border-outline-variant/30 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="material-symbols-outlined text-secondary-container text-[28px]">star</span>
+                            <span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container-high px-xs py-base rounded">تقييم {{ profile.average_rating|default:"0.0" }}/5</span>
+                        </div>
+                        <div class="mt-md">
+                            <p class="font-label-md text-label-md text-on-surface-variant">إجمالي التقييمات</p>
+                            <h2 class="font-headline-md text-headline-md text-on-background mt-base">{{ profile.total_reviews|default:"0" }}</h2>
+                        </div>
+                    </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-outline-variant/30 flex justify-between items-center">
-                    <a href="{% url 'payments:wallet' %}" class="text-xs text-primary font-bold hover:underline flex items-center gap-0.5">
-                        عرض المحفظة <span class="material-symbols-outlined text-xs">arrow_back</span>
-                    </a>
-                    {% include 'partials/_badge.html' with text='نشط' type='success' %}
+                <!-- Quick Actions Column -->
+                <div class="md:col-span-4 bg-surface-container-lowest rounded-lg p-md shadow-ambient border border-outline-variant/30">
+                    <h3 class="font-title-lg text-title-lg text-on-background mb-md">إجراءات سريعة</h3>
+                    <div class="grid grid-cols-2 gap-sm">
+                        <a href="{% url 'teachers:manage_availability' %}" class="bg-surface-container hover:bg-surface-container-high transition-colors p-sm rounded flex flex-col items-center justify-center gap-xs text-center">
+                            <span class="material-symbols-outlined text-on-surface-variant">edit_calendar</span>
+                            <span class="font-label-md text-label-md text-on-surface">تحديث التواجد</span>
+                        </a>
+                        <a href="{% url 'teachers:manage_subjects' %}" class="bg-surface-container hover:bg-surface-container-high transition-colors p-sm rounded flex flex-col items-center justify-center gap-xs text-center">
+                            <span class="material-symbols-outlined text-on-surface-variant">menu_book</span>
+                            <span class="font-label-md text-label-md text-on-surface">موادي الدراسية</span>
+                        </a>
+                        <a href="{% url 'payments:wallet' %}" class="bg-surface-container hover:bg-surface-container-high transition-colors p-sm rounded flex flex-col items-center justify-center gap-xs text-center">
+                            <span class="material-symbols-outlined text-on-surface-variant">payments</span>
+                            <span class="font-label-md text-label-md text-on-surface">سحب الأرباح</span>
+                        </a>
+                        <a href="{% url 'messaging:inbox' %}" class="bg-surface-container hover:bg-surface-container-high transition-colors p-sm rounded flex flex-col items-center justify-center gap-xs text-center">
+                            <span class="material-symbols-outlined text-on-surface-variant">chat</span>
+                            <span class="font-label-md text-label-md text-on-surface">الرسائل</span>
+                        </a>
+                    </div>
                 </div>
             </div>
 
-            <!-- Col 3: Messaging and Certificates -->
-            <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
-                <div>
-                    <h3 class="font-bold text-primary mb-3 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
-                        <span class="material-symbols-outlined text-[18px]">workspace_premium</span> الشهادات والخبرات
-                    </h3>
-                    <p class="text-xs text-on-surface-variant leading-relaxed">
-                        ارفع شهادات التخرج، الماجستير، أو خبرات العمل لتعزيز مصداقيتك وجذب المزيد من أولياء الأمور.
-                    </p>
+            <!-- Two-Column Layout for Schedule and Requests -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+                <!-- Schedule Section -->
+                <div class="lg:col-span-2 space-y-md">
+                    <div class="flex justify-between items-end">
+                        <h3 class="font-title-lg text-title-lg text-on-background">الجدول الزمني (اليوم وغداً)</h3>
+                        <a href="{% url 'bookings:teacher_list' %}" class="font-label-md text-label-md text-primary hover:underline">عرض الجدول كاملاً</a>
+                    </div>
+                    <div class="space-y-sm">
+                        <!-- Current Lesson Card (Active) (Placeholder) -->
+                        <div class="bg-surface-container-lowest rounded-lg p-md shadow-ambient border-l-4 border-l-primary flex flex-col sm:flex-row justify-between items-start sm:items-center gap-md border border-outline-variant/30">
+                            <div class="flex gap-md items-start">
+                                <div class="bg-primary-fixed/30 text-primary-fixed-dim rounded p-sm flex flex-col items-center justify-center w-16 h-16 shrink-0">
+                                    <span class="font-headline-md text-headline-md leading-none text-primary">10</span>
+                                    <span class="font-label-sm text-label-sm text-primary mt-base">ص</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-title-lg text-title-lg text-on-background">مراجعة فيزياء 101</h4>
+                                    <p class="font-body-md text-body-md text-on-surface-variant mt-xs flex items-center gap-xs">
+                                        <span class="material-symbols-outlined text-[16px]">person</span>
+                                        الطالب: محمد خالد
+                                    </p>
+                                    <span class="inline-block bg-primary-fixed-dim/20 text-primary px-xs py-base rounded font-label-sm text-label-sm mt-xs">جارية الآن</span>
+                                </div>
+                            </div>
+                            <div class="bg-surface-container p-sm rounded text-center w-full sm:w-auto">
+                                <p class="font-label-sm text-label-sm text-on-surface-variant mb-xs">رمز الحضور</p>
+                                <span class="font-headline-md text-headline-md text-on-background tracking-widest">A7X9</span>
+                            </div>
+                        </div>
+                        <!-- Upcoming Lesson (Placeholder) -->
+                        <div class="bg-surface-container-lowest rounded-lg p-md border border-outline-variant/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-md">
+                            <div class="flex gap-md items-start">
+                                <div class="bg-surface-container-high rounded p-sm flex flex-col items-center justify-center w-16 h-16 shrink-0">
+                                    <span class="font-headline-md text-headline-md leading-none text-on-surface">12</span>
+                                    <span class="font-label-sm text-label-sm text-on-surface-variant mt-base">م</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-title-lg text-title-lg text-on-background">تأسيس رياضيات</h4>
+                                    <p class="font-body-md text-body-md text-on-surface-variant mt-xs flex items-center gap-xs">
+                                        <span class="material-symbols-outlined text-[16px]">person</span>
+                                        الطالبة: سارة فهد
+                                    </p>
+                                    <span class="inline-block bg-surface-container-high text-on-surface px-xs py-base rounded font-label-sm text-label-sm mt-xs">قادمة</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-sm w-full sm:w-auto mt-sm sm:mt-0">
+                                <a href="{% url 'bookings:teacher_list' %}" class="flex-1 bg-primary text-on-primary px-md py-xs rounded hover:bg-primary-container transition-colors font-label-md text-label-md text-center">بدء الدرس</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-outline-variant/30 flex justify-between items-center">
-                    <a href="{% url 'teachers:upload_certificate' %}" class="text-xs text-primary font-bold hover:underline">
-                        إضافة شهادة جديدة +
-                    </a>
+
+                <!-- Booking Requests Section & Certificates Column -->
+                <div class="lg:col-span-1 flex flex-col gap-md">
+                    <div class="space-y-md">
+                        <div class="flex justify-between items-end">
+                            <h3 class="font-title-lg text-title-lg text-on-background">طلبات الحجز</h3>
+                            <span class="bg-error-container text-on-error-container px-xs py-base rounded-full font-label-sm text-label-sm">2 جديد</span>
+                        </div>
+                        <div class="space-y-sm">
+                            <!-- Request Card (Placeholder) -->
+                            <div class="bg-surface-container-lowest rounded-lg p-sm shadow-ambient border border-outline-variant/30">
+                                <div class="flex gap-sm items-start mb-md">
+                                    <div class="w-10 h-10 rounded-full bg-secondary-container/10 flex items-center justify-center text-secondary font-bold shrink-0">
+                                        ع
+                                    </div>
+                                    <div>
+                                        <h4 class="font-label-md text-label-md text-on-background font-bold">عبدالله سالم</h4>
+                                        <p class="font-body-md text-body-md text-on-surface-variant text-[14px]">طلب جلسة: كيمياء عضوية</p>
+                                        <p class="font-label-sm text-label-sm text-on-surface-variant mt-xs">غداً, 4:00 مساءً</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-sm">
+                                    <a href="{% url 'bookings:teacher_list' %}" class="flex-1 bg-primary text-on-primary py-xs rounded hover:bg-primary-container transition-colors font-label-md text-label-md text-center">عرض الطلب</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Certificates Section -->
+                    <div class="bg-surface-container-lowest rounded-lg p-md shadow-ambient border border-outline-variant/30 space-y-sm">
+                        <h3 class="font-title-lg text-title-lg text-on-background flex items-center gap-xs">
+                            <span class="material-symbols-outlined text-primary">workspace_premium</span>
+                            الشهادات والخبرات
+                        </h3>
+                        <p class="font-body-md text-on-surface-variant leading-relaxed">
+                            ارفع شهادات التخرج، الماجستير، أو خبرات العمل لتعزيز مصداقيتك وجذب المزيد من أولياء الأمور.
+                        </p>
+                        <a href="{% url 'teachers:upload_certificate' %}" class="inline-block text-primary font-bold hover:underline">إضافة شهادة جديدة +</a>
+                    </div>
                 </div>
             </div>
-        </div>
-
-    {% else %}
-        <!-- No Profile Created yet -->
-        <div class="status-card border border-warning/30 bg-warning-container/10 text-warning-ink rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-sm max-w-lg mx-auto py-10">
-            <span class="material-symbols-outlined text-[48px] mb-3">account_box</span>
-            <h2 class="font-bold text-lg mb-2">لم تقم بتهيئة ملف المعلم بعد</h2>
-            <p class="text-xs opacity-90 leading-relaxed mb-6">
-                يرجى البدء بتسجيل بياناتك الأساسية والنبذة وخبرات العمل حتى نتمكن من عرض حسابك في محرك البحث للمنصة.
-            </p>
-            <a class="btn btn-primary font-semibold px-8" href="{% url 'teachers:setup_profile' %}">إعداد البروفايل الآن</a>
-        </div>
-    {% endif %}
-</section>
+        {% else %}
+            <!-- No Profile Created yet -->
+            <div class="flex flex-col items-center justify-center py-xl">
+                <div class="border border-secondary-container/30 bg-secondary-container/10 text-on-secondary-container rounded-2xl p-md md:p-lg flex flex-col items-center justify-center text-center shadow-sm max-w-lg mx-auto py-10 gap-md">
+                    <span class="material-symbols-outlined text-[48px] text-secondary">account_box</span>
+                    <h2 class="font-title-lg font-bold text-on-surface">لم تقم بتهيئة ملف المعلم بعد</h2>
+                    <p class="font-body-md text-on-surface-variant leading-relaxed">
+                        يرجى البدء بتسجيل بياناتك الأساسية والنبذة وخبرات العمل حتى نتمكن من عرض حسابك في محرك البحث للمنصة.
+                    </p>
+                    <a class="font-label-md bg-primary text-on-primary px-lg py-3 rounded-lg hover:bg-surface-tint transition-all active:scale-[0.98]" href="{% url 'teachers:setup_profile' %}">إعداد البروفايل الآن</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</main>
 {% endblock %}

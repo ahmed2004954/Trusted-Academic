@@ -1,14 +1,16 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}لوحة التحكم لولي الأمر - ثقة أكاديمية{% endblock %}
+{% block title %}لوحة تحكم ولي الأمر - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content dashboard text-right">
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-4 pb-xl px-margin-mobile md:px-margin-desktop max-w-7xl w-full mx-auto text-right">
     <!-- Welcome Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 border-b border-outline-variant/30 pb-6">
+    <header class="mb-lg border-b border-outline-variant/30 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-md">
         <div>
-            <h1 class="font-display-lg text-primary font-bold mb-1">لوحة تحكم ولي الأمر</h1>
-            <p class="text-sm text-on-surface-variant">متابعة دقيقة لمستوى أبنائك الدراسي وحصصهم الأسبوعية والتقارير الأكاديمية الصادرة من المعلمين.</p>
+            <h1 class="font-display-lg text-display-lg text-primary mb-xs font-bold">لوحة تحكم ولي الأمر</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">متابعة دقيقة لمستوى أبنائك الدراسي وحصصهم الأسبوعية والتقارير الأكاديمية الصادرة من المعلمين.</p>
         </div>
         <div class="flex items-center gap-3">
             <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
@@ -19,108 +21,177 @@
                 <span class="text-xs text-on-surface-variant">ولي أمر</span>
             </div>
         </div>
-    </div>
+    </header>
 
-    <!-- Quick Action Buttons -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <a class="btn btn-primary" href="{% url 'parents:create_student' %}">
-            <span class="material-symbols-outlined text-[18px]">person_add</span> إنشاء حساب طالب مُدار
-        </a>
-        <a class="btn btn-secondary" href="{% url 'parents:link_student' %}">
-            <span class="material-symbols-outlined text-[18px]">link</span> ربط حساب طالب موجود
-        </a>
-        <a class="btn btn-secondary" href="{% url 'messaging:inbox' %}">
-            <span class="material-symbols-outlined text-[18px]">mail</span> رسائل المعلمين 
-            {% if messaging_unread_count %}
-                <span class="badge badge-error mr-1">{{ messaging_unread_count }}</span>
-            {% endif %}
-        </a>
-    </div>
-
-    <!-- Dashboard Widgets Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Col 1: Linked Students -->
-        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm flex flex-col">
-            <h3 class="font-bold text-primary mb-4 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
-                <span class="material-symbols-outlined text-[18px] icon-fill">groups</span> الأبناء المرتبطون
-            </h3>
-            
-            <div class="flex flex-col gap-4">
-                {% for student in linked_students %}
-                <div class="bg-surface-container-low border border-outline-variant/30 rounded-xl p-3.5 flex flex-col gap-3">
-                    <div>
-                        <span class="font-semibold text-sm block text-on-surface">{{ student.get_full_name }}</span>
-                        {% if student.student_profile.grade_level %}
-                            <span class="text-xs text-on-surface-variant block mt-0.5">{{ student.student_profile.grade_level.name }}</span>
-                        {% endif %}
-                    </div>
-                    <a class="bg-primary/10 text-primary text-xs font-bold py-2 rounded-lg text-center hover:bg-primary hover:text-on-primary transition-colors flex items-center justify-center gap-1" href="{% url 'parents:student_booking_history' student.pk %}">
-                        <span class="material-symbols-outlined text-sm">history</span> سجل الحجوزات
-                    </a>
+    <!-- Dashboard Grid (Fluid 12-col) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+        <!-- Primary Column (8 cols) -->
+        <div class="lg:col-span-8 flex flex-col gap-xl">
+            <!-- Managed Students Section -->
+            <section>
+                <div class="flex justify-between items-end mb-md">
+                    <h2 class="font-headline-lg text-on-background font-bold">الطلاب المسجلين</h2>
                 </div>
-                {% empty %}
-                <div class="text-center py-6 opacity-70">
-                    <span class="material-symbols-outlined text-[32px] text-on-surface-variant">person_off</span>
-                    <p class="text-xs mt-2">لا يوجد أبناء مرتبطون حالياً.</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Col 2: Recent Bookings -->
-        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm flex flex-col">
-            <h3 class="font-bold text-primary mb-4 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
-                <span class="material-symbols-outlined text-[18px] icon-fill">calendar_month</span> أحدث الحجوزات
-            </h3>
-            
-            <div class="flex flex-col gap-3">
-                {% for booking in recent_bookings %}
-                <div class="bg-surface-container-low border border-outline-variant/30 rounded-xl p-3 flex justify-between items-center text-xs">
-                    <div>
-                        <span class="font-bold text-on-surface block mb-0.5">{{ booking.subject.name }}</span>
-                        <span class="text-on-surface-variant font-medium">{{ booking.student.get_full_name }}</span>
-                    </div>
-                    <span class="bg-surface px-2.5 py-1 rounded-lg border border-outline-variant/40 font-semibold text-on-surface-variant">
-                        {{ booking.scheduled_start|date:'Y-m-d' }}
-                    </span>
-                </div>
-                {% empty %}
-                <div class="text-center py-6 opacity-70 mt-auto mb-auto">
-                    <span class="material-symbols-outlined text-[32px] text-on-surface-variant">event_busy</span>
-                    <p class="text-xs mt-2">لا توجد حجوزات حديثة للأبناء.</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Col 3: Recent Reports -->
-        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm flex flex-col">
-            <h3 class="font-bold text-primary mb-4 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
-                <span class="material-symbols-outlined text-[18px] icon-fill">analytics</span> أحدث التقارير الأكاديمية
-            </h3>
-            
-            <div class="flex flex-col gap-3">
-                {% for report in recent_reports %}
-                <div class="bg-surface-container-low border border-outline-variant/30 rounded-xl p-3.5 flex flex-col gap-3">
-                    <div class="flex justify-between items-start text-xs">
-                        <div>
-                            <span class="font-semibold text-on-surface block mb-0.5">{{ report.student.get_full_name }}</span>
-                            <span class="text-on-surface-variant block">{{ report.created_at|date:'Y-m-d H:i' }}</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+                    {% for student in linked_students %}
+                        <!-- Student Profile Card -->
+                        <div class="bg-surface-container-lowest rounded-lg p-md border border-outline-variant shadow-sm flex flex-col gap-md transition-shadow hover:shadow-md">
+                            <div class="flex items-center gap-md">
+                                <div class="w-16 h-16 rounded-full bg-primary-container/10 flex items-center justify-center text-primary font-headline-md shrink-0">
+                                    {{ student.get_full_name|slice:":1"|default:student.email|slice:":1"|upper }}
+                                </div>
+                                <div>
+                                    <h3 class="font-title-lg text-title-lg text-primary mb-1 font-bold">{{ student.get_full_name }}</h3>
+                                    <p class="font-body-md text-body-md text-on-surface-variant">
+                                        {% if student.student_profile.grade_level %}{{ student.student_profile.grade_level.name }}{% else %}لم يحدد الصف الدراسي{% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            <!-- Key Metrics / Badges -->
+                            <div class="flex flex-wrap gap-xs border-t border-surface-variant pt-md">
+                                <span class="inline-flex items-center gap-1 bg-primary-fixed-dim px-2 py-1 rounded font-label-sm text-label-sm text-on-primary-container">
+                                    <span class="material-symbols-outlined text-[16px]">verified</span> موثق أكاديمياً
+                                </span>
+                            </div>
+                            <a href="{% url 'parents:student_booking_history' student.pk %}" class="mt-auto w-full text-center border border-outline text-primary font-label-md text-label-md py-2 rounded hover:bg-surface-container-low transition-colors block font-bold">
+                                عرض تفاصيل الأداء وسجل الحجوزات
+                            </a>
                         </div>
-                        {% include 'partials/_badge.html' with text='جديد' type='info' %}
+                    {% empty %}
+                        <div class="col-span-2 text-center py-8 opacity-70 border border-dashed border-outline-variant rounded-xl">
+                            <span class="material-symbols-outlined text-[48px] text-on-surface-variant mb-2">person_off</span>
+                            <p class="font-body-md text-on-surface-variant">لا يوجد أبناء مرتبطون حالياً.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Upcoming Lessons Summary -->
+            <section>
+                <h2 class="font-headline-lg text-on-background mb-md font-bold">أحدث حجوزات الأبناء</h2>
+                <div class="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm flex flex-col">
+                    {% for booking in recent_bookings %}
+                        <!-- Lesson Item -->
+                        <div class="p-md flex items-start gap-md border-b border-surface-variant last:border-b-0">
+                            <div class="flex flex-col items-center justify-center bg-surface-container py-2 px-3 rounded-lg min-w-[70px]">
+                                <span class="font-headline-md text-headline-md text-primary font-bold">{{ booking.scheduled_start|date:"d" }}</span>
+                                <span class="font-label-sm text-label-sm text-on-surface-variant">{{ booking.scheduled_start|date:"M" }}</span>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex flex-wrap justify-between items-start gap-2 mb-2">
+                                    <div>
+                                        <h4 class="font-title-lg text-title-lg text-on-background mb-1 font-bold">{{ booking.subject.name }}</h4>
+                                        <p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-[18px]">schedule</span> {{ booking.scheduled_start|date:"H:i" }} - {{ booking.scheduled_end|date:"H:i" }}
+                                        </p>
+                                    </div>
+                                    <span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded font-label-sm text-label-sm flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[14px]">videocam</span> {{ booking.get_lesson_type_display }}
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-2 mt-xs pt-xs border-t border-surface-variant border-opacity-50">
+                                    <span class="font-label-md text-label-md text-on-surface-variant">للطالب: {{ booking.student.get_full_name }}</span>
+                                    <span class="text-outline-variant text-sm">•</span>
+                                    <span class="font-label-md text-label-md text-primary flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[16px]">person</span> {{ booking.teacher.user.get_full_name }}
+                                    </span>
+                                    <span class="text-outline-variant text-sm">•</span>
+                                    <span class="font-label-md text-label-md text-on-surface-variant font-bold">الحالة: {{ booking.get_booking_status_display }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-8 opacity-70">
+                            <span class="material-symbols-outlined text-[48px] text-on-surface-variant mb-2">event_busy</span>
+                            <p class="font-body-md text-on-surface-variant">لا توجد حجوزات حديثة للأبناء.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Recent Reports Section -->
+            <section>
+                <h2 class="font-headline-lg text-on-background mb-md font-bold">أحدث التقارير الأكاديمية</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+                    {% for report in recent_reports %}
+                        <!-- Report Card -->
+                        <div class="bg-surface-container-lowest rounded-lg p-md border border-outline-variant shadow-sm flex flex-col gap-md transition-shadow hover:shadow-md">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-title-lg text-title-lg text-on-background mb-1 font-bold">تقرير أداء: {{ report.student.get_full_name }}</h4>
+                                    <p class="font-body-md text-body-md text-on-surface-variant">المعلم: {{ report.teacher.user.get_full_name }}</p>
+                                    <p class="font-label-sm text-label-sm text-outline mt-1">{{ report.created_at|date:"Y-m-d H:i" }}</p>
+                                </div>
+                                <span class="bg-primary-container text-on-primary-container px-2 py-1 rounded font-label-sm text-label-sm">جديد</span>
+                            </div>
+                            <a href="{% url 'reports:detail' report.pk %}" class="w-full text-center bg-secondary-container text-on-secondary-container font-label-md text-label-md py-2 rounded hover:bg-secondary-fixed-dim transition-colors font-bold">
+                                عرض التقرير الدراسي
+                            </a>
+                        </div>
+                    {% empty %}
+                        <div class="col-span-2 text-center py-8 opacity-70 border border-dashed border-outline-variant rounded-xl">
+                            <span class="material-symbols-outlined text-[48px] text-on-surface-variant mb-2">analytics</span>
+                            <p class="font-body-md text-on-surface-variant">لم تصدر تقارير جديدة للأبناء بعد.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+
+        <!-- Secondary Column / Sidebar (4 cols) -->
+        <div class="lg:col-span-4 flex flex-col gap-lg">
+            <!-- managed student & linking options -->
+            <section class="bg-primary text-on-primary rounded-lg p-lg shadow-sm relative overflow-hidden">
+                <div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 16px 16px;"></div>
+                <div class="relative z-10 space-y-md">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[28px]">group_add</span>
+                        <h2 class="font-title-lg text-title-lg font-bold">إدارة الأبناء</h2>
                     </div>
-                    <a class="bg-secondary-container text-on-secondary-container text-xs font-semibold py-2 rounded-lg text-center hover:bg-secondary-fixed-dim transition-colors" href="{% url 'reports:detail' report.pk %}">
-                        عرض التقرير الدراسي
+                    <p class="font-body-md text-primary-fixed-dim">يمكنك ربط حساب طالب موجود بالفعل باستخدام رمز الربط الخاص به لمتابعة تقدمه، أو إنشاء حساب جديد مُدار بواسطتك بالكامل.</p>
+                    <div class="flex flex-col gap-3">
+                        <a href="{% url 'parents:link_student' %}" class="w-full bg-secondary-container text-on-secondary-container font-label-md text-label-md py-3 rounded hover:bg-opacity-90 transition-opacity flex items-center justify-center gap-2 font-bold">
+                            <span class="material-symbols-outlined text-[18px]">link</span>
+                            <span>ربط حساب طالب موجود</span>
+                        </a>
+                        <a href="{% url 'parents:create_student' %}" class="w-full bg-surface-container-lowest text-primary font-label-md text-label-md py-3 rounded hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 font-bold">
+                            <span class="material-symbols-outlined text-[18px]">person_add</span>
+                            <span>إنشاء حساب طالب مُدار</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Access Menu -->
+            <section>
+                <h2 class="font-title-lg text-title-lg text-on-background mb-sm font-bold">وصول سريع</h2>
+                <div class="flex flex-col gap-sm">
+                    <a class="group bg-surface-container-lowest border border-outline-variant rounded-lg p-sm flex items-center gap-md hover:border-primary transition-colors shadow-sm" href="{% url 'teachers:public_list' %}">
+                        <div class="bg-surface-container p-3 rounded-lg text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors shrink-0">
+                            <span class="material-symbols-outlined">search</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-label-md text-label-md text-on-background group-hover:text-primary transition-colors font-bold">البحث عن معلم</h3>
+                            <p class="font-label-sm text-label-sm text-on-surface-variant mt-1">البحث وحجز دروس جديدة للأبناء</p>
+                        </div>
+                        <span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors transform group-hover:-translate-x-1 duration-200">chevron_left</span>
+                    </a>
+                    <a class="group bg-surface-container-lowest border border-outline-variant rounded-lg p-sm flex items-center gap-md hover:border-primary transition-colors shadow-sm" href="{% url 'messaging:inbox' %}">
+                        <div class="bg-surface-container p-3 rounded-lg text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors shrink-0 relative">
+                            <span class="material-symbols-outlined">mail</span>
+                            {% if messaging_unread_count %}
+                                <span class="absolute top-0 right-0 w-3 h-3 bg-error rounded-full border-2 border-surface-container-lowest"></span>
+                            {% endif %}
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-label-md text-label-md text-on-background group-hover:text-primary transition-colors font-bold">الرسائل</h3>
+                            <p class="font-label-sm text-label-sm text-on-surface-variant mt-1">التواصل مع معلمي الأبناء</p>
+                        </div>
+                        <span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors transform group-hover:-translate-x-1 duration-200">chevron_left</span>
                     </a>
                 </div>
-                {% empty %}
-                <div class="text-center py-6 opacity-70 mt-auto mb-auto">
-                    <span class="material-symbols-outlined text-[32px] text-on-surface-variant">analytics</span>
-                    <p class="text-xs mt-2">لم تصدر تقارير جديدة للأبناء بعد.</p>
-                </div>
-                {% endfor %}
-            </div>
+            </section>
         </div>
     </div>
-</section>
+</main>
 {% endblock %}

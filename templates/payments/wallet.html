@@ -1,106 +1,154 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}محفظة المعلم - ثقة أكاديمية{% endblock %}
+{% block title %}المحفظة المالية والأرباح - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content text-right">
-    <!-- Header -->
-    <div class="border-b border-outline-variant/30 pb-4 mb-6">
-        <h1 class="font-display-lg text-primary font-bold">محفظة المعلم المالية</h1>
-        <p class="text-xs text-on-surface-variant mt-1">تابع رصيد أرباحك، وقدم طلبات السحب للتحويل المالي المباشر.</p>
+<style>
+    select, input[type="text"], input[type="number"], textarea {
+        width: 100%;
+        background-color: #faf9f6;
+        border: 1px solid #bec9c2;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        font-family: 'IBM Plex Sans Arabic', sans-serif;
+        font-size: 14px;
+        color: #1a1c1a;
+        transition: all 0.2s;
+    }
+    select:focus, input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
+        border-color: #004532;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 69, 50, 0.1);
+    }
+</style>
+
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-[1200px] mx-auto px-margin-mobile md:px-margin-desktop py-lg text-right">
+    <!-- Page Header -->
+    <header class="mb-lg border-b border-outline-variant/30 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-md">
+        <div>
+            <h1 class="font-headline-lg text-primary mb-xs font-bold">المحفظة المالية والأرباح</h1>
+            <p class="font-body-lg text-on-surface-variant">تابع رصيد أرباحك، وقدم طلبات السحب للتحويل المالي المباشر.</p>
+        </div>
+        <a href="{% url 'teachers:dashboard' %}" class="bg-surface-container border border-outline-variant/30 text-on-surface hover:bg-surface-container-high px-md py-2.5 rounded-lg font-label-md font-bold text-xs">العودة للوحة التحكم</a>
+    </header>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-gutter mb-xl">
+        <!-- Available Balance -->
+        <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md flex items-center justify-between shadow-sm">
+            <div>
+                <p class="font-label-sm text-outline">الرصيد المتاح للسحب</p>
+                <p class="font-display-lg text-primary font-bold mt-1">{{ wallet.available_balance }} <span class="text-xs text-on-surface-variant">ج.م</span></p>
+                <p class="font-label-sm text-outline-variant mt-xs">الحد الأدنى للسحب: {{ minimum_threshold }} ج.م</p>
+            </div>
+            <span class="material-symbols-outlined text-4xl text-primary icon-fill">account_balance_wallet</span>
+        </div>
+        <!-- Pending Balance -->
+        <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md flex items-center justify-between shadow-sm">
+            <div>
+                <p class="font-label-sm text-outline">الرصيد المعلق (حصص لم تنتهِ بعد)</p>
+                <p class="font-display-lg text-secondary font-bold mt-1">{{ wallet.pending_balance }} <span class="text-xs text-on-surface-variant">ج.م</span></p>
+            </div>
+            <span class="material-symbols-outlined text-4xl text-secondary">pending</span>
+        </div>
+        <!-- Total Earned -->
+        <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md flex items-center justify-between shadow-sm">
+            <div>
+                <p class="font-label-sm text-outline">إجمالي الأرباح الكلية</p>
+                <p class="font-display-lg text-primary font-bold mt-1">{{ wallet.total_earned }} <span class="text-xs text-on-surface-variant">ج.م</span></p>
+            </div>
+            <span class="material-symbols-outlined text-4xl text-primary icon-fill">payments</span>
+        </div>
     </div>
 
-    <!-- Balance Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-5 shadow-sm">
-            <span class="text-xs text-on-surface-variant font-medium block mb-1">الرصيد المتاح للسحب</span>
-            <p class="font-display-lg text-primary font-bold">{{ wallet.available_balance }} <span class="text-xs text-on-surface-variant">ج.م</span></p>
-        </div>
-        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-5 shadow-sm">
-            <span class="text-xs text-on-surface-variant font-medium block mb-1">الرصيد المعلق (قيد المراجعة)</span>
-            <p class="font-display-lg text-on-surface font-bold">{{ wallet.pending_balance }} <span class="text-xs text-on-surface-variant">ج.م</span></p>
-        </div>
-        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-5 shadow-sm">
-            <span class="text-xs text-on-surface-variant font-medium block mb-1">إجمالي الأرباح الكلية</span>
-            <p class="font-display-lg text-secondary-container font-bold">{{ wallet.total_earned }} <span class="text-xs text-on-surface-variant">ج.م</span></p>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start">
         <!-- New Withdrawal Request Form -->
-        <div class="lg:col-span-1">
-            <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm">
-                <h3 class="font-bold text-primary mb-3 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
-                    <span class="material-symbols-outlined">payments</span> طلب سحب جديد
-                </h3>
-                <p class="text-[11px] text-on-surface-variant leading-relaxed mb-4">
-                    الحد الأدنى لتقديم طلب السحب هو <strong>{{ minimum_threshold }} ج.م</strong>. سيتم مراجعة الطلب وتحويله خلال 48 ساعة عمل.
-                </p>
-                <form method="post" class="flex flex-col gap-4">
-                    {% csrf_token %}
+        <div class="col-span-1 lg:col-span-4 bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-md shadow-sm flex flex-col gap-md">
+            <h2 class="font-title-lg font-bold text-on-surface pb-xs border-b border-outline-variant/30 flex items-center gap-xs">
+                <span class="material-symbols-outlined text-primary">outbox</span>
+                طلب سحب جديد
+            </h2>
+            <p class="text-xs text-on-surface-variant leading-relaxed">
+                الحد الأدنى لتقديم طلب السحب هو <strong>{{ minimum_threshold }} ج.م</strong>. سيتم مراجعة الطلب وتحويله خلال 48 ساعة عمل.
+            </p>
+            
+            {% if form.errors %}
+                <div class="bg-error-container text-on-error-container p-sm rounded-lg text-xs font-semibold">
+                    يرجى تصحيح الأخطاء أدناه قبل المتابعة.
+                </div>
+            {% endif %}
+
+            <form method="post" class="flex flex-col gap-sm">
+                {% csrf_token %}
+                <div class="flex flex-col gap-sm">
                     {% for field in form %}
                         <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-xs text-on-surface">{{ field.label }}</label>
+                            <label class="font-semibold text-xs text-on-surface mb-1">{{ field.label }}</label>
                             {{ field }}
                             {% if field.help_text %}
-                                <span class="text-[10px] text-on-surface-variant opacity-80">{{ field.help_text }}</span>
+                                <span class="text-[10px] text-on-surface-variant opacity-80 mt-0.5">{{ field.help_text }}</span>
                             {% endif %}
                             {% for error in field.errors %}
-                                <span class="text-error text-[10px] font-bold">{{ error }}</span>
+                                <span class="text-error text-[10px] font-bold mt-1 block">{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% endfor %}
-                    <button type="submit" class="w-full btn btn-primary py-2.5 text-xs font-semibold">إرسال طلب السحب</button>
-                </form>
-            </div>
+                </div>
+                <button type="submit" class="bg-primary text-on-primary font-label-md py-2.5 rounded-lg hover:bg-surface-tint w-full mt-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">done</span>
+                    تأكيد طلب السحب
+                </button>
+            </form>
         </div>
 
-        <!-- Withdrawals Table -->
-        <div class="lg:col-span-2">
-            <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm">
-                <h3 class="font-bold text-primary mb-4 border-b border-outline-variant/30 pb-2">
-                    طلبات السحب السابقة
-                </h3>
-                {% if withdrawals %}
-                    <div class="overflow-x-auto">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th class="py-2.5 px-3">المبلغ المطلوبة</th>
-                                    <th class="py-2.5 px-3">طريقة التحويل</th>
-                                    <th class="py-2.5 px-3">حالة الطلب</th>
-                                    <th class="py-2.5 px-3">تاريخ الطلب</th>
-                                    <th class="py-2.5 px-3">تاريخ التحويل</th>
-                                    <th class="py-2.5 px-3">ملاحظات</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for withdrawal in withdrawals %}
-                                    <tr class="text-xs hover:bg-surface-container-lowest/50 transition-colors">
-                                        <td class="py-3 px-3 font-bold text-on-surface">{{ withdrawal.amount }} ج.م</td>
-                                        <td class="py-3 px-3 text-on-surface-variant">{{ withdrawal.payment_method }}</td>
-                                        <td class="py-3 px-3">
+        <!-- Withdrawals History -->
+        <div class="col-span-1 lg:col-span-8 bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-md md:p-lg shadow-sm">
+            <h2 class="font-title-lg font-bold text-on-surface mb-md pb-xs border-b border-outline-variant/30">سجل طلبات السحب والأرباح</h2>
+            
+            {% if withdrawals %}
+                <div class="overflow-x-auto w-full">
+                    <table class="w-full text-right border-collapse">
+                        <thead>
+                            <tr class="border-b border-outline-variant text-outline font-label-md">
+                                <th class="pb-sm px-2">المبلغ المطلوب</th>
+                                <th class="pb-sm px-2">طريقة التحويل</th>
+                                <th class="pb-sm px-2">حالة الطلب</th>
+                                <th class="pb-sm px-2">تاريخ الطلب</th>
+                                <th class="pb-sm px-2">تاريخ التحويل</th>
+                                <th class="pb-sm px-2">ملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody class="font-body-md text-on-surface">
+                            {% for withdrawal in withdrawals %}
+                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors">
+                                    <td class="py-md px-2 font-bold">{{ withdrawal.amount }} ج.م</td>
+                                    <td class="py-md px-2">{{ withdrawal.payment_method }}</td>
+                                    <td class="py-md px-2">
+                                        <span class="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full font-bold
                                             {% if withdrawal.status == 'approved' or withdrawal.status == 'processed' %}
-                                                {% include 'partials/_badge.html' with text=withdrawal.get_status_display type='success' %}
+                                                bg-primary-container/20 text-primary
                                             {% elif withdrawal.status == 'rejected' %}
-                                                {% include 'partials/_badge.html' with text=withdrawal.get_status_display type='error' %}
+                                                bg-error-container text-on-error-container
                                             {% else %}
-                                                {% include 'partials/_badge.html' with text=withdrawal.get_status_display type='warning' %}
-                                            {% endif %}
-                                        </td>
-                                        <td class="py-3 px-3 text-on-surface-variant">{{ withdrawal.requested_at|date:'Y-m-d H:i' }}</td>
-                                        <td class="py-3 px-3 text-on-surface-variant">{{ withdrawal.processed_at|date:'Y-m-d H:i'|default:'-' }}</td>
-                                        <td class="py-3 px-3 text-on-surface-variant max-w-[150px] truncate" title="{{ withdrawal.notes }}">{{ withdrawal.notes|default:'-' }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% else %}
-                    <p class="text-xs text-on-surface-variant py-4">لا توجد طلبات سحب أرباح سابقة مسجلة.</p>
-                {% endif %}
-            </div>
+                                                bg-secondary-container/20 text-secondary
+                                            {% endif %}">
+                                            {{ withdrawal.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td class="py-md px-2 font-mono text-xs">{{ withdrawal.requested_at|date:"Y-m-d H:i" }}</td>
+                                    <td class="py-md px-2 font-mono text-xs">{{ withdrawal.processed_at|date:"Y-m-d H:i"|default:"-" }}</td>
+                                    <td class="py-md px-2 max-w-[150px] truncate text-xs" title="{{ withdrawal.notes }}">{{ withdrawal.notes|default:"-" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-xs text-on-surface-variant py-4 text-center">لا توجد طلبات سحب أرباح سابقة مسجلة.</p>
+            {% endif %}
         </div>
     </div>
-</section>
+</main>
 {% endblock %}

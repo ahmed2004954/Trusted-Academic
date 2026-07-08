@@ -1,98 +1,151 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}لوحة الإدارة العامة - ثقة أكاديمية{% endblock %}
+{% block title %}لوحة تحكم الإدارة - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content dashboard text-right">
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-4 pb-xl px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto w-full text-right">
     <!-- Welcome Header -->
-    <div class="border-b border-outline-variant/30 pb-4 mb-8">
-        <h1 class="font-display-lg text-primary font-bold">لوحة الإدارة والتحكم الإشرافي</h1>
-        <p class="text-xs text-on-surface-variant mt-1">متابعة سير العمليات، مراجعة طلبات تفعيل المعلمين، وتأكيد الإيصالات المالية والشكاوى.</p>
-    </div>
+    <header class="mb-lg border-b border-outline-variant/30 pb-6">
+        <h1 class="font-headline-lg text-primary mb-xs font-bold">لوحة الإدارة والتحكم الإشرافي</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">متابعة سير العمليات، مراجعة طلبات تفعيل المعلمين، وتأكيد الإيصالات المالية والشكاوى.</p>
+    </header>
 
-    <!-- Quick Action Links Grid -->
-    <h2 class="font-bold text-sm text-primary mb-4 flex items-center gap-2">
-        <span class="material-symbols-outlined text-[18px]">bolt</span> الإجراءات الإدارية السريعة
-    </h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {% for action in quick_actions %}
-            <a class="bg-surface border border-outline-variant/50 rounded-2xl p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex justify-between items-center text-xs" href="{{ action.url }}">
-                <span class="font-bold text-on-surface">{{ action.label }}</span>
-                {% if action.count != None %}
-                    {% include 'partials/_badge.html' with text=action.count type='error' %}
-                {% endif %}
-            </a>
-        {% endfor %}
-    </div>
-
-    <!-- Metrics Column Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-        <!-- Col 1: Operational Summary -->
-        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm">
-            <h3 class="font-bold text-primary mb-4 border-b border-outline-variant/30 pb-2 text-sm flex items-center gap-2">
-                <span class="material-symbols-outlined text-[18px]">query_stats</span> ملخص التشغيل
-            </h3>
-            <div class="flex flex-col gap-3 text-xs">
-                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
-                    <span class="text-on-surface-variant font-medium">إجمالي المستخدمين:</span>
-                    <span class="text-on-surface font-bold">{{ metrics.total_users }}</span>
-                </div>
-                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
-                    <span class="text-on-surface-variant font-medium">حجوزات اليوم:</span>
-                    <span class="text-on-surface font-bold">{{ metrics.today_bookings }}</span>
-                </div>
-                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
-                    <span class="text-on-surface-variant font-medium">حجوزات هذا الأسبوع:</span>
-                    <span class="text-on-surface font-bold">{{ metrics.week_bookings }}</span>
-                </div>
-                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
-                    <span class="text-on-surface-variant font-medium">الحجوزات المكتملة:</span>
-                    <span class="text-on-surface font-bold">{{ metrics.completed_bookings }}</span>
-                </div>
+    <!-- KPI Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter mb-xl">
+        <!-- Metric 1: Users -->
+        <a href="{% url 'adminpanel:user_list' %}" class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md flex items-center justify-between hover:shadow transition-all shadow-[0_2px_8px_rgba(0,33,22,0.04)]">
+            <div>
+                <p class="font-label-sm text-outline">إجمالي المستخدمين</p>
+                <p class="font-display-lg text-primary font-bold mt-1">{{ metrics.total_users }}</p>
+                <p class="font-label-sm text-on-surface-variant mt-xs">طالب، ولي أمر، ومعلم</p>
             </div>
-        </div>
+            <span class="material-symbols-outlined text-4xl text-primary icon-fill">groups</span>
+        </a>
+        <!-- Metric 2: Pending Teachers -->
+        <a href="{% url 'adminpanel:pending_teachers' %}" class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md flex items-center justify-between hover:shadow transition-all shadow-[0_2px_8px_rgba(0,33,22,0.04)]">
+            <div>
+                <p class="font-label-sm text-outline">مدرسين بانتظار الاعتماد</p>
+                <p class="font-display-lg text-secondary-container font-bold mt-1">{{ pending_count }}</p>
+                <p class="font-label-sm text-on-surface-variant mt-xs">طلب فحص أوراق معلق</p>
+            </div>
+            <span class="material-symbols-outlined text-4xl text-secondary-container icon-fill">pending_actions</span>
+        </a>
+        <!-- Metric 3: Pending Payments -->
+        <a href="{% url 'payments:admin_pending' %}" class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md flex items-center justify-between hover:shadow transition-all shadow-[0_2px_8px_rgba(0,33,22,0.04)]">
+            <div>
+                <p class="font-label-sm text-outline">إيصالات الدفع المعلقة</p>
+                <p class="font-display-lg text-primary font-bold mt-1">{{ pending_payment_count }}</p>
+                <p class="font-label-sm text-on-surface-variant mt-xs">بحاجة لمطابقة التحويلات</p>
+            </div>
+            <span class="material-symbols-outlined text-4xl text-primary icon-fill">payments</span>
+        </a>
+        <!-- Metric 4: Open Complaints -->
+        <a href="{% url 'complaints:staff_queue' %}" class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md flex items-center justify-between hover:shadow transition-all shadow-[0_2px_8px_rgba(0,33,22,0.04)]">
+            <div>
+                <p class="font-label-sm text-outline">الشكاوى المفتوحة</p>
+                <p class="font-display-lg text-error font-bold mt-1">{{ metrics.open_complaints }}</p>
+                <p class="font-label-sm text-on-surface-variant mt-xs">نزاعات حضور أو غياب معلم</p>
+            </div>
+            <span class="material-symbols-outlined text-4xl text-error icon-fill">campaign</span>
+        </a>
+    </div>
 
-        <!-- Col 2: Users Roles -->
-        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm">
-            <h3 class="font-bold text-primary mb-4 border-b border-outline-variant/30 pb-2 text-sm flex items-center gap-2">
-                <span class="material-symbols-outlined text-[18px]">groups</span> المستخدمون حسب الدور
-            </h3>
-            <div class="flex flex-col gap-3 text-xs">
-                {% for row in metrics.users_by_role %}
-                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
-                    <span class="text-on-surface-variant font-medium">{{ row.role }}:</span>
-                    <span class="text-on-surface font-bold">{{ row.count }}</span>
-                </div>
+    <!-- Actions & Stats Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start">
+        <!-- Admin Quick Actions -->
+        <div class="col-span-1 lg:col-span-4 bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-md shadow-sm flex flex-col gap-md">
+            <h2 class="font-title-lg font-bold text-on-surface pb-xs border-b border-outline-variant/30">إجراءات سريعة</h2>
+            <div class="flex flex-col gap-sm">
+                {% for action in quick_actions %}
+                    <a href="{{ action.url }}" class="w-full bg-surface-container border border-outline-variant/30 text-on-surface font-label-md py-2.5 rounded-lg text-center hover:bg-surface-container-high transition-all flex items-center justify-between px-md font-bold">
+                        <span>{{ action.label }}</span>
+                        {% if action.count != None %}
+                            <span class="bg-error text-on-error text-[11px] font-bold rounded-full px-2.5 py-0.5">{{ action.count }}</span>
+                        {% endif %}
+                    </a>
                 {% empty %}
-                <p class="text-xs text-on-surface-variant py-4">لا يوجد مستخدمون بعد.</p>
+                    <p class="font-body-md text-on-surface-variant text-center py-4">لا توجد إجراءات معلقة.</p>
                 {% endfor %}
+                <a href="{% url 'adminpanel:manage_subjects' %}" class="w-full bg-primary text-on-primary font-label-md py-2.5 rounded-lg text-center hover:bg-surface-tint transition-all block font-bold">تعديل حدود الأسعار والمواد</a>
             </div>
         </div>
 
-        <!-- Col 3: Teacher statuses -->
-        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm">
-            <h3 class="font-bold text-primary mb-4 border-b border-outline-variant/30 pb-2 text-sm flex items-center gap-2">
-                <span class="material-symbols-outlined text-[18px]">badge</span> حالات حسابات المعلمين
-            </h3>
-            <div class="flex flex-col gap-3 text-xs">
-                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
-                    <span class="text-on-surface-variant font-medium">معلمون قيد المراجعة:</span>
-                    {% include 'partials/_badge.html' with text=metrics.teacher_counts.pending type='warning' %}
+        <!-- Stats Details -->
+        <div class="col-span-1 lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-lg">
+            <!-- Operational Summary Card -->
+            <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-md shadow-sm">
+                <h3 class="font-title-lg font-bold text-primary mb-md pb-xs border-b border-outline-variant/30 flex items-center gap-xs">
+                    <span class="material-symbols-outlined">query_stats</span>
+                    ملخص التشغيل والحجوزات
+                </h3>
+                <div class="flex flex-col gap-sm">
+                    <div class="flex justify-between items-center bg-surface-container-low px-md py-2.5 rounded-xl font-label-md">
+                        <span class="text-on-surface-variant">حجوزات اليوم:</span>
+                        <span class="text-on-surface font-bold">{{ metrics.today_bookings }}</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-surface-container-low px-md py-2.5 rounded-xl font-label-md">
+                        <span class="text-on-surface-variant">حجوزات هذا الأسبوع:</span>
+                        <span class="text-on-surface font-bold">{{ metrics.week_bookings }}</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-surface-container-low px-md py-2.5 rounded-xl font-label-md">
+                        <span class="text-on-surface-variant">الحجوزات المكتملة:</span>
+                        <span class="text-on-surface font-bold">{{ metrics.completed_bookings }}</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-surface-container-low px-md py-2.5 rounded-xl font-label-md">
+                        <span class="text-on-surface-variant">طلبات سحب معلقة:</span>
+                        <span class="text-on-surface font-bold">{{ metrics.pending_withdrawals }}</span>
+                    </div>
                 </div>
-                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
-                    <span class="text-on-surface-variant font-medium">معلمون معتمدون:</span>
-                    {% include 'partials/_badge.html' with text=metrics.teacher_counts.approved type='success' %}
+            </div>
+
+            <!-- Users by Role Card -->
+            <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-md shadow-sm">
+                <h3 class="font-title-lg font-bold text-primary mb-md pb-xs border-b border-outline-variant/30 flex items-center gap-xs">
+                    <span class="material-symbols-outlined">groups</span>
+                    المستخدمون حسب الدور
+                </h3>
+                <div class="flex flex-col gap-sm">
+                    {% for row in metrics.users_by_role %}
+                        <div class="flex justify-between items-center bg-surface-container-low px-md py-2.5 rounded-xl font-label-md">
+                            <span class="text-on-surface-variant">
+                                {% if row.role == 'student' %}طلاب{% elif row.role == 'teacher' %}معلمون{% elif row.role == 'parent' %}أولياء أمور{% elif row.role == 'admin' %}مديرون{% else %}{{ row.role }}{% endif %}:
+                            </span>
+                            <span class="text-on-surface font-bold">{{ row.count }}</span>
+                        </div>
+                    {% empty %}
+                        <p class="font-body-md text-on-surface-variant py-4 text-center">لا يوجد مستخدمون بعد.</p>
+                    {% endfor %}
                 </div>
-                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
-                    <span class="text-on-surface-variant font-medium">طلبات مرفوضة:</span>
-                    {% include 'partials/_badge.html' with text=metrics.teacher_counts.rejected type='error' %}
-                </div>
-                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
-                    <span class="text-on-surface-variant font-medium">حسابات موقوفة:</span>
-                    {% include 'partials/_badge.html' with text=metrics.teacher_counts.suspended type='error' %}
+            </div>
+
+            <!-- Teacher Statuses Card -->
+            <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-md shadow-sm md:col-span-2">
+                <h3 class="font-title-lg font-bold text-primary mb-md pb-xs border-b border-outline-variant/30 flex items-center gap-xs">
+                    <span class="material-symbols-outlined">badge</span>
+                    حالات حسابات المعلمين
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                    <div class="flex justify-between items-center bg-surface-container-low px-md py-2.5 rounded-xl font-label-md">
+                        <span class="text-on-surface-variant font-medium">معلمون قيد المراجعة:</span>
+                        <span class="bg-secondary-container text-on-secondary-container px-2.5 py-0.5 rounded-full font-label-sm text-label-sm">{{ metrics.teacher_counts.pending|default:"0" }}</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-surface-container-low px-md py-2.5 rounded-xl font-label-md">
+                        <span class="text-on-surface-variant font-medium">معلمون معتمدون:</span>
+                        <span class="bg-primary text-on-primary px-2.5 py-0.5 rounded-full font-label-sm text-label-sm">{{ metrics.teacher_counts.approved|default:"0" }}</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-surface-container-low px-md py-2.5 rounded-xl font-label-md">
+                        <span class="text-on-surface-variant font-medium">طلبات مرفوضة:</span>
+                        <span class="bg-error text-on-error px-2.5 py-0.5 rounded-full font-label-sm text-label-sm">{{ metrics.teacher_counts.rejected|default:"0" }}</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-surface-container-low px-md py-2.5 rounded-xl font-label-md">
+                        <span class="text-on-surface-variant font-medium">حسابات موقوفة:</span>
+                        <span class="bg-error text-on-error px-2.5 py-0.5 rounded-full font-label-sm text-label-sm">{{ metrics.teacher_counts.suspended|default:"0" }}</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</section>
+</main>
 {% endblock %}

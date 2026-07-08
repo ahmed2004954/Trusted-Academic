@@ -24,6 +24,7 @@
         </div>
         <div class="flex items-center gap-sm">
             {% if user.is_authenticated %}
+                <span class="hidden md:block font-label-md text-on-surface-variant font-bold ml-2">{{ user.get_full_name|default:user.email }}</span>
                 <div class="hidden md:flex items-center gap-sm">
                     {% if user.role == 'student' %}
                         <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="{% url 'students:dashboard' %}">حسابي</a>
@@ -71,6 +72,9 @@
         <a class="font-label-md text-on-surface-variant" href="{% url 'core:contact' %}">تواصل معنا</a>
         <hr class="border-outline-variant my-xs">
         {% if user.is_authenticated %}
+            <div class="font-label-md text-on-surface font-bold pb-2 border-b border-outline-variant/30 mb-2">
+                مرحباً، {{ user.get_full_name|default:user.email }}
+            </div>
             {% if user.role == 'student' %}
                 <a class="font-label-md text-primary" href="{% url 'students:dashboard' %}">حسابي</a>
                 <a class="font-label-md text-on-surface-variant" href="{% url 'bookings:student_list' %}">حجوزاتي</a>

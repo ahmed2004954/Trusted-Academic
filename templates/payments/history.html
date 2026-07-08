@@ -1,41 +1,88 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}سجل المدفوعات - منصة الدروس الخصوصية{% endblock %}
+{% block title %}سجل المدفوعات والفواتير - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>سجل المدفوعات</h1>
-    {% if payments %}
-        <div class="table-wrap">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>الحجز</th>
-                        <th>المدرس</th>
-                        <th>المبلغ</th>
-                        <th>طريقة الدفع</th>
-                        <th>الحالة</th>
-                        <th>المرجع</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for payment in payments %}
-                        <tr>
-                            <td>#{{ payment.booking.pk }}</td>
-                            <td>{{ payment.booking.teacher.user.get_full_name }}</td>
-                            <td>{{ payment.amount }} {{ payment.currency }}</td>
-                            <td>{{ payment.get_payment_method_display }}</td>
-                            <td>{{ payment.get_payment_status_display }}</td>
-                            <td>{{ payment.transaction_reference|default:'-' }}</td>
-                            <td><a class="btn btn-secondary" href="{% url 'bookings:student_detail' payment.booking.pk %}">تفاصيل الحجز</a></td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-[1200px] mx-auto px-margin-mobile md:px-margin-desktop py-xl text-right">
+    <!-- Page Header -->
+    <div class="flex justify-between items-center mb-lg border-b border-outline-variant/30 pb-6">
+        <div>
+            <h1 class="font-headline-lg text-primary font-bold">المدفوعات والفواتير</h1>
+            <p class="font-body-md text-on-surface-variant mt-1">تابع إيصالات الدفع الخاصة بك وحالة مراجعتها من قبل الإدارة.</p>
         </div>
-    {% else %}
-        <p class="empty-state compact">لا توجد مدفوعات بعد.</p>
-    {% endif %}
-</section>
+        <a href="{% url 'teachers:public_list' %}" class="bg-primary text-on-primary font-label-md px-lg py-2.5 rounded-lg hover:bg-surface-tint transition-all font-bold">حجز درس جديد / دفع حصة</a>
+    </div>
+
+    <!-- Payments Card Container -->
+    <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-md md:p-lg shadow-sm">
+        <h2 class="font-title-lg font-bold text-on-surface mb-md pb-xs border-b border-outline-variant/30 flex items-center gap-xs">
+            <span class="material-symbols-outlined text-primary">receipt_long</span>
+            تاريخ العمليات المالية وإيصالات الدفع
+        </h2>
+        
+        {% if payments %}
+            <div class="overflow-x-auto w-full">
+                <table class="w-full text-right border-collapse">
+                    <thead>
+                        <tr class="border-b border-outline-variant text-outline font-label-md">
+                            <th class="pb-sm px-2">رقم الحجز</th>
+                            <th class="pb-sm px-2">المدرس والمادة</th>
+                            <th class="pb-sm px-2">تاريخ الدفع</th>
+                            <th class="pb-sm px-2">الوسيلة</th>
+                            <th class="pb-sm px-2">المبلغ</th>
+                            <th class="pb-sm px-2">الحالة</th>
+                            <th class="pb-sm px-2">الرقم المرجعي</th>
+                            <th class="pb-sm px-2">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody class="font-body-md text-on-surface">
+                        {% for payment in payments %}
+                            <tr class="border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors">
+                                <td class="py-md px-2 font-mono">#{{ payment.booking.pk }}</td>
+                                <td class="py-md px-2 font-bold">{{ payment.booking.teacher.user.get_full_name }} - {{ payment.booking.subject.name }}</td>
+                                <td class="py-md px-2">{{ payment.created_at|date:"Y-m-d H:i" }}</td>
+                                <td class="py-md px-2">{{ payment.get_payment_method_display }}</td>
+                                <td class="py-md px-2 font-bold text-primary">{{ payment.amount }} {{ payment.currency }}</td>
+                                <td class="py-md px-2">
+                                    <span class="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full font-bold
+                                        {% if payment.payment_status == 'paid' %}
+                                            bg-primary-container/20 text-primary
+                                        {% elif payment.payment_status == 'failed' %}
+                                            bg-error-container text-on-error-container
+                                        {% elif payment.payment_status == 'awaiting_verification' %}
+                                            bg-secondary-container/20 text-secondary
+                                        {% else %}
+                                            bg-surface-container text-on-surface-variant
+                                        {% endif %}">
+                                        {{ payment.get_payment_status_display }}
+                                    </span>
+                                </td>
+                                <td class="py-md px-2 font-mono text-xs">{{ payment.transaction_reference|default:"-" }}</td>
+                                <td class="py-md px-2">
+                                    <div class="flex gap-2">
+                                        <a href="{% url 'bookings:student_detail' payment.booking.pk %}" class="text-primary hover:underline font-label-sm font-bold">تفاصيل الحجز</a>
+                                        {% if payment.receipt_image %}
+                                            <span class="text-outline-variant">|</span>
+                                            <a href="{{ payment.receipt_image.url }}" target="_blank" class="text-primary hover:underline font-label-sm">عرض الإيصال</a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-12">
+                <span class="material-symbols-outlined text-[48px] text-on-surface-variant mb-2">receipt_long</span>
+                <h3 class="font-title-lg font-bold text-on-surface">لا توجد مدفوعات مسجلة بعد</h3>
+                <p class="font-body-md text-on-surface-variant mt-2 max-w-md mx-auto">لم تقم بإجراء أي عمليات دفع أو تحويل بعد.</p>
+                <a href="{% url 'teachers:public_list' %}" class="inline-block mt-4 bg-primary text-on-primary px-lg py-2.5 rounded-lg font-label-md hover:bg-surface-tint font-bold">حجز حصة جديدة</a>
+            </div>
+        {% endif %}
+    </div>
+</main>
 {% endblock %}

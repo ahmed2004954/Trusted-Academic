@@ -1,83 +1,135 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}لوحة التحكم للطالب - ثقة أكاديمية{% endblock %}
+{% block title %}لوحة تحكم الطالب - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content dashboard text-right">
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-4 pb-xl px-margin-mobile md:px-margin-desktop w-full max-w-[1440px] mx-auto text-right">
     <!-- Welcome Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 border-b border-outline-variant/30 pb-6">
-        <div>
-            <h1 class="font-display-lg text-primary font-bold mb-1">لوحة تحكم الطالب</h1>
-            <p class="text-sm text-on-surface-variant">مرحباً بك مجدداً في حسابك التعليمي. يمكنك هنا مراجعة مواعيد حصصك والتواصل مع معلميك.</p>
-        </div>
-        <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                {{ user.first_name|first }}
+    <header class="mb-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-md">
+        <div class="flex items-center gap-md">
+            <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-outline-variant bg-primary-container/10 flex items-center justify-center text-primary font-headline-md">
+                {{ user.get_full_name|slice:":1"|default:user.email|slice:":1"|upper }}
             </div>
             <div>
-                <span class="font-semibold block text-on-surface">{{ user.get_full_name }}</span>
-                <span class="text-xs text-on-surface-variant">طالب معتمد</span>
+                <h1 class="font-headline-lg text-headline-lg text-on-surface mb-1">مرحباً بك، {{ user.get_full_name|default:user.email }}</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant">
+                    {% if profile.grade_level %}{{ profile.grade_level.name }}{% else %}لم يتم تحديد الصف بعد{% endif %}
+                    {% if profile.school_name %} - {{ profile.school_name }}{% endif %}
+                </p>
             </div>
         </div>
-    </div>
-
-    <!-- Quick Action Buttons -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <a class="btn btn-primary" href="{% url 'bookings:student_list' %}">
-            <span class="material-symbols-outlined text-[18px]">event_note</span> عرض جدول حصصي
-        </a>
-        <a class="btn btn-secondary" href="{% url 'messaging:inbox' %}">
-            <span class="material-symbols-outlined text-[18px]">mail</span> رسائل المعلمين 
-            {% if messaging_unread_count %}
-                <span class="badge badge-error mr-1">{{ messaging_unread_count }}</span>
-            {% endif %}
-        </a>
-        <a class="btn btn-secondary" href="{% url 'students:linking_code' %}">
-            <span class="material-symbols-outlined text-[18px]">key</span> كود ربط ولي الأمر
-        </a>
-    </div>
-
-    <!-- Information Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Student Info card -->
-        <div class="dashboard-card md:col-span-1 border border-outline-variant/50 rounded-2xl p-6 bg-surface shadow-sm">
-            <h3 class="font-bold text-primary mb-4 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
-                <span class="material-symbols-outlined text-[18px] icon-fill">school</span> البيانات التعليمية
-            </h3>
-            <div class="flex flex-col gap-3">
-                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-sm">
-                    <span class="text-on-surface-variant font-medium">الاسم:</span>
-                    <span class="text-on-surface font-bold">{{ user.get_full_name }}</span>
-                </div>
-                {% if profile.grade_level %}
-                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-sm">
-                    <span class="text-on-surface-variant font-medium">الصف الدراسي:</span>
-                    <span class="text-on-surface font-bold">{{ profile.grade_level.name }}</span>
-                </div>
-                {% endif %}
-                {% if profile.school_name %}
-                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-sm">
-                    <span class="text-on-surface-variant font-medium">المدرسة:</span>
-                    <span class="text-on-surface font-bold">{{ profile.school_name }}</span>
-                </div>
-                {% endif %}
+        <!-- Quick Stats Pills -->
+        <div class="flex gap-sm">
+            <div class="bg-surface-container-highest px-md py-xs rounded-full flex items-center gap-2">
+                <span class="material-symbols-outlined text-[20px] text-primary">event_upcoming</span>
+                <span class="font-label-md text-label-md text-on-surface">3 دروس اليوم</span>
+            </div>
+            <div class="bg-error-container text-on-error-container px-md py-xs rounded-full flex items-center gap-2">
+                <span class="material-symbols-outlined text-[20px]">assignment_late</span>
+                <span class="font-label-md text-label-md">1 مهمة معلقة</span>
             </div>
         </div>
+    </header>
 
-        <!-- Recent Activity Column -->
-        <div class="md:col-span-2 dashboard-card border border-outline-variant/50 rounded-2xl p-6 bg-surface shadow-sm">
-            <h3 class="font-bold text-primary mb-4 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
-                <span class="material-symbols-outlined text-[18px] icon-fill">history</span> آخر التحديثات والحصص
-            </h3>
-            <p class="text-sm text-on-surface-variant leading-relaxed">
-                انتقل إلى صفحة <a href="{% url 'bookings:student_list' %}" class="text-primary font-bold hover:underline">جدول حصصي</a> لمشاهدة جميع تفاصيل المواعيد، روابط غرف زووم/جوجل ميت، وتأكيد الحضور فور انتهاء الحصة.
-            </p>
-            <div class="mt-6 flex justify-end">
-                <a href="{% url 'teachers:public_list' %}" class="bg-primary/10 text-primary text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-primary hover:text-on-primary transition-colors flex items-center gap-1.5 shadow-sm">
-                    <span class="material-symbols-outlined text-sm">search</span> ابحث عن معلم جديد
-                </a>
+    <!-- Dashboard Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+        <!-- Left Column / Main Area -->
+        <div class="lg:col-span-8 flex flex-col gap-lg">
+            <!-- Upcoming Lessons Section -->
+            <section>
+                <div class="flex justify-between items-center mb-md">
+                    <h2 class="font-title-lg text-title-lg text-on-surface">الدروس القادمة</h2>
+                    <a href="{% url 'bookings:student_list' %}" class="font-label-md text-label-md text-primary hover:underline flex items-center gap-1">
+                        عرض الجدول الكامل
+                        <span class="material-symbols-outlined text-[16px]">arrow_back_ios</span>
+                    </a>
+                </div>
+                <div class="flex flex-col gap-sm">
+                    <!-- Lesson Card 1 (Static Placeholder with Dynamic Actions) -->
+                    <div class="bg-surface-container-lowest rounded-xl p-md flex flex-col sm:flex-row justify-between items-start sm:items-center border border-outline-variant ambient-shadow hover:border-primary transition-colors">
+                        <div class="flex gap-md w-full sm:w-auto">
+                            <div class="bg-surface-container w-16 h-16 rounded-lg flex flex-col items-center justify-center text-primary">
+                                <span class="font-headline-md text-headline-md leading-none">10</span>
+                                <span class="font-label-sm text-label-sm">صباحاً</span>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <h3 class="font-title-lg text-title-lg text-on-surface mb-1">الرياضيات المتقدمة (MATH 101)</h3>
+                                <div class="flex items-center gap-2 text-on-surface-variant font-label-md text-label-md">
+                                    <span class="material-symbols-outlined text-[16px]">school</span>
+                                    <span>أ. محمد عبد الله</span>
+                                    <span class="bg-secondary-container text-on-secondary-container rounded-full p-0.5" title="أكاديمي موثق">
+                                        <span class="material-symbols-outlined text-[12px] fill">verified</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{% url 'bookings:student_list' %}" class="mt-md sm:mt-0 w-full sm:w-auto bg-primary text-on-primary font-label-md text-label-md px-md py-xs rounded-full flex items-center justify-center gap-2 hover:bg-primary-container hover:text-on-primary-container transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">videocam</span>
+                            انضمام للدرس
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Academic Progress / Reports -->
+            <section class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant ambient-shadow">
+                <h2 class="font-title-lg text-title-lg text-on-surface mb-md">التقارير الأكاديمية الأخيرة</h2>
+                <div class="flex flex-col gap-4">
+                    <div class="flex items-start gap-md pb-4 border-b border-surface-variant">
+                        <div class="bg-primary-container text-on-primary-container p-2 rounded-full mt-1">
+                            <span class="material-symbols-outlined">analytics</span>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-label-md text-label-md text-on-surface font-bold">تقرير تقييم منتصف الفصل - الكيمياء</h4>
+                            <p class="font-body-md text-body-md text-on-surface-variant mt-1">تم نشر التقرير الأكاديمي. الأداء العام: ممتاز.</p>
+                            <a href="{% url 'bookings:student_list' %}" class="text-primary font-bold text-sm hover:underline mt-2 inline-block">عرض التقرير التعليمي الكامل</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Right Column / Sidebar -->
+        <div class="lg:col-span-4 flex flex-col gap-lg">
+            <!-- Trust / Verification Badge -->
+            <div class="bg-primary-container text-on-primary-container rounded-xl p-md flex items-center gap-md">
+                <span class="material-symbols-outlined text-[32px]">shield_person</span>
+                <div>
+                    <h3 class="font-label-md text-label-md font-bold">حساب طالب موثق</h3>
+                    <p class="font-label-sm text-label-sm opacity-90">تم التحقق من الهوية التعليمية</p>
+                </div>
             </div>
+
+            <!-- Quick Actions Grid -->
+            <section>
+                <h2 class="font-title-lg text-title-lg text-on-surface mb-md">إجراءات سريعة</h2>
+                <div class="grid grid-cols-2 gap-sm">
+                    <a class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center justify-center gap-2 hover:bg-surface-container-low hover:border-primary transition-all ambient-shadow group text-center aspect-square" href="{% url 'teachers:public_list' %}">
+                        <div class="bg-primary-fixed-dim text-on-primary-fixed-variant p-3 rounded-full group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined">add_circle</span>
+                        </div>
+                        <span class="font-label-md text-label-md text-on-surface">حجز درس جديد</span>
+                    </a>
+                    <a class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center justify-center gap-2 hover:bg-surface-container-low hover:border-primary transition-all ambient-shadow group text-center aspect-square" href="{% url 'messaging:inbox' %}">
+                        <div class="bg-surface-variant text-on-surface-variant p-3 rounded-full group-hover:scale-110 transition-transform relative">
+                            <span class="material-symbols-outlined">forum</span>
+                            {% if messaging_unread_count %}
+                                <span class="absolute top-0 right-0 w-5 h-5 bg-error text-on-error text-[10px] font-bold rounded-full border-2 border-surface-container-lowest flex items-center justify-center">{{ messaging_unread_count }}</span>
+                            {% endif %}
+                        </div>
+                        <span class="font-label-md text-label-md text-on-surface">الرسائل</span>
+                    </a>
+                    <a class="col-span-2 bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center justify-center gap-3 hover:bg-surface-container-low hover:border-primary transition-all ambient-shadow group text-center" href="{% url 'students:linking_code' %}">
+                        <div class="bg-secondary-container/10 text-secondary p-2 rounded-full group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined">key</span>
+                        </div>
+                        <span class="font-label-md text-label-md text-on-surface font-bold">كود ربط ولي الأمر</span>
+                    </a>
+                </div>
+            </section>
         </div>
     </div>
-</section>
+</main>
 {% endblock %}
