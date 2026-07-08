@@ -1,133 +1,165 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
 {% block title %}مراجعة حساب معلم - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content text-right">
-    <!-- Header -->
-    <div class="border-b border-outline-variant/30 pb-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-            <h1 class="font-display-lg text-primary font-bold">مراجعة المعلم: {{ profile.user.get_full_name }}</h1>
-            <p class="text-xs text-on-surface-variant mt-1">تفاصيل الهوية الأكاديمية، المستندات المرفقة، والشهادات لاعتماد وتفعيل الحساب.</p>
-        </div>
-        <div class="flex gap-2">
-            <a class="btn btn-secondary text-xs" href="{% url 'adminpanel:pending_teachers' %}">العودة للطلبات المعلقة</a>
-        </div>
-    </div>
+<style>
+    textarea, select, input[type="text"] {
+        width: 100%;
+        background-color: #faf9f6;
+        border: 1px solid #bec9c2;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        font-family: 'IBM Plex Sans Arabic', sans-serif;
+        font-size: 14px;
+        color: #1a1c1a;
+        transition: all 0.2s ease;
+    }
+    textarea:focus, select:focus, input:focus {
+        border-color: #004532;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 69, 50, 0.1);
+    }
+    input[type="radio"] {
+        accent-color: #004532;
+        margin-inline-start: 0.35rem;
+    }
+    form ul {
+        display: grid;
+        gap: 0.5rem;
+    }
+</style>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-6">
-        <!-- Details Column -->
-        <div class="col-span-1 lg:col-span-8 flex flex-col gap-6">
-            <!-- Basic info -->
-            <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm">
-                <h3 class="font-bold text-primary mb-4 border-b border-outline-variant/30 pb-2 text-sm flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[18px]">account_box</span> بيانات المدرس العامة
-                </h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                    <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
-                        <span class="text-on-surface-variant font-medium">البريد الإلكتروني:</span>
-                        <span class="text-on-surface font-bold">{{ profile.user.email }}</span>
-                    </div>
-                    <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
-                        <span class="text-on-surface-variant font-medium">رقم الهاتف:</span>
-                        <span class="text-on-surface font-bold">{{ profile.user.phone|default:'غير متاح' }}</span>
-                    </div>
-                    <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
-                        <span class="text-on-surface-variant font-medium">العنوان والخبرة:</span>
-                        <span class="text-on-surface font-bold truncate max-w-[200px]" title="{{ profile.headline }}">{{ profile.headline|default:'غير مكتمل' }}</span>
-                    </div>
-                    <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
-                        <span class="text-on-surface-variant font-medium">سنوات الخبرة الأكاديمية:</span>
-                        <span class="text-on-surface font-bold">{{ profile.experience_years }} سنة خبرة</span>
+<main class="flex-grow pt-4 pb-xl px-margin-mobile md:px-margin-desktop text-right">
+    <div class="max-w-7xl mx-auto space-y-lg">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md border-b border-outline-variant/30 pb-6">
+            <div>
+                <p class="font-label-md text-label-md text-primary font-bold mb-xs">اعتماد المعلمين</p>
+                <h1 class="font-headline-lg text-headline-lg text-on-background">مراجعة المعلم: {{ profile.user.get_full_name|default:profile.user.email }}</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant mt-xs">راجع بيانات الهوية الأكاديمية، الملفات، والشهادات قبل اتخاذ قرار الاعتماد.</p>
+            </div>
+            <a href="{% url 'adminpanel:pending_teachers' %}" class="inline-flex items-center gap-2 border border-outline-variant text-on-surface px-md py-2 rounded-lg font-label-md hover:bg-surface-container transition-colors">
+                <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                الطلبات المعلقة
+            </a>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+            <section class="lg:col-span-8 space-y-md">
+                <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                    <h2 class="font-title-lg text-title-lg text-on-surface mb-sm flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">account_box</span>
+                        بيانات المعلم العامة
+                    </h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                        <div class="bg-surface-container rounded-lg p-sm border border-outline-variant/30">
+                            <p class="font-label-sm text-label-sm text-on-surface-variant">البريد الإلكتروني</p>
+                            <p class="font-label-md text-label-md text-on-surface font-bold break-all">{{ profile.user.email }}</p>
+                        </div>
+                        <div class="bg-surface-container rounded-lg p-sm border border-outline-variant/30">
+                            <p class="font-label-sm text-label-sm text-on-surface-variant">رقم الهاتف</p>
+                            <p class="font-label-md text-label-md text-on-surface font-bold">{{ profile.user.phone|default:"غير متاح" }}</p>
+                        </div>
+                        <div class="bg-surface-container rounded-lg p-sm border border-outline-variant/30">
+                            <p class="font-label-sm text-label-sm text-on-surface-variant">العنوان المهني</p>
+                            <p class="font-label-md text-label-md text-on-surface font-bold">{{ profile.headline|default:"غير مكتمل" }}</p>
+                        </div>
+                        <div class="bg-surface-container rounded-lg p-sm border border-outline-variant/30">
+                            <p class="font-label-sm text-label-sm text-on-surface-variant">سنوات الخبرة</p>
+                            <p class="font-label-md text-label-md text-on-surface font-bold">{{ profile.experience_years }} سنة</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Documents -->
-            <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm">
-                <h3 class="font-bold text-primary mb-4 border-b border-outline-variant/30 pb-2 text-sm flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[18px]">folder_shared</span> ملفات التحقق الأساسية
-                </h3>
-                <div class="flex flex-col gap-3">
-                    {% if profile.photo %}
-                        <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-xs">
-                            <span class="text-on-surface font-semibold">الصورة الشخصية للبروفايل</span>
-                            <a href="{{ profile.photo.url }}" class="text-primary hover:underline font-bold" target="_blank">عرض الملف</a>
-                        </div>
-                    {% endif %}
-                    {% if profile.cv_file %}
-                        <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-xs">
-                            <span class="text-on-surface font-semibold">السيرة الذاتية والأوراق الثبوتية</span>
-                            <a href="{{ profile.cv_file.url }}" class="text-primary hover:underline font-bold" target="_blank">عرض الملف</a>
-                        </div>
-                    {% endif %}
-                    {% if profile.intro_video_url %}
-                        <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-xs">
-                            <span class="text-on-surface font-semibold">فيديو تعريفي وشرح المعلم</span>
-                            <a href="{{ profile.intro_video_url }}" class="text-primary hover:underline font-bold" target="_blank">رابط اللقاء</a>
-                        </div>
-                    {% endif %}
-                    {% if not profile.photo and not profile.cv_file and not profile.intro_video_url %}
-                        <p class="text-xs text-on-surface-variant py-2">لا توجد ملفات تحقق أساسية مرفوعة حالياً.</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Bio -->
-            <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm">
-                <h3 class="font-bold text-primary mb-3 border-b border-outline-variant/30 pb-2 text-sm flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[18px]">person</span> نبذة المعلم الذاتية
-                </h3>
-                <p class="text-xs text-on-surface-variant leading-loose">
-                    {{ profile.bio|linebreaksbr|default:'لم يتم إدخال نبذة.' }}
-                </p>
-            </div>
-
-            <!-- Certificates -->
-            <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm">
-                <h3 class="font-bold text-primary mb-4 border-b border-outline-variant/30 pb-2 text-sm flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[18px]">workspace_premium</span> الشهادات الأكاديمية والمهنية
-                </h3>
-                {% if profile.certificates.all %}
-                    <div class="flex flex-col gap-3 text-xs">
-                        {% for certificate in profile.certificates.all %}
-                            <div class="flex justify-between items-center bg-surface-container-low px-4 py-3 rounded-xl">
-                                <div>
-                                    <span class="font-bold text-on-surface block mb-0.5">{{ certificate.title }}</span>
-                                    <span class="text-on-surface-variant opacity-80">{{ certificate.issuing_organization }}</span>
-                                </div>
-                                <a href="{{ certificate.file.url }}" class="text-primary hover:underline font-bold" target="_blank">عرض الشهادة</a>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p class="text-xs text-on-surface-variant py-2">لم يقم المعلم برفع شهادات مهنية بعد.</p>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- Decision Box Column -->
-        <div class="col-span-1 lg:col-span-4 bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm">
-            <h3 class="font-bold text-primary mb-3 flex items-center gap-2 border-b border-outline-variant/30 pb-2 text-sm">
-                <span class="material-symbols-outlined text-[18px]">gavel</span> قرار المراجعة والاعتماد
-            </h3>
-            <form method="post" class="flex flex-col gap-4">
-                {% csrf_token %}
-                {% for field in form %}
-                    <div class="flex flex-col gap-1 text-xs">
-                        <label class="font-semibold text-on-surface mb-1">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.help_text %}
-                            <span class="text-[10px] text-on-surface-variant opacity-80 mt-0.5">{{ field.help_text }}</span>
+                <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                    <h2 class="font-title-lg text-title-lg text-on-surface mb-sm flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">folder_shared</span>
+                        ملفات التحقق الأساسية
+                    </h2>
+                    <div class="space-y-sm">
+                        {% if profile.photo %}
+                            <a href="{{ profile.photo.url }}" target="_blank" rel="noopener" class="flex items-center justify-between gap-sm bg-surface-container rounded-lg p-sm border border-outline-variant/30 hover:border-primary/40 transition-colors">
+                                <span class="font-label-md text-label-md text-on-surface font-bold">الصورة الشخصية</span>
+                                <span class="text-primary font-label-md">عرض الملف</span>
+                            </a>
                         {% endif %}
-                        {% for error in field.errors %}
-                            <span class="text-error text-[10px] font-bold">{{ error }}</span>
+                        {% if profile.cv_file %}
+                            <a href="{{ profile.cv_file.url }}" target="_blank" rel="noopener" class="flex items-center justify-between gap-sm bg-surface-container rounded-lg p-sm border border-outline-variant/30 hover:border-primary/40 transition-colors">
+                                <span class="font-label-md text-label-md text-on-surface font-bold">السيرة الذاتية والأوراق الثبوتية</span>
+                                <span class="text-primary font-label-md">عرض الملف</span>
+                            </a>
+                        {% endif %}
+                        {% if profile.intro_video_url %}
+                            <a href="{{ profile.intro_video_url }}" target="_blank" rel="noopener" class="flex items-center justify-between gap-sm bg-surface-container rounded-lg p-sm border border-outline-variant/30 hover:border-primary/40 transition-colors">
+                                <span class="font-label-md text-label-md text-on-surface font-bold">الفيديو التعريفي</span>
+                                <span class="text-primary font-label-md">فتح الرابط</span>
+                            </a>
+                        {% endif %}
+                        {% if not profile.photo and not profile.cv_file and not profile.intro_video_url %}
+                            <p class="font-body-md text-body-md text-on-surface-variant">لا توجد ملفات تحقق أساسية مرفوعة حالياً.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                    <h2 class="font-title-lg text-title-lg text-on-surface mb-sm flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">person</span>
+                        نبذة المعلم
+                    </h2>
+                    <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">{{ profile.bio|linebreaksbr|default:"لم يتم إدخال نبذة." }}</p>
+                </div>
+
+                <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                    <h2 class="font-title-lg text-title-lg text-on-surface mb-sm flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">workspace_premium</span>
+                        الشهادات الأكاديمية والمهنية
+                    </h2>
+                    <div class="space-y-sm">
+                        {% for certificate in profile.certificates.all %}
+                            <a href="{{ certificate.file.url }}" target="_blank" rel="noopener" class="flex flex-col sm:flex-row sm:items-center justify-between gap-sm bg-surface-container rounded-lg p-sm border border-outline-variant/30 hover:border-primary/40 transition-colors">
+                                <span>
+                                    <span class="font-label-md text-label-md text-on-surface font-bold block">{{ certificate.title }}</span>
+                                    <span class="font-label-sm text-label-sm text-on-surface-variant">{{ certificate.issuing_organization }}</span>
+                                </span>
+                                <span class="text-primary font-label-md">عرض الشهادة</span>
+                            </a>
+                        {% empty %}
+                            <p class="font-body-md text-body-md text-on-surface-variant">لم يقم المعلم برفع شهادات مهنية بعد.</p>
                         {% endfor %}
                     </div>
-                {% endfor %}
-                <button type="submit" class="w-full btn btn-primary py-2.5 text-xs font-semibold">حفظ قرار المراجعة</button>
-            </form>
+                </div>
+            </section>
+
+            <aside class="lg:col-span-4 bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm lg:sticky lg:top-28">
+                <h2 class="font-title-lg text-title-lg text-on-surface mb-sm flex items-center gap-2 border-b border-outline-variant/30 pb-sm">
+                    <span class="material-symbols-outlined text-primary">gavel</span>
+                    قرار المراجعة
+                </h2>
+                {% if form.non_field_errors %}
+                    <div class="mb-sm bg-error-container text-on-error-container rounded-lg p-sm font-label-md">{{ form.non_field_errors }}</div>
+                {% endif %}
+                <form method="post" class="space-y-sm">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="flex flex-col gap-base">
+                            <label class="font-label-md text-label-md text-on-surface font-bold">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <span class="font-label-sm text-label-sm text-on-surface-variant">{{ field.help_text }}</span>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <span class="text-error text-xs font-bold">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-md py-3 rounded-lg font-label-md font-bold hover:bg-surface-tint transition-all active:scale-[0.98]">
+                        <span class="material-symbols-outlined text-[18px]">save</span>
+                        حفظ قرار المراجعة
+                    </button>
+                </form>
+            </aside>
         </div>
     </div>
-</section>
+</main>
 {% endblock %}

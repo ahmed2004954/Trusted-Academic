@@ -5,6 +5,13 @@
 {% block nav_active %}home{% endblock %}
 
 {% block content %}
+<style>
+    .subject-chip-label {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+</style>
+
 <!-- Premium Hero Section -->
 <section class="relative pt-20 pb-16 px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto overflow-hidden">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -137,9 +144,9 @@
     </div>
     <div class="flex flex-wrap gap-3">
         {% for subject in active_subjects %}
-            <a href="{% url 'teachers:public_list' %}?subject={{ subject.id }}" class="bg-surface border border-outline-variant/60 text-on-surface font-label-md text-label-md px-5 py-3 rounded-full hover:bg-primary/5 hover:border-primary hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2 shadow-sm font-medium reveal reveal-stagger-{{ forloop.counter|default:1 }}">
-                <span class="material-symbols-outlined text-primary text-[20px]">book</span>
-                {{ subject.name }}
+            <a href="{% url 'teachers:public_list' %}?subject={{ subject.id }}" class="max-w-full sm:max-w-[22rem] bg-surface border border-outline-variant/60 text-on-surface font-label-md text-label-md px-5 py-3 rounded-full hover:bg-primary/5 hover:border-primary hover:-translate-y-0.5 transition-all duration-200 inline-flex items-center gap-2 shadow-sm font-medium reveal reveal-stagger-{{ forloop.counter|default:1 }}">
+                <span class="material-symbols-outlined text-primary text-[20px] shrink-0">book</span>
+                <span class="subject-chip-label min-w-0 text-right leading-6" dir="auto">{{ subject.name }}</span>
             </a>
         {% endfor %}
     </div>

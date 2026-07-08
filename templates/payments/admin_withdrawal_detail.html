@@ -1,31 +1,138 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}تفاصيل طلب السحب - منصة الدروس الخصوصية{% endblock %}
+{% block title %}تفاصيل طلب السحب - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>تفاصيل طلب السحب</h1>
-    <div class="status-card">
-        <p><strong>المدرس:</strong> {{ withdrawal.teacher.user.get_full_name }} ({{ withdrawal.teacher.user.email }})</p>
-        <p><strong>المبلغ:</strong> {{ withdrawal.amount }} EGP</p>
-        <p><strong>طريقة الدفع:</strong> {{ withdrawal.payment_method }}</p>
-        <p><strong>تفاصيل الدفع:</strong> {{ withdrawal.payment_details|linebreaksbr }}</p>
-        <p><strong>الحالة:</strong> {{ withdrawal.get_status_display }}</p>
-        <p><strong>الرصيد المتاح الحالي:</strong> {{ wallet.available_balance }} EGP</p>
-        <p><strong>تم حجز الرصيد:</strong> {% if withdrawal.balance_deducted_at %}نعم{% else %}لا{% endif %}</p>
-        {% if withdrawal.notes %}
-            <p><strong>ملاحظات:</strong> {{ withdrawal.notes }}</p>
-        {% endif %}
+<style>
+    textarea, input[type="text"] {
+        width: 100%;
+        background-color: #faf9f6;
+        border: 1px solid #bec9c2;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        font-family: 'IBM Plex Sans Arabic', sans-serif;
+        font-size: 14px;
+        color: #1a1c1a;
+        transition: all 0.2s ease;
+    }
+    textarea:focus, input:focus {
+        border-color: #004532;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 69, 50, 0.1);
+    }
+</style>
+
+<main class="flex-grow pt-4 pb-xl px-margin-mobile md:px-margin-desktop text-right">
+    <div class="max-w-7xl mx-auto space-y-lg">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md border-b border-outline-variant/30 pb-6">
+            <div>
+                <p class="font-label-md text-label-md text-primary font-bold mb-xs">السحب المالي</p>
+                <h1 class="font-headline-lg text-headline-lg text-on-background">تفاصيل طلب السحب #{{ withdrawal.pk }}</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant mt-xs">راجع الرصيد وطريقة التحويل قبل تغيير حالة الطلب.</p>
+            </div>
+            <a href="{% url 'payments:admin_withdrawal_queue' %}" class="inline-flex items-center gap-2 border border-outline-variant text-on-surface px-md py-2 rounded-lg font-label-md hover:bg-surface-container transition-colors">
+                <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                قائمة السحب
+            </a>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+            <section class="lg:col-span-8 space-y-md">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+                    <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                        <p class="font-label-md text-label-md text-on-surface-variant">مبلغ السحب</p>
+                        <h2 class="font-headline-md text-headline-md text-primary mt-base">{{ withdrawal.amount }} ج.م</h2>
+                    </div>
+                    <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                        <p class="font-label-md text-label-md text-on-surface-variant">الرصيد المتاح</p>
+                        <h2 class="font-headline-md text-headline-md text-on-background mt-base">{{ wallet.available_balance }} ج.م</h2>
+                    </div>
+                    <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                        <p class="font-label-md text-label-md text-on-surface-variant">حالة الطلب</p>
+                        <h2 class="font-title-lg text-title-lg text-on-background mt-base">{{ withdrawal.get_status_display }}</h2>
+                    </div>
+                </div>
+
+                <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                    <h2 class="font-title-lg text-title-lg text-on-surface mb-sm flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">person</span>
+                        بيانات المعلم
+                    </h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                        <div class="bg-surface-container rounded-lg p-sm border border-outline-variant/30">
+                            <p class="font-label-sm text-label-sm text-on-surface-variant">الاسم</p>
+                            <p class="font-label-md text-label-md text-on-surface font-bold">{{ withdrawal.teacher.user.get_full_name|default:withdrawal.teacher.user.email }}</p>
+                        </div>
+                        <div class="bg-surface-container rounded-lg p-sm border border-outline-variant/30">
+                            <p class="font-label-sm text-label-sm text-on-surface-variant">البريد</p>
+                            <p class="font-label-md text-label-md text-on-surface font-bold break-all">{{ withdrawal.teacher.user.email }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                    <h2 class="font-title-lg text-title-lg text-on-surface mb-sm flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+                        بيانات التحويل
+                    </h2>
+                    <div class="space-y-sm">
+                        <div class="bg-surface-container rounded-lg p-sm border border-outline-variant/30">
+                            <p class="font-label-sm text-label-sm text-on-surface-variant">طريقة الدفع</p>
+                            <p class="font-label-md text-label-md text-on-surface font-bold">{{ withdrawal.payment_method }}</p>
+                        </div>
+                        <div class="bg-surface-container rounded-lg p-sm border border-outline-variant/30">
+                            <p class="font-label-sm text-label-sm text-on-surface-variant">تفاصيل الدفع</p>
+                            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">{{ withdrawal.payment_details|linebreaksbr }}</p>
+                        </div>
+                        <div class="bg-surface-container rounded-lg p-sm border border-outline-variant/30">
+                            <p class="font-label-sm text-label-sm text-on-surface-variant">تم حجز الرصيد؟</p>
+                            <p class="font-label-md text-label-md text-on-surface font-bold">{% if withdrawal.balance_deducted_at %}نعم{% else %}لا{% endif %}</p>
+                        </div>
+                        {% if withdrawal.notes %}
+                            <div class="bg-surface-container rounded-lg p-sm border border-outline-variant/30">
+                                <p class="font-label-sm text-label-sm text-on-surface-variant">ملاحظات سابقة</p>
+                                <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">{{ withdrawal.notes|linebreaksbr }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <aside class="lg:col-span-4 bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm lg:sticky lg:top-28">
+                <h2 class="font-title-lg text-title-lg text-on-surface mb-sm flex items-center gap-2 border-b border-outline-variant/30 pb-sm">
+                    <span class="material-symbols-outlined text-primary">rule</span>
+                    إجراء الإدارة
+                </h2>
+                {% if form.non_field_errors %}
+                    <div class="mb-sm bg-error-container text-on-error-container rounded-lg p-sm font-label-md">{{ form.non_field_errors }}</div>
+                {% endif %}
+                <form method="post" class="space-y-sm">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="flex flex-col gap-base">
+                            <label class="font-label-md text-label-md text-on-surface font-bold">{{ field.label }}</label>
+                            {{ field }}
+                            {% for error in field.errors %}
+                                <span class="text-error text-xs font-bold">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" formaction="{% url 'payments:admin_withdrawal_action' withdrawal_pk=withdrawal.pk action='approve' %}" class="w-full inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-md py-3 rounded-lg font-label-md font-bold hover:bg-surface-tint transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                        اعتماد وحجز الرصيد
+                    </button>
+                    <button type="submit" formaction="{% url 'payments:admin_withdrawal_action' withdrawal_pk=withdrawal.pk action='complete' %}" class="w-full inline-flex items-center justify-center gap-2 bg-secondary-container text-on-secondary-container px-md py-3 rounded-lg font-label-md font-bold hover:opacity-90 transition-opacity">
+                        <span class="material-symbols-outlined text-[18px]">task_alt</span>
+                        تعليم كمكتمل
+                    </button>
+                    <button type="submit" formaction="{% url 'payments:admin_withdrawal_action' withdrawal_pk=withdrawal.pk action='reject' %}" class="w-full inline-flex items-center justify-center gap-2 border border-error text-error px-md py-3 rounded-lg font-label-md font-bold hover:bg-error-container/10 transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">cancel</span>
+                        رفض الطلب
+                    </button>
+                </form>
+            </aside>
+        </div>
     </div>
-
-    <form method="post" class="form-card">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" formaction="{% url 'payments:admin_withdrawal_action' withdrawal.pk 'approve' %}" class="btn btn-primary">اعتماد وحجز الرصيد</button>
-        <button type="submit" formaction="{% url 'payments:admin_withdrawal_action' withdrawal.pk 'complete' %}" class="btn btn-primary">تعليم كمكتمل</button>
-        <button type="submit" formaction="{% url 'payments:admin_withdrawal_action' withdrawal.pk 'reject' %}" class="btn btn-secondary">رفض</button>
-    </form>
-
-    <a class="btn btn-secondary" href="{% url 'payments:admin_withdrawal_queue' %}">رجوع لقائمة السحب</a>
-</section>
+</main>
 {% endblock %}

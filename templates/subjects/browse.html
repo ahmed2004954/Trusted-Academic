@@ -5,6 +5,11 @@
 
 {% block content %}
 <style>
+    .subject-card-title,
+    .subject-card-copy {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
     select {
         width: 100%;
         background-color: #faf9f6;
@@ -67,8 +72,8 @@
                         </span>
                     </div>
                     <div class="flex-1">
-                        <h2 class="font-title-lg text-title-lg text-on-surface">{{ subject.name }}</h2>
-                        <p class="font-body-md text-body-md text-on-surface-variant mt-xs">اعرض المعلمين المعتمدين المتاحين لهذه المادة وقارن الأسعار والمواعيد.</p>
+                        <h2 class="subject-card-title font-title-lg text-title-lg text-on-surface leading-tight" dir="auto">{{ subject.name }}</h2>
+                        <p class="subject-card-copy font-body-md text-body-md text-on-surface-variant mt-xs">اعرض المعلمين المعتمدين المتاحين لهذه المادة وقارن الأسعار والمواعيد.</p>
                     </div>
                     <a href="{% url 'teachers:public_list' %}?subject={{ subject.pk }}" class="inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-md py-2.5 rounded-lg font-label-md font-bold hover:bg-surface-tint transition-colors mt-auto">
                         <span class="material-symbols-outlined text-[18px]">search</span>

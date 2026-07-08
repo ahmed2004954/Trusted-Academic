@@ -4,6 +4,20 @@
 {% block title %}استكشف المواد الدراسية - ثقة أكاديمية{% endblock %}
 
 {% block content %}
+<style>
+    .subject-card-title,
+    .subject-card-copy {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+    .subject-card-copy {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+
 <div class="px-margin-mobile md:px-margin-desktop py-12 w-full max-w-[1440px] mx-auto text-right">
     <!-- Page Heading -->
     <div class="mb-10">
@@ -23,9 +37,9 @@
                         <span class="material-symbols-outlined text-2xl icon-fill">menu_book</span>
                     </div>
                     
-                    <h2 class="font-headline-md text-headline-md text-on-surface font-bold mb-2 self-stretch truncate">{{ subject.name }}</h2>
-                    <p class="font-body-md text-sm text-on-surface-variant leading-relaxed mb-6 h-12 overflow-hidden self-stretch">
-                        تصفح المعلمين المعتمدين لمادة {{ subject.name }} وقارن بين أسعار الحصص ومواعيدهم الأسبوعية.
+                    <h2 class="subject-card-title font-headline-md text-headline-md text-on-surface font-bold mb-2 self-stretch leading-tight min-h-[68px]" dir="auto">{{ subject.name }}</h2>
+                    <p class="subject-card-copy font-body-md text-sm text-on-surface-variant leading-relaxed mb-6 min-h-[72px] self-stretch">
+                        تصفح المعلمين المعتمدين لمادة <span dir="auto">{{ subject.name }}</span> وقارن بين أسعار الحصص ومواعيدهم الأسبوعية.
                     </p>
                     
                     <a class="w-full text-center bg-primary text-on-primary font-semibold py-2.5 rounded-xl hover:bg-primary-hover hover:shadow-sm transition-all duration-200 mt-auto text-xs active:scale-[0.98]" href="{% url 'teachers:public_list' %}?subject={{ subject.id }}">
