@@ -24,11 +24,11 @@
         <div class="flex gap-sm">
             <div class="bg-surface-container-highest px-md py-xs rounded-full flex items-center gap-2">
                 <span class="material-symbols-outlined text-[20px] text-primary">event_upcoming</span>
-                <span class="font-label-md text-label-md text-on-surface">3 دروس اليوم</span>
+                <span class="font-label-md text-label-md text-on-surface">{{ today_lessons_count }} دروس اليوم</span>
             </div>
             <div class="bg-error-container text-on-error-container px-md py-xs rounded-full flex items-center gap-2">
                 <span class="material-symbols-outlined text-[20px]">assignment_late</span>
-                <span class="font-label-md text-label-md">1 مهمة معلقة</span>
+                <span class="font-label-md text-label-md">{{ pending_tasks_count }} مهمة معلقة</span>
             </div>
         </div>
     </header>
@@ -47,29 +47,50 @@
                     </a>
                 </div>
                 <div class="flex flex-col gap-sm">
-                    <!-- Lesson Card 1 (Static Placeholder with Dynamic Actions) -->
-                    <div class="bg-surface-container-lowest rounded-xl p-md flex flex-col sm:flex-row justify-between items-start sm:items-center border border-outline-variant ambient-shadow hover:border-primary transition-colors">
-                        <div class="flex gap-md w-full sm:w-auto">
-                            <div class="bg-surface-container w-16 h-16 rounded-lg flex flex-col items-center justify-center text-primary">
-                                <span class="font-headline-md text-headline-md leading-none">10</span>
-                                <span class="font-label-sm text-label-sm">صباحاً</span>
-                            </div>
-                            <div class="flex flex-col justify-center">
-                                <h3 class="font-title-lg text-title-lg text-on-surface mb-1">الرياضيات المتقدمة (MATH 101)</h3>
-                                <div class="flex items-center gap-2 text-on-surface-variant font-label-md text-label-md">
-                                    <span class="material-symbols-outlined text-[16px]">school</span>
-                                    <span>أ. محمد عبد الله</span>
-                                    <span class="bg-secondary-container text-on-secondary-container rounded-full p-0.5" title="أكاديمي موثق">
-                                        <span class="material-symbols-outlined text-[12px] fill">verified</span>
-                                    </span>
+                    {% for lesson in upcoming_lessons %}
+                        <!-- Lesson Card -->
+                        <div class="bg-surface-container-lowest rounded-xl p-md flex flex-col sm:flex-row justify-between items-start sm:items-center border border-outline-variant ambient-shadow hover:border-primary transition-colors">
+                            <div class="flex gap-md w-full sm:w-auto">
+                                <div class="bg-surface-container w-16 h-16 rounded-lg flex flex-col items-center justify-center text-primary shrink-0">
+                                    <span class="font-headline-md text-headline-md leading-none">{{ lesson.scheduled_start|date:"d" }}</span>
+                                    <span class="font-label-sm text-label-sm">{{ lesson.scheduled_start|date:"M" }}</span>
+                                </div>
+                                <div class="flex flex-col justify-center">
+                                    <h3 class="font-title-lg text-title-lg text-on-surface mb-1">{{ lesson.subject.name }} ({{ lesson.grade_level.name }})</h3>
+                                    <div class="flex items-center gap-2 text-on-surface-variant font-label-md text-label-md">
+                                        <span class="material-symbols-outlined text-[16px]">school</span>
+                                        <span>أ. {{ lesson.teacher.user.get_full_name }}</span>
+                                        {% if lesson.teacher.approval_status == 'approved' %}
+                                            <span class="bg-secondary-container text-on-secondary-container rounded-full p-0.5" title="أكاديمي موثق">
+                                                <span class="material-symbols-outlined text-[12px] fill">verified</span>
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    <p class="text-xs text-on-surface-variant mt-1">{{ lesson.scheduled_start|date:"H:i" }} ({% if lesson.duration_minutes %}{{ lesson.duration_minutes }} دقيقة{% else %}60 دقيقة{% endif %}) - {{ lesson.get_booking_status_display }}</p>
                                 </div>
                             </div>
+                            {% if lesson.booking_status == 'confirmed' or lesson.booking_status == 'in_progress' %}
+                                <a href="{% url 'bookings:student_list' %}" class="mt-md sm:mt-0 w-full sm:w-auto bg-primary text-on-primary font-label-md text-label-md px-md py-xs rounded-full flex items-center justify-center gap-2 hover:bg-primary-container hover:text-on-primary-container transition-colors font-bold">
+                                    <span class="material-symbols-outlined text-[18px]">videocam</span>
+                                    انضمام للدرس
+                                </a>
+                            {% elif lesson.booking_status == 'pending_payment' or lesson.booking_status == 'awaiting_student_payment' %}
+                                <a href="{% url 'payments:instructions' lesson.pk %}" class="mt-md sm:mt-0 w-full sm:w-auto bg-secondary-container text-on-secondary-container font-label-md text-label-md px-md py-xs rounded-full flex items-center justify-center gap-2 hover:bg-secondary-fixed-dim transition-colors font-bold">
+                                    <span class="material-symbols-outlined text-[18px]">payments</span>
+                                    إتمام الدفع
+                                </a>
+                            {% else %}
+                                <a href="{% url 'bookings:student_detail' lesson.pk %}" class="mt-md sm:mt-0 w-full sm:w-auto border border-outline-variant text-on-surface font-label-md text-label-md px-md py-xs rounded-full flex items-center justify-center gap-2 hover:bg-surface-container transition-colors">
+                                    التفاصيل
+                                </a>
+                            {% endif %}
                         </div>
-                        <a href="{% url 'bookings:student_list' %}" class="mt-md sm:mt-0 w-full sm:w-auto bg-primary text-on-primary font-label-md text-label-md px-md py-xs rounded-full flex items-center justify-center gap-2 hover:bg-primary-container hover:text-on-primary-container transition-colors">
-                            <span class="material-symbols-outlined text-[18px]">videocam</span>
-                            انضمام للدرس
-                        </a>
-                    </div>
+                    {% empty %}
+                        <div class="text-center py-8 opacity-70 border border-dashed border-outline-variant rounded-xl bg-surface-container-lowest">
+                            <span class="material-symbols-outlined text-[48px] text-on-surface-variant mb-2">event_busy</span>
+                            <p class="font-body-md text-on-surface-variant">لا توجد دروس قادمة حالياً.</p>
+                        </div>
+                    {% endfor %}
                 </div>
             </section>
 
@@ -77,16 +98,24 @@
             <section class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant ambient-shadow">
                 <h2 class="font-title-lg text-title-lg text-on-surface mb-md">التقارير الأكاديمية الأخيرة</h2>
                 <div class="flex flex-col gap-4">
-                    <div class="flex items-start gap-md pb-4 border-b border-surface-variant">
-                        <div class="bg-primary-container text-on-primary-container p-2 rounded-full mt-1">
-                            <span class="material-symbols-outlined">analytics</span>
+                    {% for report in recent_reports %}
+                        <div class="flex items-start gap-md pb-4 border-b border-surface-variant last:border-b-0 last:pb-0">
+                            <div class="bg-primary-container text-on-primary-container p-2 rounded-full mt-1">
+                                <span class="material-symbols-outlined">analytics</span>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-label-md text-label-md text-on-surface font-bold">تقرير أداء: {{ report.booking.subject.name }}</h4>
+                                <p class="font-body-md text-body-md text-on-surface-variant mt-1">المعلم: أ. {{ report.teacher.user.get_full_name }}</p>
+                                <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 leading-relaxed">{{ report.summary|truncatewords:20 }}</p>
+                                <a href="{% url 'reports:detail' report.pk %}" class="text-primary font-bold text-sm hover:underline mt-2 inline-block">عرض التقرير التعليمي الكامل</a>
+                            </div>
                         </div>
-                        <div class="flex-1">
-                            <h4 class="font-label-md text-label-md text-on-surface font-bold">تقرير تقييم منتصف الفصل - الكيمياء</h4>
-                            <p class="font-body-md text-body-md text-on-surface-variant mt-1">تم نشر التقرير الأكاديمي. الأداء العام: ممتاز.</p>
-                            <a href="{% url 'bookings:student_list' %}" class="text-primary font-bold text-sm hover:underline mt-2 inline-block">عرض التقرير التعليمي الكامل</a>
+                    {% empty %}
+                        <div class="text-center py-4 opacity-70">
+                            <span class="material-symbols-outlined text-[36px] text-on-surface-variant mb-1">analytics</span>
+                            <p class="font-body-md text-on-surface-variant">لا توجد تقارير دراسية مسجلة بعد.</p>
                         </div>
-                    </div>
+                    {% endfor %}
                 </div>
             </section>
         </div>

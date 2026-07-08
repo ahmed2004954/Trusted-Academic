@@ -9,7 +9,7 @@ from teachers.models import TeacherProfile
 
 def home(request):
     """Public homepage."""
-    active_subjects = Subject.objects.filter(is_active=True, teacher_subjects__is_active=True).distinct()[:8]
+    active_subjects = Subject.objects.filter(is_active=True)[:8]
     featured_teachers = (
         TeacherProfile.objects.filter(
             approval_status=TeacherProfile.ApprovalStatus.APPROVED,

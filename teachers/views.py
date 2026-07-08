@@ -111,12 +111,60 @@ def teacher_required(view_func):
     return wrapper
 
 
+from django.utils import timezone
+from datetime import datetime, time
+from bookings.models import Booking
+from payments.services import get_or_create_wallet
+
+
 @login_required
 def dashboard(request):
     if request.user.role != 'teacher':
         raise PermissionDenied
     profile = TeacherProfile.objects.filter(user=request.user).first()
-    return render(request, 'teachers/dashboard.html', {'profile': profile})
+    if not profile:
+        return render(request, 'teachers/dashboard.html', {'profile': None})
+
+    # Get or create teacher wallet
+    wallet = get_or_create_wallet(profile)
+
+    # Count active bookings (confirmed or in progress)
+    active_bookings_count = Booking.objects.filter(
+        teacher=profile,
+        booking_status__in=[Booking.BookingStatus.CONFIRMED, Booking.BookingStatus.IN_PROGRESS]
+    ).count()
+
+    # Schedule for today and tomorrow
+    now = timezone.now()
+    today_start = timezone.make_aware(datetime.combine(now.date(), time.min))
+    tomorrow_end = timezone.make_aware(datetime.combine((now + timezone.timedelta(days=1)).date(), time.max))
+
+    schedule_bookings = Booking.objects.filter(
+        teacher=profile,
+        scheduled_start__range=(today_start, tomorrow_end)
+    ).exclude(
+        booking_status__in=[
+            Booking.BookingStatus.CANCELLED_BY_STUDENT,
+            Booking.BookingStatus.CANCELLED_BY_TEACHER,
+            Booking.BookingStatus.TEACHER_REJECTED
+        ]
+    ).select_related('student', 'subject', 'grade_level').order_by('scheduled_start')
+
+    # Pending requests that need teacher action
+    pending_requests = Booking.objects.filter(
+        teacher=profile,
+        booking_status=Booking.BookingStatus.PENDING_TEACHER_ACCEPTANCE
+    ).select_related('student', 'subject', 'grade_level').order_by('scheduled_start')
+
+    context = {
+        'profile': profile,
+        'wallet': wallet,
+        'active_bookings_count': active_bookings_count,
+        'schedule_bookings': schedule_bookings,
+        'pending_requests': pending_requests,
+    }
+    return render(request, 'teachers/dashboard.html', context)
+
 
 
 @teacher_required
