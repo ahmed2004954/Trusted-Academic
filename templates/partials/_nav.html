@@ -1,0 +1,327 @@
+{% load static %}
+<header class="site-header" id="site-header">
+    <nav class="navbar">
+        <!-- Logo / Brand -->
+        <a class="brand" href="{% url 'core:home' %}">
+            <span class="material-symbols-outlined brand-icon">school</span>
+            <span>ثقة أكاديمية</span>
+        </a>
+
+        <!-- Primary Navigation Links (Desktop) -->
+        <ul class="nav-links">
+            <li><a href="{% url 'core:home' %}" class="{% if nav_active == 'home' %}active{% endif %}">الرئيسية</a></li>
+            <li><a href="{% url 'subjects:list' %}" class="{% if nav_active == 'subjects' %}active{% endif %}">المواد</a></li>
+            <li><a href="{% url 'teachers:public_list' %}" class="{% if nav_active == 'teachers' %}active{% endif %}">المعلمون</a></li>
+            <li><a href="{% url 'core:about' %}" class="{% if nav_active == 'about' %}active{% endif %}">من نحن</a></li>
+        </ul>
+
+        <!-- Account / Authentication (Desktop) -->
+        <div class="nav-auth">
+            <!-- Theme Toggler -->
+            <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="تبديل المظهر">
+                <span class="material-symbols-outlined">light_mode</span>
+            </button>
+
+            {% if user.is_authenticated %}
+                <!-- User Profile Dropdown -->
+                <div class="user-dropdown-container">
+                    <button class="user-dropdown-toggle" id="userMenuButton" aria-expanded="false" aria-haspopup="true">
+                        <div class="avatar-placeholder">
+                            {{ user.get_full_name|slice:":1"|default:user.email|slice:":1"|upper }}
+                        </div>
+                        <span class="user-name-text">{{ user.get_full_name|default:user.email }}</span>
+                        <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                    </button>
+                    <div class="user-dropdown-menu" aria-labelledby="userMenuButton" role="menu">
+                        <div class="dropdown-header">
+                            <p class="user-full-name">{{ user.get_full_name|default:user.email }}</p>
+                            <p class="user-role">
+                                {% if user.role == 'student' %}طالب{% elif user.role == 'teacher' %}معلم{% elif user.role == 'parent' %}ولي أمر{% elif user.is_staff %}إدارة{% else %}مستخدم{% endif %}
+                            </p>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        
+                        <!-- Messages -->
+                        <a href="{% url 'messaging:inbox' %}" role="menuitem">
+                            <span class="material-symbols-outlined dropdown-icon">mail</span>
+                            <span>الرسائل</span>
+                            {% if messaging_unread_count %}
+                                <span class="badge badge-error">{{ messaging_unread_count }}</span>
+                            {% endif %}
+                        </a>
+                        
+                        <!-- Complaints -->
+                        <a href="{% url 'complaints:list' %}" role="menuitem">
+                            <span class="material-symbols-outlined dropdown-icon">report_problem</span>
+                            <span>الشكاوى</span>
+                        </a>
+
+                        <div class="dropdown-divider"></div>
+
+                        <!-- Role Specific Links -->
+                        {% if user.role == 'student' %}
+                            <a href="{% url 'students:dashboard' %}" role="menuitem">
+                                <span class="material-symbols-outlined dropdown-icon">dashboard</span>
+                                <span>لوحة الطالب</span>
+                            </a>
+                            <a href="{% url 'bookings:student_list' %}" role="menuitem">
+                                <span class="material-symbols-outlined dropdown-icon">calendar_month</span>
+                                <span>حجوزاتي</span>
+                            </a>
+                            <a href="{% url 'payments:history' %}" role="menuitem">
+                                <span class="material-symbols-outlined dropdown-icon">receipt_long</span>
+                                <span>سجل المدفوعات</span>
+                            </a>
+                        {% elif user.role == 'teacher' %}
+                            <a href="{% url 'teachers:dashboard' %}" role="menuitem">
+                                <span class="material-symbols-outlined dropdown-icon">dashboard</span>
+                                <span>لوحة المعلم</span>
+                            </a>
+                            <a href="{% url 'payments:wallet' %}" role="menuitem">
+                                <span class="material-symbols-outlined dropdown-icon">account_balance_wallet</span>
+                                <span>محفظتي</span>
+                            </a>
+                            <a href="{% url 'bookings:teacher_list' %}" role="menuitem">
+                                <span class="material-symbols-outlined dropdown-icon">class</span>
+                                <span>حصصي</span>
+                            </a>
+                            <a href="{% url 'teachers:setup_profile' %}" role="menuitem">
+                                <span class="material-symbols-outlined dropdown-icon">manage_accounts</span>
+                                <span>الملف الشخصي</span>
+                            </a>
+                        {% elif user.role == 'parent' %}
+                            <a href="{% url 'parents:dashboard' %}" role="menuitem">
+                                <span class="material-symbols-outlined dropdown-icon">dashboard</span>
+                                <span>لوحة ولي الأمر</span>
+                            </a>
+                        {% endif %}
+
+                        <!-- Staff / Admin Links -->
+                        {% if user.is_staff %}
+                            <div class="dropdown-divider"></div>
+                            <a href="{% url 'adminpanel:dashboard' %}" role="menuitem">
+                                <span class="material-symbols-outlined dropdown-icon">admin_panel_settings</span>
+                                <span>لوحة الإدارة</span>
+                            </a>
+                            <a href="{% url 'payments:admin_pending' %}" role="menuitem">
+                                <span class="material-symbols-outlined dropdown-icon">fact_check</span>
+                                <span>مراجعة المدفوعات</span>
+                            </a>
+                            <a href="{% url 'payments:admin_withdrawal_queue' %}" role="menuitem">
+                                <span class="material-symbols-outlined dropdown-icon">payments</span>
+                                <span>طلبات السحب</span>
+                            </a>
+                            <a href="{% url 'complaints:staff_queue' %}" role="menuitem">
+                                <span class="material-symbols-outlined dropdown-icon">forum</span>
+                                <span>إدارة الشكاوى</span>
+                            </a>
+                        {% endif %}
+
+                        <div class="dropdown-divider"></div>
+                        
+                        <!-- Profile Settings -->
+                        <a href="{% url 'accounts:profile' %}" role="menuitem">
+                            <span class="material-symbols-outlined dropdown-icon">settings</span>
+                            <span>إعدادات الحساب</span>
+                        </a>
+
+                        <!-- Logout Form -->
+                        <form method="post" action="{% url 'accounts:logout' %}" class="logout-form">
+                            {% csrf_token %}
+                            <button type="submit" role="menuitem" class="logout-button">
+                                <span class="material-symbols-outlined dropdown-icon">logout</span>
+                                <span>تسجيل الخروج</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="btn btn-secondary">تسجيل الدخول</a>
+                <a href="{% url 'accounts:register' %}" class="btn btn-primary">إنشاء حساب</a>
+            {% endif %}
+        </div>
+
+        <!-- Burger Toggle for Mobile -->
+        <button class="burger-menu-btn" id="burgerMenuButton" aria-label="فتح القائمة" aria-expanded="false">
+            <span class="material-symbols-outlined">menu</span>
+        </button>
+    </nav>
+</header>
+
+<!-- Off-Canvas Mobile Navigation Drawer -->
+<div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+    <div class="drawer-panel">
+        <div class="drawer-header">
+            <a class="brand" href="{% url 'core:home' %}">
+                <span class="material-symbols-outlined brand-icon">school</span>
+                <span>ثقة أكاديمية</span>
+            </a>
+            <div class="flex items-center gap-2" style="display: flex; align-items: center; gap: 8px;">
+                <button id="mobileThemeToggleBtn" class="theme-toggle-btn" aria-label="تبديل المظهر">
+                    <span class="material-symbols-outlined">light_mode</span>
+                </button>
+                <button class="drawer-close-btn" id="drawerCloseButton" aria-label="إغلاق القائمة">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="drawer-content">
+            <!-- Mobile Primary Links -->
+            <ul class="drawer-links">
+                <li><a href="{% url 'core:home' %}" class="{% if nav_active == 'home' %}active{% endif %}">الرئيسية</a></li>
+                <li><a href="{% url 'subjects:list' %}" class="{% if nav_active == 'subjects' %}active{% endif %}">المواد</a></li>
+                <li><a href="{% url 'teachers:public_list' %}" class="{% if nav_active == 'teachers' %}active{% endif %}">المعلمون</a></li>
+                <li><a href="{% url 'core:about' %}" class="{% if nav_active == 'about' %}active{% endif %}">من نحن</a></li>
+                <li><a href="{% url 'core:faq' %}" class="{% if nav_active == 'faq' %}active{% endif %}">الأسئلة الشائعة</a></li>
+                <li><a href="{% url 'core:contact' %}" class="{% if nav_active == 'contact' %}active{% endif %}">تواصل معنا</a></li>
+            </ul>
+
+            <div class="drawer-divider"></div>
+
+            <!-- Mobile Account Links -->
+            {% if user.is_authenticated %}
+                <div class="drawer-profile-info">
+                    <div class="avatar-placeholder">
+                        {{ user.get_full_name|slice:":1"|default:user.email|slice:":1"|upper }}
+                    </div>
+                    <div>
+                        <p class="profile-name">{{ user.get_full_name|default:user.email }}</p>
+                        <p class="profile-role">
+                            {% if user.role == 'student' %}طالب{% elif user.role == 'teacher' %}معلم{% elif user.role == 'parent' %}ولي أمر{% elif user.is_staff %}إدارة{% else %}مستخدم{% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <ul class="drawer-links drawer-account-links">
+                    <!-- Messaging -->
+                    <li>
+                        <a href="{% url 'messaging:inbox' %}">
+                            <span class="material-symbols-outlined">mail</span>
+                            <span>الرسائل</span>
+                            {% if messaging_unread_count %}
+                                <span class="badge badge-error ml-auto">{{ messaging_unread_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    
+                    <!-- Complaints -->
+                    <li>
+                        <a href="{% url 'complaints:list' %}">
+                            <span class="material-symbols-outlined">report_problem</span>
+                            <span>الشكاوى</span>
+                        </a>
+                    </li>
+
+                    <div class="drawer-divider"></div>
+
+                    <!-- Role specific -->
+                    {% if user.role == 'student' %}
+                        <li>
+                            <a href="{% url 'students:dashboard' %}">
+                                <span class="material-symbols-outlined">dashboard</span>
+                                <span>لوحة الطالب</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'bookings:student_list' %}">
+                                <span class="material-symbols-outlined">calendar_month</span>
+                                <span>حجوزاتي</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'payments:history' %}">
+                                <span class="material-symbols-outlined">receipt_long</span>
+                                <span>سجل المدفوعات</span>
+                            </a>
+                        </li>
+                    {% elif user.role == 'teacher' %}
+                        <li>
+                            <a href="{% url 'teachers:dashboard' %}">
+                                <span class="material-symbols-outlined">dashboard</span>
+                                <span>لوحة المعلم</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'payments:wallet' %}">
+                                <span class="material-symbols-outlined">account_balance_wallet</span>
+                                <span>محفظتي</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'bookings:teacher_list' %}">
+                                <span class="material-symbols-outlined">class</span>
+                                <span>حصصي</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'teachers:setup_profile' %}">
+                                <span class="material-symbols-outlined">manage_accounts</span>
+                                <span>الملف الشخصي</span>
+                            </a>
+                        </li>
+                    {% elif user.role == 'parent' %}
+                        <li>
+                            <a href="{% url 'parents:dashboard' %}">
+                                <span class="material-symbols-outlined">dashboard</span>
+                                <span>لوحة ولي الأمر</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% if user.is_staff %}
+                        <div class="drawer-divider"></div>
+                        <li>
+                            <a href="{% url 'adminpanel:dashboard' %}">
+                                <span class="material-symbols-outlined">admin_panel_settings</span>
+                                <span>لوحة الإدارة</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'payments:admin_pending' %}">
+                                <span class="material-symbols-outlined">fact_check</span>
+                                <span>مراجعة المدفوعات</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'payments:admin_withdrawal_queue' %}">
+                                <span class="material-symbols-outlined">payments</span>
+                                <span>طلبات السحب</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'complaints:staff_queue' %}">
+                                <span class="material-symbols-outlined">forum</span>
+                                <span>إدارة الشكاوى</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <div class="drawer-divider"></div>
+                    <li>
+                        <a href="{% url 'accounts:profile' %}">
+                            <span class="material-symbols-outlined">settings</span>
+                            <span>إعدادات الحساب</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="drawer-actions">
+                    <form method="post" action="{% url 'accounts:logout' %}" class="w-full">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-full text-error">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span>تسجيل الخروج</span>
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="drawer-actions">
+                    <a href="{% url 'accounts:login' %}" class="btn btn-secondary w-full">تسجيل الدخول</a>
+                    <a href="{% url 'accounts:register' %}" class="btn btn-primary w-full">إنشاء حساب</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

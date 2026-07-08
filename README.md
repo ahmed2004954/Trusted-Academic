@@ -1,6 +1,6 @@
 # منصة الدروس الخصوصية — Tutors Marketplace
 
-Online private tutoring marketplace for Egypt. Built with **Django + PostgreSQL + Django Templates/HTMX**.
+Online private tutoring marketplace for Egypt. Built with **Django + PostgreSQL/SQLite + Django Templates**.
 
 ## Project Structure
 
@@ -63,13 +63,29 @@ Edit `.env` as needed. By default it uses SQLite for development.
 python manage.py migrate
 ```
 
-### 6. Create a superuser
+### 6. Seed demo data for local review
+
+```bash
+python manage.py seed_demo_data
+```
+
+The command creates safe local demo accounts and prints their credentials. It also creates an approved teacher, subject, grade level, pricing range, offering, and availability slot.
+
+### 7. Create a superuser if you do not use demo data
 
 ```bash
 python manage.py createsuperuser
 ```
 
-### 7. Run the development server
+### 8. Run tests
+
+```bash
+python manage.py check
+python manage.py makemigrations --check
+python manage.py test
+```
+
+### 9. Run the development server
 
 ```bash
 python manage.py runserver
@@ -99,6 +115,9 @@ DATABASE_PORT=5432
 - Custom user model: `accounts.User` (email-based login)
 - Default timezone: `Africa/Cairo`
 - Default commission: 15% (configurable in `.env`)
+- Public discovery shows only approved teachers with active offerings
+- Manual payments require staff verification before bookings are confirmed
+- Wallet earnings move from pending to available after attendance completion
 - Static files served with WhiteNoise in production
 - Media files served locally in development
 
@@ -106,12 +125,20 @@ DATABASE_PORT=5432
 
 - [ ] Set `DEBUG=False`
 - [ ] Generate a strong `SECRET_KEY`
+- [ ] Set `ALLOWED_HOSTS` to the production domains
 - [ ] Configure PostgreSQL
 - [ ] Configure production email backend
 - [ ] Set up S3-compatible storage for media files
-- [ ] Enable HTTPS and secure cookies
+- [ ] Enable HTTPS with `SECURE_SSL_REDIRECT=True`, `SESSION_COOKIE_SECURE=True`, and `CSRF_COOKIE_SECURE=True`
+- [ ] Set `SECURE_HSTS_SECONDS` only after HTTPS is confirmed on the production domain
+- [ ] Set `SECURE_PROXY_SSL_HEADER_NAME=HTTP_X_FORWARDED_PROTO` when behind a trusted HTTPS proxy that sends that header
 - [ ] Collect static files: `python manage.py collectstatic`
+- [ ] Run `python manage.py migrate`
+- [ ] Run `python manage.py test`
 - [ ] Run `python manage.py check --deploy`
+- [ ] Verify admin/staff accounts, payment instructions, and support email settings
+
+See `LAUNCH_CHECKLIST.md` for a concise launch-readiness pass.
 
 ## License
 

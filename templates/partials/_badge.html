@@ -1,0 +1,14 @@
+<span class="inline-flex items-center justify-center font-bold text-[11px] px-2.5 py-1 rounded-lg border leading-none
+  {% if type == 'success' %}
+    bg-success-container/20 border-success/30 text-success-ink
+  {% elif type == 'error' %}
+    bg-error-container/20 border-error/30 text-error-ink
+  {% elif type == 'warning' %}
+    bg-warning-container/20 border-warning/30 text-warning-ink
+  {% elif type == 'info' %}
+    bg-info-container/20 border-info/30 text-info-ink
+  {% else %}
+    bg-surface-container border-outline-variant/60 text-on-surface-variant
+  {% endif %}">
+  {{ text }}
+</span>

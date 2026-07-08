@@ -1,0 +1,98 @@
+{% load static %}
+<nav class="bg-surface-container-lowest border-b border-outline-variant shadow-sm fixed top-0 w-full z-50 transition-all duration-200">
+    <div class="flex flex-row justify-between items-center px-margin-mobile md:px-margin-desktop h-20 w-full mx-auto max-w-[1440px]">
+        <a class="font-headline-md text-headline-md font-bold text-primary flex items-center gap-2" href="{% url 'core:home' %}">
+            <span class="material-symbols-outlined icon-fill text-secondary-container">school</span>
+            ثقة أكاديمية
+        </a>
+        <form class="hidden md:flex flex-1 max-w-md mx-gutter" method="get" action="{% url 'teachers:public_list' %}">
+            <div class="relative w-full">
+                <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+                <input class="w-full bg-surface-container border border-outline-variant text-on-surface rounded-full py-2 pr-10 pl-4 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary font-body-md text-body-md transition-colors" name="q" value="{{ request.GET.q }}" placeholder="ابحث عن مادة أو معلم..." type="text">
+            </div>
+        </form>
+        <div class="hidden md:flex items-center gap-gutter">
+            <a class="font-label-md text-label-md {% if nav_active == 'home' %}nav-active{% else %}text-on-surface-variant hover:text-primary transition-colors{% endif %}" href="{% url 'core:home' %}">الرئيسية</a>
+            <a class="font-label-md text-label-md {% if nav_active == 'teachers' %}nav-active{% else %}text-on-surface-variant hover:text-primary transition-colors{% endif %}" href="{% url 'teachers:public_list' %}">المعلمون</a>
+            <a class="font-label-md text-label-md {% if nav_active == 'subjects' %}nav-active{% else %}text-on-surface-variant hover:text-primary transition-colors{% endif %}" href="{% url 'subjects:list' %}">المواد</a>
+            {% if user.is_authenticated %}
+                <a class="font-label-md text-label-md {% if nav_active == 'messages' %}nav-active{% else %}text-on-surface-variant hover:text-primary transition-colors{% endif %}" href="{% url 'messaging:inbox' %}">
+                    الرسائل{% if messaging_unread_count %} <span class="inline-flex items-center justify-center bg-error text-on-error text-[11px] font-bold rounded-full w-5 h-5">{{ messaging_unread_count }}</span>{% endif %}
+                </a>
+            {% endif %}
+            <a class="font-label-md text-label-md {% if nav_active == 'about' %}nav-active{% else %}text-on-surface-variant hover:text-primary transition-colors{% endif %}" href="{% url 'core:about' %}">من نحن</a>
+        </div>
+        <div class="flex items-center gap-sm">
+            {% if user.is_authenticated %}
+                <div class="hidden md:flex items-center gap-sm">
+                    {% if user.role == 'student' %}
+                        <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="{% url 'students:dashboard' %}">حسابي</a>
+                        <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="{% url 'bookings:student_list' %}">حجوزاتي</a>
+                    {% elif user.role == 'teacher' %}
+                        <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="{% url 'teachers:dashboard' %}">لوحتي</a>
+                        <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="{% url 'payments:wallet' %}">محفظتي</a>
+                    {% elif user.role == 'parent' %}
+                        <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="{% url 'parents:dashboard' %}">لوحة ولي الأمر</a>
+                    {% endif %}
+                    {% if user.is_staff %}
+                        <a class="font-label-md text-label-md bg-primary-container text-on-primary px-3 py-1 rounded-lg hover:bg-primary hover:text-on-primary transition-colors" href="{% url 'adminpanel:dashboard' %}">الإدارة</a>
+                    {% endif %}
+                    <form method="post" action="{% url 'accounts:logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="font-label-md text-label-md text-on-surface-variant hover:text-error transition-colors flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[20px]">logout</span>
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="hidden md:block font-label-md text-label-md text-primary hover:text-surface-tint transition-colors">تسجيل الدخول</a>
+                <a href="{% url 'accounts:register' %}" class="font-label-md text-label-md bg-primary text-on-primary px-4 py-2 rounded-lg hover:bg-surface-tint transition-colors active:scale-[0.98]">إنشاء حساب</a>
+            {% endif %}
+            <button class="md:hidden text-on-surface-variant" type="button" onclick="toggleMobileMenu()" aria-label="القائمة">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<div id="mobile-menu" class="fixed inset-0 bg-black/50 z-40 hidden transition-all duration-300">
+    <div class="w-64 bg-surface h-full p-md flex flex-col gap-md shadow-lg transition-transform transform translate-x-full duration-300 mr-auto overflow-y-auto">
+        <div class="flex items-center justify-between pb-sm border-b border-outline-variant">
+            <span class="font-headline-md text-primary font-bold">ثقة أكاديمية</span>
+            <button type="button" onclick="toggleMobileMenu()" class="text-on-surface-variant" aria-label="إغلاق">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <a class="font-label-md text-on-surface-variant" href="{% url 'core:home' %}">الرئيسية</a>
+        <a class="font-label-md text-on-surface-variant" href="{% url 'teachers:public_list' %}">المعلمون</a>
+        <a class="font-label-md text-on-surface-variant" href="{% url 'subjects:list' %}">المواد</a>
+        <a class="font-label-md text-on-surface-variant" href="{% url 'core:about' %}">من نحن</a>
+        <a class="font-label-md text-on-surface-variant" href="{% url 'core:faq' %}">الأسئلة الشائعة</a>
+        <a class="font-label-md text-on-surface-variant" href="{% url 'core:contact' %}">تواصل معنا</a>
+        <hr class="border-outline-variant my-xs">
+        {% if user.is_authenticated %}
+            {% if user.role == 'student' %}
+                <a class="font-label-md text-primary" href="{% url 'students:dashboard' %}">حسابي</a>
+                <a class="font-label-md text-on-surface-variant" href="{% url 'bookings:student_list' %}">حجوزاتي</a>
+                <a class="font-label-md text-on-surface-variant" href="{% url 'payments:history' %}">مدفوعاتي</a>
+            {% elif user.role == 'teacher' %}
+                <a class="font-label-md text-primary" href="{% url 'teachers:dashboard' %}">لوحتي</a>
+                <a class="font-label-md text-on-surface-variant" href="{% url 'payments:wallet' %}">محفظتي</a>
+                <a class="font-label-md text-on-surface-variant" href="{% url 'bookings:teacher_list' %}">حصصي</a>
+            {% elif user.role == 'parent' %}
+                <a class="font-label-md text-primary" href="{% url 'parents:dashboard' %}">لوحة ولي الأمر</a>
+            {% endif %}
+            <a class="font-label-md text-on-surface-variant" href="{% url 'messaging:inbox' %}">الرسائل</a>
+            {% if user.is_staff %}
+                <a class="font-label-md text-primary font-bold" href="{% url 'adminpanel:dashboard' %}">لوحة الإدارة</a>
+            {% endif %}
+            <form method="post" action="{% url 'accounts:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="font-label-md text-error text-center w-full">تسجيل الخروج</button>
+            </form>
+        {% else %}
+            <a class="font-label-md text-primary font-bold" href="{% url 'accounts:login' %}">تسجيل الدخول</a>
+            <a class="font-label-md text-on-primary bg-primary px-4 py-2 rounded text-center" href="{% url 'accounts:register' %}">إنشاء حساب</a>
+        {% endif %}
+    </div>
+</div>

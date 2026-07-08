@@ -1,0 +1,38 @@
+<task>
+Complete Sprint 14 launch-prep for this Django tutors marketplace, working from the current dirty tree. Read SPRINTS.md Sprint 14, README.md, PRD.md, plan.md, and LAUNCH_CHECKLIST.md first, then finish the remaining Sprint 14 items that are not already implemented.
+
+Current state already includes some launch-prep work: homepage subjects/featured teachers, terms/privacy routes/templates, README checklist, launch checklist, CSS/JS polish, demo seed command, and some seam tests may already be present. Preserve and build on that work; do not revert it.
+
+Focus on production-ready MVP completeness, not speculative features:
+- Ensure public pages exist and are linked: home, about, FAQ, contact, terms, privacy, subjects, teachers.
+- Improve mobile responsiveness and basic UX polish using existing static/css/main.css and static/js/main.js patterns only.
+- Add or verify flash-message/toast behavior without introducing new packages.
+- Tighten role/permission checks on public/user/staff flows where Sprint 14 requires it. Do not redesign auth.
+- Ensure CSRF/security settings are production-ready and documented via env toggles, without breaking local development.
+- Add/complete high-value tests for the PRD seams listed in Sprint 14 where practical, using the existing Django TestCase style and helpers. Do not add brittle template-internal assertions or mock internal project functions.
+- Add or improve safe demo-data/fixtures/seed support only if missing; do not create production credentials.
+- Update launch documentation/checklists so a production deployer has clear gates.
+- Update SPRINTS.md checkboxes only for items you actually complete.
+
+Keep the work scoped to Sprint 14. Do not introduce DRF, Celery, Docker, payment gateways, S3 implementation, WhatsApp, or internal video. Do not change the data model unless a missing migration is truly required. Prefer small, idiomatic Django changes over new abstractions.
+</task>
+
+<verification_loop>
+Use the existing virtualenv and run these before finishing; fix anything they surface:
+  ./venv/Scripts/python manage.py check
+  ./venv/Scripts/python manage.py makemigrations --check --dry-run
+  ./venv/Scripts/python manage.py test
+Confirm git status shows only intentional Sprint 14 changes. If a gate cannot run, report the exact reason and do not claim it passed.
+</verification_loop>
+
+<action_safety>
+Keep changes scoped to Sprint 14 launch readiness. Do not run git add, git commit, git reset, git checkout, or destructive cleanup. Do not delete or overwrite existing user changes; preserve the dirty worktree and edit only what is necessary. Avoid adding dependencies unless absolutely necessary; if you think a dependency is needed, leave it out and report the limitation.
+</action_safety>
+
+<structured_output_contract>
+End with a report in this exact shape:
+  1. What changed and why
+  2. Files touched
+  3. Gate outcomes with the exact commands and pass/fail summary
+  4. Any deviations, open risks, or decisions needed
+</structured_output_contract>

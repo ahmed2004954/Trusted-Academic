@@ -1,46 +1,125 @@
 {% extends 'base.html' %}
 
-{% block title %}لوحة ولي الأمر - منصة الدروس الخصوصية{% endblock %}
+{% block title %}لوحة التحكم لولي الأمر - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content dashboard">
-    <h1>لوحة ولي الأمر</h1>
-    <p>مرحباً بك في حساب ولي الأمر. من هنا يمكنك متابعة أبنائك وحجوزاتهم.</p>
-    <a class="btn btn-primary" href="{% url 'parents:create_student' %}">إنشاء حساب طالب مُدار</a>
-    <a class="btn btn-secondary" href="{% url 'parents:link_student' %}">ربط طالب موجود</a>
-    <a class="btn btn-secondary" href="{% url 'messaging:inbox' %}">الرسائل{% if messaging_unread_count %} ({{ messaging_unread_count }}){% endif %}</a>
+<section class="page-content dashboard text-right">
+    <!-- Welcome Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 border-b border-outline-variant/30 pb-6">
+        <div>
+            <h1 class="font-display-lg text-primary font-bold mb-1">لوحة تحكم ولي الأمر</h1>
+            <p class="text-sm text-on-surface-variant">متابعة دقيقة لمستوى أبنائك الدراسي وحصصهم الأسبوعية والتقارير الأكاديمية الصادرة من المعلمين.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                {{ user.first_name|first }}
+            </div>
+            <div>
+                <span class="font-semibold block text-on-surface">{{ user.get_full_name }}</span>
+                <span class="text-xs text-on-surface-variant">ولي أمر</span>
+            </div>
+        </div>
+    </div>
 
-    <div class="dashboard-grid">
-        <div class="dashboard-card">
-            <h2>الطلاب المرتبطون</h2>
-            {% for student in linked_students %}
-                <p>
-                    <strong>{{ student.get_full_name }}</strong>
-                    {% if student.student_profile.grade_level %} - {{ student.student_profile.grade_level.name }}{% endif %}
-                </p>
-                <a class="btn btn-primary" href="{% url 'parents:student_booking_history' student.pk %}">سجل الحجوزات</a>
-            {% empty %}
-                <p>لم يتم ربط أي طالب بعد.</p>
-            {% endfor %}
+    <!-- Quick Action Buttons -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <a class="btn btn-primary" href="{% url 'parents:create_student' %}">
+            <span class="material-symbols-outlined text-[18px]">person_add</span> إنشاء حساب طالب مُدار
+        </a>
+        <a class="btn btn-secondary" href="{% url 'parents:link_student' %}">
+            <span class="material-symbols-outlined text-[18px]">link</span> ربط حساب طالب موجود
+        </a>
+        <a class="btn btn-secondary" href="{% url 'messaging:inbox' %}">
+            <span class="material-symbols-outlined text-[18px]">mail</span> رسائل المعلمين 
+            {% if messaging_unread_count %}
+                <span class="badge badge-error mr-1">{{ messaging_unread_count }}</span>
+            {% endif %}
+        </a>
+    </div>
+
+    <!-- Dashboard Widgets Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Col 1: Linked Students -->
+        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm flex flex-col">
+            <h3 class="font-bold text-primary mb-4 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
+                <span class="material-symbols-outlined text-[18px] icon-fill">groups</span> الأبناء المرتبطون
+            </h3>
+            
+            <div class="flex flex-col gap-4">
+                {% for student in linked_students %}
+                <div class="bg-surface-container-low border border-outline-variant/30 rounded-xl p-3.5 flex flex-col gap-3">
+                    <div>
+                        <span class="font-semibold text-sm block text-on-surface">{{ student.get_full_name }}</span>
+                        {% if student.student_profile.grade_level %}
+                            <span class="text-xs text-on-surface-variant block mt-0.5">{{ student.student_profile.grade_level.name }}</span>
+                        {% endif %}
+                    </div>
+                    <a class="bg-primary/10 text-primary text-xs font-bold py-2 rounded-lg text-center hover:bg-primary hover:text-on-primary transition-colors flex items-center justify-center gap-1" href="{% url 'parents:student_booking_history' student.pk %}">
+                        <span class="material-symbols-outlined text-sm">history</span> سجل الحجوزات
+                    </a>
+                </div>
+                {% empty %}
+                <div class="text-center py-6 opacity-70">
+                    <span class="material-symbols-outlined text-[32px] text-on-surface-variant">person_off</span>
+                    <p class="text-xs mt-2">لا يوجد أبناء مرتبطون حالياً.</p>
+                </div>
+                {% endfor %}
+            </div>
         </div>
 
-        <div class="dashboard-card">
-            <h2>أحدث الحجوزات</h2>
-            {% for booking in recent_bookings %}
-                <p>{{ booking.student.get_full_name }} - {{ booking.subject.name }} - {{ booking.scheduled_start|date:'Y-m-d H:i' }}</p>
-            {% empty %}
-                <p>لا توجد حجوزات حديثة.</p>
-            {% endfor %}
+        <!-- Col 2: Recent Bookings -->
+        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm flex flex-col">
+            <h3 class="font-bold text-primary mb-4 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
+                <span class="material-symbols-outlined text-[18px] icon-fill">calendar_month</span> أحدث الحجوزات
+            </h3>
+            
+            <div class="flex flex-col gap-3">
+                {% for booking in recent_bookings %}
+                <div class="bg-surface-container-low border border-outline-variant/30 rounded-xl p-3 flex justify-between items-center text-xs">
+                    <div>
+                        <span class="font-bold text-on-surface block mb-0.5">{{ booking.subject.name }}</span>
+                        <span class="text-on-surface-variant font-medium">{{ booking.student.get_full_name }}</span>
+                    </div>
+                    <span class="bg-surface px-2.5 py-1 rounded-lg border border-outline-variant/40 font-semibold text-on-surface-variant">
+                        {{ booking.scheduled_start|date:'Y-m-d' }}
+                    </span>
+                </div>
+                {% empty %}
+                <div class="text-center py-6 opacity-70 mt-auto mb-auto">
+                    <span class="material-symbols-outlined text-[32px] text-on-surface-variant">event_busy</span>
+                    <p class="text-xs mt-2">لا توجد حجوزات حديثة للأبناء.</p>
+                </div>
+                {% endfor %}
+            </div>
         </div>
 
-        <div class="dashboard-card">
-            <h2>أحدث التقارير</h2>
-            {% for report in recent_reports %}
-                <p>{{ report.student.get_full_name }} - {{ report.created_at|date:'Y-m-d H:i' }}</p>
-                <a class="btn btn-primary" href="{% url 'reports:detail' report.pk %}">عرض التقرير</a>
-            {% empty %}
-                <p>لا توجد تقارير حديثة.</p>
-            {% endfor %}
+        <!-- Col 3: Recent Reports -->
+        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm flex flex-col">
+            <h3 class="font-bold text-primary mb-4 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
+                <span class="material-symbols-outlined text-[18px] icon-fill">analytics</span> أحدث التقارير الأكاديمية
+            </h3>
+            
+            <div class="flex flex-col gap-3">
+                {% for report in recent_reports %}
+                <div class="bg-surface-container-low border border-outline-variant/30 rounded-xl p-3.5 flex flex-col gap-3">
+                    <div class="flex justify-between items-start text-xs">
+                        <div>
+                            <span class="font-semibold text-on-surface block mb-0.5">{{ report.student.get_full_name }}</span>
+                            <span class="text-on-surface-variant block">{{ report.created_at|date:'Y-m-d H:i' }}</span>
+                        </div>
+                        {% include 'partials/_badge.html' with text='جديد' type='info' %}
+                    </div>
+                    <a class="bg-secondary-container text-on-secondary-container text-xs font-semibold py-2 rounded-lg text-center hover:bg-secondary-fixed-dim transition-colors" href="{% url 'reports:detail' report.pk %}">
+                        عرض التقرير الدراسي
+                    </a>
+                </div>
+                {% empty %}
+                <div class="text-center py-6 opacity-70 mt-auto mb-auto">
+                    <span class="material-symbols-outlined text-[32px] text-on-surface-variant">analytics</span>
+                    <p class="text-xs mt-2">لم تصدر تقارير جديدة للأبناء بعد.</p>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </section>

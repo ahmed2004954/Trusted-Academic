@@ -1,0 +1,41 @@
+{% extends 'base_identity.html' %}
+
+{% block title %}الشروط والأحكام - ثقة أكاديمية{% endblock %}
+
+{% block content %}
+<div class="max-w-[1000px] mx-auto px-margin-mobile md:px-margin-desktop py-lg w-full">
+    <div class="mb-lg">
+        <h1 class="font-display-lg text-primary mb-xs">الشروط والأحكام</h1>
+        <p class="font-body-lg text-on-surface-variant">شروط الاستخدام وسياسات التعامل المالي والتعليمي داخل منصة ثقة أكاديمية.</p>
+    </div>
+
+    <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-md md:p-lg shadow-sm flex flex-col gap-md">
+        <div>
+            <h2 class="font-title-lg font-bold text-on-surface mb-xs">1. السياسة العامة والعمولات</h2>
+            <p class="font-body-md text-on-surface-variant">تخضع جميع الحصص المحجوزة من خلال المنصة لعمولة ثابتة قدرها 15% تُخصم من مستحقات المعلم لصالح تشغيل وتطوير المنصة. يتم تحويل المبالغ للمعلمين بعد تسوية الحصص وتأكيد حضور الطلاب.</p>
+        </div>
+
+        <div>
+            <h2 class="font-title-lg font-bold text-on-surface mb-xs">2. سياسة الإلغاء والاسترجاع للطلاب</h2>
+            <ul class="list-disc list-inside font-body-md text-on-surface-variant pr-xs flex flex-col gap-xs">
+                <li>يُسمح للطالب بإلغاء الحصة قبل موعدها المحدد بـ 6 ساعات على الأقل واسترداد كامل قيمة الحصة.</li>
+                <li>في حال الإلغاء خلال فترة تقل عن 6 ساعات من الحصة، يتم خصم 20% من قيمة الحصة لصالح المعلم كتعويض عن وقت حجز الحصة.</li>
+                <li>عدم الحضور بدون إلغاء يترتب عليه خصم قيمة الحصة بالكامل ولا يحق للطالب المطالبة باستردادها إلا في الحالات الاستثنائية التي تقرها الإدارة.</li>
+            </ul>
+        </div>
+
+        <div>
+            <h2 class="font-title-lg font-bold text-on-surface mb-xs">3. غياب المعلم وإعادة الجدولة</h2>
+            <ul class="list-disc list-inside font-body-md text-on-surface-variant pr-xs flex flex-col gap-xs">
+                <li>في حال غياب المعلم عن الحصة، يحصل الطالب على استرداد مالي كامل أو إعادة جدولة مجانية فورية.</li>
+                <li>يتم تسجيل مخالفة على المعلم في حال الغياب المتكرر بدون عذر مسبق، مما قد يعرض حسابه للتعليق المؤقت أو الدائم.</li>
+            </ul>
+        </div>
+
+        <div>
+            <h2 class="font-title-lg font-bold text-on-surface mb-xs">4. تأكيد الحضور وأكواد الحصص</h2>
+            <p class="font-body-md text-on-surface-variant">يتم توليد كود حضور عشوائي لكل حصة. يجب على المعلم مشاركة هذا الكود مع الطالب أثناء الحصة ليقوم الطالب بإدخاله في حسابه لتأكيد إتمام الحصة. إذا لم يتم إدخال الكود خلال 24 ساعة، يتم إكمال الحصة تلقائياً مع فتح باب الاعتراض للإدارة.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

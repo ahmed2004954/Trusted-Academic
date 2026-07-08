@@ -1,39 +1,57 @@
 {% extends 'base.html' %}
 
-{% block title %}طلبات السحب - منصة الدروس الخصوصية{% endblock %}
+{% block title %}طلبات السحب المالي - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>طلبات السحب</h1>
+<section class="page-content text-right">
+    <!-- Header -->
+    <div class="border-b border-outline-variant/30 pb-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="font-display-lg text-primary font-bold">طلبات سحب أرباح المعلمين</h1>
+            <p class="text-xs text-on-surface-variant mt-1">مراجعة ومعالجة طلبات تحويل الأرباح المالية المستحقة لمعلمي المنصة.</p>
+        </div>
+        <a class="btn btn-secondary text-xs" href="{% url 'adminpanel:dashboard' %}">العودة للوحة الإدارة</a>
+    </div>
+
     {% if withdrawals %}
-        <div class="table-wrap">
+        <div class="overflow-x-auto">
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>المدرس</th>
-                        <th>المبلغ</th>
-                        <th>طريقة الدفع</th>
-                        <th>الحالة</th>
-                        <th>تاريخ الطلب</th>
-                        <th></th>
+                        <th class="py-3 px-4">المعلم</th>
+                        <th class="py-3 px-4">مبلغ السحب</th>
+                        <th class="py-3 px-4">طريقة التحويل</th>
+                        <th class="py-3 px-4">حالة الطلب</th>
+                        <th class="py-3 px-4">تاريخ الطلب</th>
+                        <th class="py-3 px-4"></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for withdrawal in withdrawals %}
-                        <tr>
-                            <td>{{ withdrawal.teacher.user.get_full_name }}</td>
-                            <td>{{ withdrawal.amount }} EGP</td>
-                            <td>{{ withdrawal.payment_method }}</td>
-                            <td>{{ withdrawal.get_status_display }}</td>
-                            <td>{{ withdrawal.requested_at|date:'Y-m-d H:i' }}</td>
-                            <td><a class="btn btn-primary" href="{% url 'payments:admin_withdrawal_detail' withdrawal.pk %}">مراجعة</a></td>
+                        <tr class="hover:bg-surface-container-lowest/50 transition-colors text-xs">
+                            <td class="py-4 px-4 font-bold text-on-surface">{{ withdrawal.teacher.user.get_full_name }}</td>
+                            <td class="py-4 px-4 font-bold text-primary">{{ withdrawal.amount }} ج.م</td>
+                            <td class="py-4 px-4 text-on-surface-variant">{{ withdrawal.payment_method }}</td>
+                            <td class="py-4 px-4">
+                                {% if withdrawal.status == 'approved' or withdrawal.status == 'processed' %}
+                                    {% include 'partials/_badge.html' with text=withdrawal.get_status_display type='success' %}
+                                {% elif withdrawal.status == 'rejected' %}
+                                    {% include 'partials/_badge.html' with text=withdrawal.get_status_display type='error' %}
+                                {% else %}
+                                    {% include 'partials/_badge.html' with text=withdrawal.get_status_display type='warning' %}
+                                {% endif %}
+                            </td>
+                            <td class="py-4 px-4 text-on-surface-variant">{{ withdrawal.requested_at|date:'Y-m-d H:i' }}</td>
+                            <td class="py-4 px-4 text-left">
+                                <a class="btn btn-primary text-[11px] py-1.5 px-4 font-semibold" href="{% url 'payments:admin_withdrawal_detail' withdrawal.pk %}">معالجة الطلب</a>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     {% else %}
-        <p class="empty-state compact">لا توجد طلبات سحب.</p>
+        {% include 'partials/_empty_state.html' with icon='payments' title='لا توجد طلبات سحب' desc='تمت معالجة كافة طلبات سحب أرباح المعلمين بنجاح وتحويل المستحقات لأصحابها.' action_url='/adminpanel/' action_text='لوحة الإدارة' %}
     {% endif %}
 </section>
 {% endblock %}

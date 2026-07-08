@@ -1,11 +1,77 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
 
-{% block title %}تواصل معنا - منصة الدروس الخصوصية{% endblock %}
+{% block title %}تواصل معنا - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>تواصل معنا</h1>
-    <p>للاستفسارات والاقتراحات، يرجى التواصل مع فريق الدعم.</p>
-    <p>البريد الإلكتروني: support@tutorsmarketplace.local</p>
-</section>
+<div class="max-w-[1000px] mx-auto px-margin-mobile md:px-margin-desktop py-lg w-full">
+    <div class="mb-lg text-center">
+        <h1 class="font-display-lg text-primary mb-xs">تواصل معنا</h1>
+        <p class="font-body-lg text-on-surface-variant">هل لديك استفسار أو شكوى؟ يسعدنا دائماً الاستماع إليك والرد على رسائلك خلال 24 ساعة.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-lg items-start">
+        <!-- Contact info -->
+        <div class="col-span-1 md:col-span-5 bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-md flex flex-col gap-md">
+            <h2 class="font-headline-md text-on-surface font-bold border-b border-outline-variant/30 pb-xs">معلومات التواصل</h2>
+            <div class="flex items-start gap-xs">
+                <span class="material-symbols-outlined text-primary">mail</span>
+                <div>
+                    <p class="font-label-md font-bold text-on-surface">البريد الإلكتروني</p>
+                    <p class="font-body-md text-on-surface-variant">support@theqa-academy.com</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-xs">
+                <span class="material-symbols-outlined text-primary">phone_iphone</span>
+                <div>
+                    <p class="font-label-md font-bold text-on-surface">الدعم الفني والواتساب</p>
+                    <p class="font-body-md text-on-surface-variant">201012345678+</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-xs">
+                <span class="material-symbols-outlined text-primary">location_on</span>
+                <div>
+                    <p class="font-label-md font-bold text-on-surface">المقر الرئيسي</p>
+                    <p class="font-body-md text-on-surface-variant">القاهرة، جمهورية مصر العربية</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <div class="col-span-1 md:col-span-7 bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-md md:p-lg shadow-sm">
+            <h2 class="font-headline-md text-on-surface font-bold mb-md pb-xs border-b border-outline-variant/30">أرسل لنا رسالة</h2>
+            <form method="post" action="{% url 'core:contact' %}" class="flex flex-col gap-sm">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                    <div class="flex flex-col gap-base">
+                        <label class="font-label-sm text-on-surface-variant">الاسم بالكامل</label>
+                        <input type="text" name="name" required class="bg-surface-container border border-outline-variant rounded-lg p-xs text-on-surface focus:outline-none focus:border-primary" placeholder="اسمك الثنائي أو الثلاثي">
+                    </div>
+                    <div class="flex flex-col gap-base">
+                        <label class="font-label-sm text-on-surface-variant">رقم الهاتف</label>
+                        <input type="tel" name="phone" required class="bg-surface-container border border-outline-variant rounded-lg p-xs text-on-surface focus:outline-none focus:border-primary" placeholder="01xxxxxxxxx">
+                    </div>
+                </div>
+                <div class="flex flex-col gap-base">
+                    <label class="font-label-sm text-on-surface-variant">البريد الإلكتروني</label>
+                    <input type="email" name="email" required class="bg-surface-container border border-outline-variant rounded-lg p-xs text-on-surface focus:outline-none focus:border-primary" placeholder="name@example.com">
+                </div>
+                <div class="flex flex-col gap-base">
+                    <label class="font-label-sm text-on-surface-variant">نوع الرسالة</label>
+                    <select name="subject" class="bg-surface-container border border-outline-variant rounded-lg p-xs text-on-surface focus:outline-none focus:border-primary">
+                        <option value="general">استفسار عام</option>
+                        <option value="complaint">شكوى بخصوص حجز</option>
+                        <option value="payment">مشكلة في الدفع</option>
+                        <option value="teacher">انضمام كمعلم</option>
+                        <option value="other">أخرى</option>
+                    </select>
+                </div>
+                <div class="flex flex-col gap-base">
+                    <label class="font-label-sm text-on-surface-variant">نص الرسالة</label>
+                    <textarea name="message" required rows="4" class="bg-surface-container border border-outline-variant rounded-lg p-xs text-on-surface focus:outline-none focus:border-primary" placeholder="اكتب تفاصيل رسالتك أو استفسارك هنا..."></textarea>
+                </div>
+                <button type="submit" class="bg-primary text-on-primary font-label-md py-2.5 rounded-lg hover:bg-surface-tint transition-all active:scale-[0.98]">إرسال الرسالة</button>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

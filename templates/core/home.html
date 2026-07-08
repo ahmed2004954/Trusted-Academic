@@ -1,26 +1,253 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}الرئيسية - منصة الدروس الخصوصية{% endblock %}
+{% block title %}ثقة أكاديمية - ابحث عن معلمك الموثوق{% endblock %}
+{% block nav_active %}home{% endblock %}
 
 {% block content %}
-<section class="hero">
-    <h1>ابحث عن أفضل المدرسين لحصص أونلاين</h1>
-    <p>منصة تجمع طلاب المراحل التعليمية المختلفة بمدرسين موثوقين في مصر.</p>
-    <a class="btn btn-primary" href="{% url 'teachers:public_list' %}">استكشف المدرسين</a>
+<!-- Premium Hero Section -->
+<section class="relative pt-20 pb-16 px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto overflow-hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <!-- Text Column -->
+        <div class="col-span-1 lg:col-span-5 flex flex-col gap-6 z-10 text-right lg:text-right">
+            <div class="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 px-3 py-1.5 rounded-full w-fit mb-2">
+                <span class="material-symbols-outlined text-primary text-sm icon-fill">verified_user</span>
+                <span class="font-label-sm text-label-sm text-primary font-semibold">منصة الدروس الخصوصية الأكثر ثقة في مصر</span>
+            </div>
+            <h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface leading-tight font-bold">
+                ابحث عن معلمك <br><span class="text-primary relative inline-block">الموثوق<span class="absolute bottom-1 right-0 left-0 h-2 bg-secondary-container/20 -z-10 rounded-full"></span></span>
+            </h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed max-w-lg">
+                نخبة من أفضل المعلمين المعتمدين والمراجعين يدوياً لجميع المراحل التعليمية. نوفر لولي الأمر تقارير دورية تضمن بقاءه على دراية كاملة بتقدم ابنه.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-fit mt-2">
+                <a href="{% url 'teachers:public_list' %}" class="font-label-md text-label-md bg-primary text-on-primary px-8 py-3.5 rounded-xl hover:bg-primary-hover hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.98] text-center flex items-center justify-center gap-2 shadow-md">
+                    <span class="material-symbols-outlined">search</span> ابحث عن معلم
+                </a>
+                <a href="{% url 'subjects:list' %}" class="font-label-md text-label-md border-2 border-primary text-primary px-8 py-3.5 rounded-xl hover:bg-primary/5 hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 font-semibold">
+                    <span class="material-symbols-outlined">menu_book</span> تصفح المواد الدراسية
+                </a>
+            </div>
+        </div>
+
+        <!-- Layered Premium Mockup Column -->
+        <div class="col-span-1 lg:col-span-7 relative h-[420px] md:h-[500px] rounded-3xl overflow-hidden bg-surface-container-low border border-outline-variant/30 flex items-center justify-center p-6 shadow-sm">
+            <!-- Background Decorative Blurs -->
+            <div class="absolute -top-12 -left-12 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-12 -right-12 w-72 h-72 bg-secondary-container/15 rounded-full blur-3xl"></div>
+
+            <div class="relative w-full h-full flex items-center justify-center">
+                <!-- Main Floating Teacher Card Mockup -->
+                <div class="absolute w-[80%] max-w-[340px] bg-surface border border-outline-variant/40 rounded-2xl p-5 shadow-lg z-20 hover:scale-[1.02] transition-transform duration-300">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary flex-shrink-0">
+                            <span class="material-symbols-outlined text-[36px] icon-fill">school</span>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5 mb-0.5">
+                                <h3 class="font-label-md font-bold text-on-surface">أ. أحمد كمال</h3>
+                                <span class="material-symbols-outlined text-secondary-container text-[18px] icon-fill">verified</span>
+                            </div>
+                            <p class="text-xs text-on-surface-variant font-medium">معلم لغة عربية - ثانوية عامة</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-1 text-xs font-semibold text-on-surface-variant mb-4 bg-surface-container-low py-1.5 px-3 rounded-lg w-fit">
+                        <span class="material-symbols-outlined text-secondary-container text-[14px] icon-fill">star</span>
+                        <span>4.9</span>
+                        <span class="opacity-60">(120 تقييم)</span>
+                        <span class="mx-1 opacity-20">|</span>
+                        <span>12 سنة خبرة</span>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-3 border-t border-outline-variant/30">
+                        <div>
+                            <span class="text-xs text-on-surface-variant">سعر الساعة تبدأ من</span>
+                            <p class="font-label-md font-bold text-primary">150 ج.م</p>
+                        </div>
+                        <span class="bg-primary/10 text-primary text-xs font-bold px-3 py-1.5 rounded-lg">متاح للحجز</span>
+                    </div>
+                </div>
+
+                <!-- Floating Feedback Card Mockup -->
+                <div class="absolute -left-2 top-8 md:left-6 md:top-14 w-[190px] bg-surface border border-outline-variant/30 rounded-xl p-3.5 shadow-md z-30 transform -rotate-3 hover:rotate-0 transition-transform duration-300">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-6 h-6 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary">
+                            <span class="material-symbols-outlined text-sm icon-fill">thumb_up</span>
+                        </div>
+                        <span class="text-[10px] font-bold text-on-surface-variant">تقييم من طالب</span>
+                    </div>
+                    <p class="text-[11px] text-on-surface-variant leading-relaxed">"شرح ممتاز جداً ومبسط، وتلقينا تقرير الحصة فوراً."</p>
+                </div>
+
+                <!-- Floating Stat badge Mockup -->
+                <div class="absolute -right-2 bottom-8 md:right-8 md:bottom-12 w-[180px] bg-surface border border-outline-variant/30 rounded-xl p-4 shadow-md z-30 transform rotate-2 hover:rotate-0 transition-transform duration-300">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                            <span class="material-symbols-outlined text-lg icon-fill">verified_user</span>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-on-surface-variant font-medium">نسبة الموثوقية</p>
+                            <p class="text-sm font-bold text-on-surface">100% معتمدون</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
-<section class="features">
-    <div class="feature">
-        <h3>مدرسون معتمدون</h3>
-        <p>كل مدرس يمر بمراجعة يدوية قبل الظهور للطلاب.</p>
+<!-- Trust Credentials Strip -->
+<div class="bg-surface-container border-y border-outline-variant/50 py-5">
+    <div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop flex flex-wrap justify-center md:justify-between items-center gap-6">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-secondary-container/10 flex items-center justify-center text-secondary">
+                <span class="material-symbols-outlined icon-fill">verified_user</span>
+            </div>
+            <span class="font-label-md text-label-md text-on-surface-variant font-semibold">مدرسون معتمدون ومراجعون يدوياً</span>
+        </div>
+        <div class="hidden md:block w-px h-6 bg-outline-variant/60"></div>
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined icon-fill">security</span>
+            </div>
+            <span class="font-label-md text-label-md text-on-surface-variant font-semibold">دفع آمن وسهل (فودافون كاش / انستاباي)</span>
+        </div>
+        <div class="hidden md:block w-px h-6 bg-outline-variant/60"></div>
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-secondary-container/10 flex items-center justify-center text-secondary">
+                <span class="material-symbols-outlined icon-fill">star</span>
+            </div>
+            <span class="font-label-md text-label-md text-on-surface-variant font-semibold">تقارير أكاديمية دورية لولي الأمر</span>
+        </div>
     </div>
-    <div class="feature">
-        <h3>حجز مرن</h3>
-        <p>اختر المادة، المرحلة، والموعد المناسب لك.</p>
+</div>
+
+<!-- Subjects Section -->
+{% if active_subjects %}
+<section class="py-16 px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto">
+    <div class="flex justify-between items-end mb-8">
+        <div>
+            <h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">تصفح المواد الدراسية</h2>
+            <p class="font-body-md text-body-md text-on-surface-variant">اختر المادة لتصفح نخبة المعلمين المتاحين لها</p>
+        </div>
+        <a href="{% url 'subjects:list' %}" class="hidden md:flex font-label-md text-label-md text-primary items-center gap-1 hover:text-primary-hover font-semibold transition-colors">
+            عرض كل المواد <span class="material-symbols-outlined text-sm">arrow_back</span>
+        </a>
     </div>
-    <div class="feature">
-        <h3>دفع محلي آمن</h3>
-        <p>ادفع عبر فودافون كاش أو انستاباي مع تأكيد يدوي.</p>
+    <div class="flex flex-wrap gap-3">
+        {% for subject in active_subjects %}
+            <a href="{% url 'teachers:public_list' %}?subject={{ subject.id }}" class="bg-surface border border-outline-variant/60 text-on-surface font-label-md text-label-md px-5 py-3 rounded-full hover:bg-primary/5 hover:border-primary hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2 shadow-sm font-medium reveal reveal-stagger-{{ forloop.counter|default:1 }}">
+                <span class="material-symbols-outlined text-primary text-[20px]">book</span>
+                {{ subject.name }}
+            </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Featured Teachers Section -->
+{% if featured_teachers %}
+<section class="py-16 px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto border-t border-outline-variant/30">
+    <div class="flex justify-between items-end mb-10">
+        <div>
+            <h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">نخبة المعلمين المعتمدين</h2>
+            <p class="font-body-md text-body-md text-on-surface-variant">تصفح وقارن بين نخبة من أفضل الكفاءات التعليمية التي تم التحقق من شهاداتها</p>
+        </div>
+        <a href="{% url 'teachers:public_list' %}" class="hidden md:flex font-label-md text-label-md text-primary items-center gap-1 hover:text-primary-hover font-semibold transition-colors">
+            عرض كل المعلمين <span class="material-symbols-outlined text-sm">arrow_back</span>
+        </a>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for teacher in featured_teachers %}
+        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 flex flex-col items-center text-center shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 reveal reveal-stagger-{{ forloop.counter|default:1 }}">
+            <!-- Profile Photo Wrapper -->
+            <div class="relative w-24 h-24 mb-4">
+                {% if teacher.photo %}
+                    <img class="w-full h-full rounded-full object-cover border-2 border-outline-variant/50" src="{{ teacher.photo.url }}" alt="{{ teacher.user.get_full_name }}">
+                {% else %}
+                    <div class="w-full h-full rounded-full bg-primary/5 border-2 border-outline-variant/30 flex items-center justify-center text-primary">
+                        <span class="material-symbols-outlined text-[48px] icon-fill">person</span>
+                    </div>
+                {% endif %}
+                <div class="absolute bottom-0 right-0 bg-surface rounded-full p-1 shadow-sm border border-outline-variant/20">
+                    <span class="material-symbols-outlined text-secondary-container icon-fill text-xl">verified</span>
+                </div>
+            </div>
+            
+            <h3 class="font-title-lg text-title-lg text-on-surface font-bold mb-1">{{ teacher.user.get_full_name }}</h3>
+            <p class="text-sm text-on-surface-variant font-medium mb-3">{{ teacher.headline|default:'مدرس معتمد على المنصة' }}</p>
+            
+            <!-- Rating / Experience -->
+            {% if teacher.total_reviews %}
+            <div class="flex items-center gap-1 mb-6 bg-surface-container-low px-3 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant">
+                <span class="material-symbols-outlined text-secondary-container icon-fill text-sm">star</span>
+                <span>{{ teacher.average_rating }}</span>
+                <span class="opacity-60">({{ teacher.total_reviews }} تقييم)</span>
+                <span class="mx-1.5 opacity-20">|</span>
+                <span>{{ teacher.experience_years }} سنوات خبرة</span>
+            </div>
+            {% else %}
+            <div class="flex items-center gap-1 mb-6 bg-surface-container-low px-3 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant">
+                <span class="material-symbols-outlined text-primary text-sm">work</span>
+                <span>{{ teacher.experience_years }} سنوات خبرة</span>
+            </div>
+            {% endif %}
+            
+            <!-- CTAs -->
+            <div class="w-full flex gap-3 mt-auto">
+                <a href="{% url 'teachers:public_detail' teacher.pk %}" class="flex-1 bg-surface-container border border-outline-variant/70 text-on-surface-variant font-label-md text-label-md py-2.5 rounded-xl hover:bg-surface-container-high transition-colors text-center font-semibold">الملف الشخصي</a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'teachers:public_detail' teacher.pk %}" class="flex-1 bg-primary text-on-primary font-label-md text-label-md py-2.5 rounded-xl hover:bg-primary-hover hover:shadow-sm transition-all text-center font-semibold">احجز الآن</a>
+                {% else %}
+                <a href="{% url 'accounts:login' %}" class="flex-1 bg-primary text-on-primary font-label-md text-label-md py-2.5 rounded-xl hover:bg-primary-hover hover:shadow-sm transition-all text-center font-semibold">احجز الآن</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Features / Pillars Section -->
+<section class="py-20 px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto border-t border-outline-variant/30">
+    <div class="text-center max-w-xl mx-auto mb-14">
+        <h2 class="font-headline-lg text-headline-lg text-on-surface mb-3">كيف نضمن جودة التعليم؟</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant">نهتم بأدق التفاصيل لنمنحك تجربة تعليمية متميزة وآمنة تماماً.</p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Pillar 1 -->
+        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-8 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow reveal reveal-stagger-1">
+            <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined text-2xl icon-fill">verified_user</span>
+            </div>
+            <h3 class="font-headline-md text-headline-md text-on-surface font-bold">معلمون مراجعون يدوياً</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                كل معلم على منصتنا يتم فحص هويته وشهاداته الأكاديمية والمهنية يدوياً من قبل فريق متخصص قبل تفعيل حسابه.
+            </p>
+        </div>
+        <!-- Pillar 2 -->
+        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-8 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow reveal reveal-stagger-2">
+            <div class="w-12 h-12 rounded-xl bg-secondary-container/10 flex items-center justify-center text-secondary">
+                <span class="material-symbols-outlined text-2xl icon-fill">analytics</span>
+            </div>
+            <h3 class="font-headline-md text-headline-md text-on-surface font-bold">تقارير ومتابعة دورية</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                بعد كل حصة، يتلقى ولي الأمر تقريراً مفصلاً يوضح سلوك الطالب، الواجبات المنزلية، والدرجات، لمتابعة مستمرة.
+            </p>
+        </div>
+        <!-- Pillar 3 -->
+        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-8 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow reveal reveal-stagger-3">
+            <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined text-2xl icon-fill">security</span>
+            </div>
+            <h3 class="font-headline-md text-headline-md text-on-surface font-bold">دفع سهل وآمن</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                وفرنا وسائل دفع محلية سهلة ومريحة كـ Vodafone Cash وInstapay مع نظام تأكيد آلي وسريع للحصص المحجوزة.
+            </p>
+        </div>
     </div>
 </section>
 {% endblock %}

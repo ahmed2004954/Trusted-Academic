@@ -1,20 +1,83 @@
 {% extends 'base.html' %}
 
-{% block title %}لوحة الطالب - منصة الدروس الخصوصية{% endblock %}
+{% block title %}لوحة التحكم للطالب - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content dashboard">
-    <h1>لوحة الطالب</h1>
-    <p>مرحباً بك في حساب الطالب. من هنا يمكنك إدارة حجوزاتك وتقييم المدرسين.</p>
-    <a class="btn btn-primary" href="{% url 'bookings:student_list' %}">عرض حجوزاتي</a>
-    <a class="btn btn-secondary" href="{% url 'messaging:inbox' %}">الرسائل{% if messaging_unread_count %} ({{ messaging_unread_count }}){% endif %}</a>
-    <a class="btn btn-secondary" href="{% url 'students:linking_code' %}">كود ربط ولي الأمر</a>
-
-    {% if profile.grade_level or profile.school_name %}
-        <div class="status-card">
-            {% if profile.grade_level %}<p><strong>الصف:</strong> {{ profile.grade_level.name }}</p>{% endif %}
-            {% if profile.school_name %}<p><strong>المدرسة:</strong> {{ profile.school_name }}</p>{% endif %}
+<section class="page-content dashboard text-right">
+    <!-- Welcome Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 border-b border-outline-variant/30 pb-6">
+        <div>
+            <h1 class="font-display-lg text-primary font-bold mb-1">لوحة تحكم الطالب</h1>
+            <p class="text-sm text-on-surface-variant">مرحباً بك مجدداً في حسابك التعليمي. يمكنك هنا مراجعة مواعيد حصصك والتواصل مع معلميك.</p>
         </div>
-    {% endif %}
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                {{ user.first_name|first }}
+            </div>
+            <div>
+                <span class="font-semibold block text-on-surface">{{ user.get_full_name }}</span>
+                <span class="text-xs text-on-surface-variant">طالب معتمد</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Action Buttons -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <a class="btn btn-primary" href="{% url 'bookings:student_list' %}">
+            <span class="material-symbols-outlined text-[18px]">event_note</span> عرض جدول حصصي
+        </a>
+        <a class="btn btn-secondary" href="{% url 'messaging:inbox' %}">
+            <span class="material-symbols-outlined text-[18px]">mail</span> رسائل المعلمين 
+            {% if messaging_unread_count %}
+                <span class="badge badge-error mr-1">{{ messaging_unread_count }}</span>
+            {% endif %}
+        </a>
+        <a class="btn btn-secondary" href="{% url 'students:linking_code' %}">
+            <span class="material-symbols-outlined text-[18px]">key</span> كود ربط ولي الأمر
+        </a>
+    </div>
+
+    <!-- Information Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Student Info card -->
+        <div class="dashboard-card md:col-span-1 border border-outline-variant/50 rounded-2xl p-6 bg-surface shadow-sm">
+            <h3 class="font-bold text-primary mb-4 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
+                <span class="material-symbols-outlined text-[18px] icon-fill">school</span> البيانات التعليمية
+            </h3>
+            <div class="flex flex-col gap-3">
+                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-sm">
+                    <span class="text-on-surface-variant font-medium">الاسم:</span>
+                    <span class="text-on-surface font-bold">{{ user.get_full_name }}</span>
+                </div>
+                {% if profile.grade_level %}
+                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-sm">
+                    <span class="text-on-surface-variant font-medium">الصف الدراسي:</span>
+                    <span class="text-on-surface font-bold">{{ profile.grade_level.name }}</span>
+                </div>
+                {% endif %}
+                {% if profile.school_name %}
+                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-sm">
+                    <span class="text-on-surface-variant font-medium">المدرسة:</span>
+                    <span class="text-on-surface font-bold">{{ profile.school_name }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Activity Column -->
+        <div class="md:col-span-2 dashboard-card border border-outline-variant/50 rounded-2xl p-6 bg-surface shadow-sm">
+            <h3 class="font-bold text-primary mb-4 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
+                <span class="material-symbols-outlined text-[18px] icon-fill">history</span> آخر التحديثات والحصص
+            </h3>
+            <p class="text-sm text-on-surface-variant leading-relaxed">
+                انتقل إلى صفحة <a href="{% url 'bookings:student_list' %}" class="text-primary font-bold hover:underline">جدول حصصي</a> لمشاهدة جميع تفاصيل المواعيد، روابط غرف زووم/جوجل ميت، وتأكيد الحضور فور انتهاء الحصة.
+            </p>
+            <div class="mt-6 flex justify-end">
+                <a href="{% url 'teachers:public_list' %}" class="bg-primary/10 text-primary text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-primary hover:text-on-primary transition-colors flex items-center gap-1.5 shadow-sm">
+                    <span class="material-symbols-outlined text-sm">search</span> ابحث عن معلم جديد
+                </a>
+            </div>
+        </div>
+    </div>
 </section>
 {% endblock %}

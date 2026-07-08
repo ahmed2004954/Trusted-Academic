@@ -1,0 +1,50 @@
+<footer class="site-footer">
+    <div class="footer-container">
+        <!-- Brand Signature Column -->
+        <div class="footer-brand-col">
+            <a class="brand" href="{% url 'core:home' %}">
+                <span class="material-symbols-outlined brand-icon">school</span>
+                <span>ثقة أكاديمية</span>
+            </a>
+            <p class="footer-tagline">
+                المنصة التعليمية الأكثر موثوقية في مصر. نربط الطلاب وأولياء الأمور بنخبة من المعلمين المعتمدين لمستقبل تعليمي أفضل.
+            </p>
+        </div>
+
+        <!-- Navigation Columns -->
+        <div class="footer-columns-group">
+            <!-- Column 1: Platform -->
+            <div class="footer-col">
+                <h4 class="footer-title">المنصة</h4>
+                <ul class="footer-links-list">
+                    <li><a href="{% url 'core:home' %}">الرئيسية</a></li>
+                    <li><a href="{% url 'teachers:public_list' %}">المعلمون</a></li>
+                    <li><a href="{% url 'subjects:list' %}">المواد الدراسية</a></li>
+                    <li><a href="{% url 'core:about' %}">عن المنصة</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 2: Support -->
+            <div class="footer-col">
+                <h4 class="footer-title">الدعم والمساعدة</h4>
+                <ul class="footer-links-list">
+                    <li><a href="{% url 'core:faq' %}">الأسئلة الشائعة</a></li>
+                    <li><a href="{% url 'core:contact' %}">تواصل معنا</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 3: Legal -->
+            <div class="footer-col">
+                <h4 class="footer-title">الشروط والخصوصية</h4>
+                <ul class="footer-links-list">
+                    <li><a href="{% url 'core:terms' %}">الشروط والأحكام</a></li>
+                    <li><a href="{% url 'core:privacy' %}">سياسة الخصوصية</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer-bottom">
+        <p>&copy; {% now "Y" %} ثقة أكاديمية. جميع الحقوق محفوظة.</p>
+    </div>
+</footer>

@@ -9,65 +9,14 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <header class="site-header">
-        <nav class="navbar">
-            <a class="brand" href="{% url 'core:home' %}">منصة الدروس</a>
-            <ul class="nav-links">
-                <li><a href="{% url 'core:home' %}">الرئيسية</a></li>
-                <li><a href="{% url 'subjects:list' %}">المواد</a></li>
-                <li><a href="{% url 'teachers:public_list' %}">المدرسون</a></li>
-                <li><a href="{% url 'core:about' %}">من نحن</a></li>
-                <li><a href="{% url 'core:faq' %}">الأسئلة الشائعة</a></li>
-                <li><a href="{% url 'core:contact' %}">تواصل معنا</a></li>
-            </ul>
-            <div class="nav-auth">
-                {% if user.is_authenticated %}
-                    <a href="{% url 'messaging:inbox' %}">الرسائل{% if messaging_unread_count %} ({{ messaging_unread_count }}){% endif %}</a>
-                    <a href="{% url 'complaints:list' %}">الشكاوى</a>
-                    {% if user.role == 'student' %}
-                        <a href="{% url 'payments:history' %}">سجل المدفوعات</a>
-                    {% endif %}
-                    {% if user.role == 'parent' %}
-                        <a href="{% url 'parents:dashboard' %}">لوحة ولي الأمر</a>
-                    {% endif %}
-                    {% if user.role == 'teacher' %}
-                        <a href="{% url 'payments:wallet' %}">محفظتي</a>
-                    {% endif %}
-                    {% if user.is_staff %}
-                        <a href="{% url 'payments:admin_pending' %}">مراجعة المدفوعات</a>
-                        <a href="{% url 'payments:admin_withdrawal_queue' %}">طلبات السحب</a>
-                        <a href="{% url 'complaints:staff_queue' %}">إدارة الشكاوى</a>
-                    {% endif %}
-                    <a href="{% url 'accounts:profile' %}">مرحباً، {{ user.get_full_name|default:user.email }}</a>
-                    <form method="post" action="{% url 'accounts:logout' %}">
-                        {% csrf_token %}
-                        <button type="submit">تسجيل الخروج</button>
-                    </form>
-                {% else %}
-                    <a href="{% url 'accounts:login' %}">تسجيل الدخول</a>
-                    <a href="{% url 'accounts:register' %}">إنشاء حساب</a>
-                {% endif %}
-            </div>
-        </nav>
-    </header>
+    {% include 'partials/_nav.html' %}
+    {% include 'partials/_messages.html' %}
 
     <main class="site-main">
-        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="message message-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="site-footer">
-        <p>&copy; {% now "Y" %} منصة الدروس الخصوصية. جميع الحقوق محفوظة.</p>
-    </footer>
+    {% include 'partials/_footer.html' %}
 
     <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}

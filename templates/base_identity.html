@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ثقة أكاديمية{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#1b6b51", "on-primary-fixed": "#002116", "on-tertiary-container": "#c7c8c4",
+                        "surface-container-lowest": "#ffffff", "on-tertiary-fixed-variant": "#454745", "inverse-primary": "#8bd6b6",
+                        "tertiary-fixed-dim": "#c6c7c3", "surface-container-low": "#f4f3f1", "on-surface-variant": "#3f4944",
+                        "primary-fixed-dim": "#8bd6b6", "surface": "#faf9f6", "surface-variant": "#e3e2e0",
+                        "on-primary-container": "#8bd6b7", "error": "#ba1a1a", "surface-dim": "#dbdad7",
+                        "on-secondary": "#ffffff", "tertiary-container": "#525451", "surface-container-high": "#e9e8e5",
+                        "primary-container": "#065f46", "error-container": "#ffdad6", "on-tertiary-fixed": "#1a1c1a",
+                        "secondary-fixed-dim": "#ffb77d", "secondary-fixed": "#ffdcc3", "primary-fixed": "#a6f2d1",
+                        "on-primary": "#ffffff", "on-error-container": "#93000a", "on-secondary-fixed": "#2f1500",
+                        "on-primary-fixed-variant": "#00513b", "inverse-surface": "#2f312f", "surface-container-highest": "#e3e2e0",
+                        "on-error": "#ffffff", "background": "#faf9f6", "outline": "#6f7973", "on-background": "#1a1c1a",
+                        "secondary-container": "#fe932c", "on-surface": "#1a1c1a", "outline-variant": "#bec9c2",
+                        "secondary": "#904d00", "inverse-on-surface": "#f2f1ee", "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#6e3900", "surface-bright": "#faf9f6", "tertiary": "#3b3d3a",
+                        "on-secondary-container": "#663500", "primary": "#004532", "tertiary-fixed": "#e2e3df",
+                        "surface-container": "#efeeeb"
+                    },
+                    "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                    "spacing": { "margin-mobile": "16px", "lg": "40px", "sm": "16px", "xs": "8px", "gutter": "24px", "md": "24px", "base": "4px", "margin-desktop": "48px", "xl": "64px" },
+                    "fontFamily": {
+                        "label-md": ["IBM Plex Sans Arabic", "sans-serif"], "display-lg-mobile": ["IBM Plex Sans Arabic", "sans-serif"],
+                        "title-lg": ["IBM Plex Sans Arabic", "sans-serif"], "body-md": ["IBM Plex Sans Arabic", "sans-serif"],
+                        "body-lg": ["IBM Plex Sans Arabic", "sans-serif"], "label-sm": ["IBM Plex Sans Arabic", "sans-serif"],
+                        "headline-md": ["IBM Plex Sans Arabic", "sans-serif"], "headline-lg": ["IBM Plex Sans Arabic", "sans-serif"],
+                        "display-lg": ["IBM Plex Sans Arabic", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "title-lg": ["20px", { "lineHeight": "30px", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "32px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "34px", "fontWeight": "600" }],
+                        "headline-lg": ["30px", { "lineHeight": "42px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "60px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'IBM Plex Sans Arabic', sans-serif; background-color: #faf9f6; color: #1a1c1a; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .icon-fill { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .ambient-shadow { box-shadow: 0 4px 24px -4px rgba(0, 69, 50, 0.04), 0 16px 48px -12px rgba(0, 69, 50, 0.08); }
+        .hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 69, 50, 0.08); }
+        .nav-active { color: #004532; border-bottom: 2px solid #004532; padding-bottom: 0.25rem; }
+        .status-pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 9999px; font-size: 12px; font-weight: 600; }
+        [x-cloak] { display: none !important; }
+    </style>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-background text-on-background antialiased flex flex-col min-h-screen pt-20">
+    {% include 'partials/_nav.html' %}
+    {% include 'partials/_messages.html' %}
+
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'partials/_footer.html' %}
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

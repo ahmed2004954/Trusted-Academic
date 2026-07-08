@@ -1,162 +1,276 @@
 {% extends 'base.html' %}
 
-{% block title %}تفاصيل الحجز - منصة الدروس الخصوصية{% endblock %}
+{% block title %}تفاصيل الحجز - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>تفاصيل الحجز</h1>
-    <div class="status-card">
-        <p><strong>الحالة:</strong> {{ booking.get_booking_status_display }}</p>
-        <p><strong>طريقة الحجز:</strong> {{ booking.get_booking_mode_display }}</p>
-        <p><strong>الطالب:</strong> {{ booking.student.get_full_name }}</p>
-        <p><strong>المدرس:</strong> {{ booking.teacher.user.get_full_name }}</p>
-        <p><strong>المادة:</strong> {{ booking.subject.name }} - {{ booking.grade_level.name }}</p>
-        <p><strong>نوع الحصة:</strong> {{ booking.get_lesson_type_display }}</p>
-        <p><strong>الموعد:</strong> {{ booking.scheduled_start|date:'Y-m-d H:i' }} - {{ booking.scheduled_end|date:'H:i' }}</p>
-        <p><strong>المدة:</strong> {{ booking.duration_minutes }} دقيقة</p>
-        <p><strong>السعر:</strong> {{ booking.price }}</p>
-        <p><strong>رسوم المنصة:</strong> {{ booking.platform_fee }}</p>
-        <p><strong>مستحق المدرس:</strong> {{ booking.teacher_payout }}</p>
-        {% if booking.payment_deadline %}
-            <p><strong>مهلة الدفع:</strong> {{ booking.payment_deadline|date:'Y-m-d H:i' }}</p>
-        {% endif %}
-        {% if booking.cancellation_reason %}
-            <p><strong>سبب الرفض/الإلغاء:</strong> {{ booking.cancellation_reason }}</p>
-        {% endif %}
-        {% if booking.attendance_confirmed_at %}
-            <p><strong>تأكيد الحضور:</strong> {{ booking.attendance_confirmed_at|date:'Y-m-d H:i' }}</p>
-        {% endif %}
-        {% if booking.cancelled_at %}
-            <p><strong>وقت الإلغاء:</strong> {{ booking.cancelled_at|date:'Y-m-d H:i' }}</p>
-        {% endif %}
-        {% if booking.reschedule_count %}
-            <p><strong>عدد مرات إعادة الجدولة:</strong> {{ booking.reschedule_count }}</p>
-        {% endif %}
-        {% if booking.reschedule_reason %}
-            <p><strong>سبب إعادة الجدولة:</strong> {{ booking.reschedule_reason }}</p>
-        {% endif %}
-    </div>
-
-    {% if not is_teacher_view and booking.booking_status == 'confirmed' or not is_teacher_view and booking.booking_status == 'pending_payment' or not is_teacher_view and booking.booking_status == 'awaiting_student_payment' or not is_teacher_view and booking.booking_status == 'awaiting_receipt_verification' %}
-        <div class="status-card">
-            <h2>الإلغاء وإعادة الجدولة</h2>
-            <p>يمكنك إلغاء الحجز قبل بداية الحصة. إعادة الجدولة متاحة مرة واحدة فقط للطالب.</p>
-            <a class="btn btn-secondary" href="{% url 'bookings:student_cancel' booking.pk %}">إلغاء الحجز</a>
-            <a class="btn btn-primary" href="{% url 'bookings:student_reschedule' booking.pk %}">إعادة الجدولة</a>
+<section class="page-content text-right">
+    <!-- Header -->
+    <div class="border-b border-outline-variant/30 pb-4 mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="font-display-lg text-primary font-bold">تفاصيل الحجز الدراسي</h1>
+            <p class="text-xs text-on-surface-variant mt-1">عرض كامل لبيانات الحجز الأكاديمي، حالة الدفع، والتقارير المرفقة.</p>
         </div>
-    {% endif %}
-
-    {% if is_teacher_view and booking.booking_status == 'confirmed' %}
-        <div class="status-card">
-            <h2>الإلغاء وإعادة الجدولة</h2>
-            <p>إلغاء أو إعادة جدولة المدرس يسجل مخالفة مرتبطة بالحجز.</p>
-            <a class="btn btn-secondary" href="{% url 'bookings:teacher_cancel' booking.pk %}">إلغاء الحجز</a>
-            <a class="btn btn-primary" href="{% url 'bookings:teacher_reschedule' booking.pk %}">إعادة الجدولة</a>
-        </div>
-    {% endif %}
-
-    <div class="status-card">
-        <h2>رسائل الحجز</h2>
-        <p>تواصل مع أطراف الحجز وارفق ملفات عند الحاجة.</p>
-        <a class="btn btn-primary" href="{% url 'messaging:booking_thread' booking.pk %}">فتح المحادثة</a>
-    </div>
-
-    <div class="status-card">
-        <h2>الشكاوى والنزاعات</h2>
-        <p>تابع الشكاوى المرتبطة بهذا الحجز أو افتح شكوى جديدة عند الحاجة.</p>
-        {% if can_create_complaint %}
-            <a class="btn btn-primary" href="{% url 'complaints:create' booking.pk %}">فتح شكوى</a>
-        {% endif %}
-        <a class="btn btn-secondary" href="{% url 'complaints:list' %}">عرض شكاواي</a>
-        {% if complaints %}
-            <div class="table-wrap">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>رقم الشكوى</th>
-                            <th>التصنيف</th>
-                            <th>الحالة</th>
-                            <th>تاريخ الإنشاء</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for complaint in complaints %}
-                            <tr>
-                                <td>#{{ complaint.pk }}</td>
-                                <td>{{ complaint.get_category_display }}</td>
-                                <td>{{ complaint.get_status_display }}</td>
-                                <td>{{ complaint.created_at|date:'Y-m-d H:i' }}</td>
-                                <td><a class="btn btn-secondary" href="{% url 'complaints:detail' complaint.pk %}">عرض</a></td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% endif %}
-    </div>
-
-    {% if not is_teacher_view %}
-        {% if booking.booking_status == 'pending_payment' or booking.booking_status == 'awaiting_student_payment' %}
-            <div class="status-card">
-                <h2>الدفع مطلوب</h2>
-                <p>يرجى فتح تعليمات الدفع ورفع إيصال التحويل لتأكيد الحجز.</p>
-                <a class="btn btn-primary" href="{% url 'payments:instructions' booking.pk %}">تعليمات الدفع ورفع الإيصال</a>
-            </div>
-        {% endif %}
-    {% endif %}
-
-    {% if is_teacher_view and booking.booking_status == 'confirmed' or is_teacher_view and booking.booking_status == 'in_progress' %}
-        <div class="status-card">
-            <h2>كود الحضور</h2>
-            <p>يظهر الكود خلال وقت الحصة وحتى 3 ساعات بعد انتهائها.</p>
-            <a class="btn btn-primary" href="{% url 'bookings:teacher_attendance_code' booking.pk %}">عرض كود الحضور</a>
-        </div>
-    {% endif %}
-
-    {% if not is_teacher_view and booking.booking_status == 'confirmed' or not is_teacher_view and booking.booking_status == 'in_progress' %}
-        <div class="status-card">
-            <h2>تأكيد حضور الحصة</h2>
-            <p>أدخل كود الحضور من المدرس خلال وقت الحصة وحتى 3 ساعات بعد انتهائها.</p>
-            <a class="btn btn-primary" href="{% url 'bookings:student_confirm_attendance' booking.pk %}">إدخال كود الحضور</a>
-        </div>
-    {% endif %}
-
-    {% if not is_teacher_view and booking.booking_status == 'completed' %}
-        <div class="status-card">
-            <h2>مراجعة المدرس</h2>
-            <a class="btn btn-primary" href="{% url 'reviews:create' booking.pk %}">إضافة مراجعة</a>
-        </div>
-    {% endif %}
-
-    {% if is_teacher_view and booking.booking_status == 'pending_teacher_acceptance' %}
-        <form method="post" action="{% url 'bookings:teacher_action' booking.pk 'accept' %}" class="inline-form">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary">قبول الطلب</button>
-        </form>
-        <form method="post" action="{% url 'bookings:teacher_action' booking.pk 'reject' %}" class="form-card">
-            {% csrf_token %}
-            <label for="reason">سبب الرفض اختياري</label>
-            <textarea id="reason" name="reason" class="form-control" rows="3"></textarea>
-            <button type="submit" class="btn btn-secondary">رفض الطلب</button>
-        </form>
-    {% endif %}
-
-    {% if is_teacher_view and booking.booking_status == 'completed' %}
-        <div class="status-card">
-            <h2>تقرير ما بعد الحصة</h2>
-            {% if booking.report %}
-                <a class="btn btn-primary" href="{% url 'reports:detail' booking.report.pk %}">عرض التقرير</a>
+        <div class="flex items-center gap-2">
+            {% if is_teacher_view %}
+                <a class="btn btn-secondary text-xs" href="{% url 'bookings:teacher_list' %}">عودة لجدول الطلاب</a>
             {% else %}
-                <a class="btn btn-primary" href="{% url 'reports:create' booking.pk %}">إنشاء تقرير</a>
+                <a class="btn btn-secondary text-xs" href="{% url 'bookings:student_list' %}">عودة لجدول حصصي</a>
             {% endif %}
         </div>
-    {% endif %}
+    </div>
 
-    {% if is_teacher_view %}
-        <a class="btn btn-secondary" href="{% url 'bookings:teacher_list' %}">رجوع للحجوزات</a>
-    {% else %}
-        <a class="btn btn-secondary" href="{% url 'bookings:student_list' %}">رجوع لحجوزاتي</a>
-    {% endif %}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Column: Booking Details -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
+            <!-- Core Info Card -->
+            <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm">
+                <h3 class="font-bold text-primary mb-4 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
+                    <span class="material-symbols-outlined icon-fill">school</span> البيانات الأساسية للحصة
+                </h3>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-sm">
+                        <span class="text-on-surface-variant font-medium">الطالب:</span>
+                        <span class="text-on-surface font-bold">{{ booking.student.get_full_name }}</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-sm">
+                        <span class="text-on-surface-variant font-medium">المعلم:</span>
+                        <span class="text-on-surface font-bold">{{ booking.teacher.user.get_full_name }}</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-sm">
+                        <span class="text-on-surface-variant font-medium">المادة والمرحلة:</span>
+                        <span class="text-on-surface font-bold">{{ booking.subject.name }} - {{ booking.grade_level.name }}</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-sm">
+                        <span class="text-on-surface-variant font-medium">نوع الحصة:</span>
+                        <span class="text-on-surface font-bold">{{ booking.get_lesson_type_display }}</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-sm">
+                        <span class="text-on-surface-variant font-medium">تاريخ الحصة:</span>
+                        <span class="text-on-surface font-bold text-xs">{{ booking.scheduled_start|date:'Y-m-d H:i' }} - {{ booking.scheduled_end|date:'H:i' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-sm">
+                        <span class="text-on-surface-variant font-medium">المدة الزمنية:</span>
+                        <span class="text-on-surface font-bold">{{ booking.duration_minutes }} دقيقة</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Details Card -->
+            <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm">
+                <h3 class="font-bold text-primary mb-4 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
+                    <span class="material-symbols-outlined icon-fill">payments</span> التفاصيل المالية وحالة الحجز
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-sm">
+                        <span class="text-on-surface-variant font-medium">حالة الطلب:</span>
+                        {% if booking.booking_status == 'confirmed' or booking.booking_status == 'completed' %}
+                            {% include 'partials/_badge.html' with text=booking.get_booking_status_display type='success' %}
+                        {% elif booking.booking_status == 'cancelled' or booking.booking_status == 'disputed' %}
+                            {% include 'partials/_badge.html' with text=booking.get_booking_status_display type='error' %}
+                        {% elif booking.booking_status == 'payment_pending_approval' %}
+                            {% include 'partials/_badge.html' with text=booking.get_booking_status_display type='info' %}
+                        {% else %}
+                            {% include 'partials/_badge.html' with text=booking.get_booking_status_display type='warning' %}
+                        {% endif %}
+                    </div>
+                    <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-sm">
+                        <span class="text-on-surface-variant font-medium">طريقة الدفع:</span>
+                        <span class="text-on-surface font-bold text-xs">{{ booking.get_booking_mode_display }}</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-sm">
+                        <span class="text-on-surface-variant font-medium">سعر الحصة:</span>
+                        <span class="text-primary font-bold text-sm">{{ booking.price }} ج.م</span>
+                    </div>
+                    {% if is_teacher_view %}
+                    <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-sm">
+                        <span class="text-on-surface-variant font-medium">مستحقاتك كمعلم:</span>
+                        <span class="text-primary font-bold text-sm">{{ booking.teacher_payout }} ج.م</span>
+                    </div>
+                    {% endif %}
+                    {% if booking.payment_deadline %}
+                    <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl text-sm">
+                        <span class="text-on-surface-variant font-medium">مهلة الدفع:</span>
+                        <span class="text-error font-bold text-xs">{{ booking.payment_deadline|date:'Y-m-d H:i' }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if booking.cancellation_reason %}
+                <div class="mt-4 p-4 bg-error-container/10 border border-error/20 rounded-xl text-xs text-error-ink leading-relaxed">
+                    <strong>سبب الإلغاء/الرفض:</strong> {{ booking.cancellation_reason }}
+                </div>
+                {% endif %}
+                {% if booking.reschedule_reason %}
+                <div class="mt-4 p-4 bg-warning-container/10 border border-warning/20 rounded-xl text-xs text-warning-ink leading-relaxed">
+                    <strong>تفاصيل إعادة الجدولة (تكرار: {{ booking.reschedule_count }}):</strong> {{ booking.reschedule_reason }}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Booking Disputes / Complaints section -->
+            <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm">
+                <div class="flex justify-between items-center border-b border-outline-variant/30 pb-2 mb-4">
+                    <h3 class="font-bold text-primary flex items-center gap-2">
+                        <span class="material-symbols-outlined icon-fill">rate_review</span> الشكاوى والنزاعات
+                    </h3>
+                    {% if can_create_complaint %}
+                        <a class="bg-primary/10 text-primary text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-primary hover:text-on-primary transition-colors" href="{% url 'complaints:create' booking.pk %}">فتح شكوى</a>
+                    {% endif %}
+                </div>
+                
+                {% if complaints %}
+                    <div class="overflow-x-auto border border-outline-variant/40 rounded-xl">
+                        <table class="w-full border-collapse">
+                            <thead>
+                                <tr class="bg-surface-container-low text-xs text-on-surface-variant">
+                                    <th class="py-2.5 px-3">الشكوى</th>
+                                    <th class="py-2.5 px-3">التصنيف</th>
+                                    <th class="py-2.5 px-3">الحالة</th>
+                                    <th class="py-2.5 px-3">تاريخ الإنشاء</th>
+                                    <th class="py-2.5 px-3"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for complaint in complaints %}
+                                <tr class="border-t border-outline-variant/20 text-xs">
+                                    <td class="py-3 px-3 font-semibold text-on-surface">#{{ complaint.pk }}</td>
+                                    <td class="py-3 px-3 text-on-surface-variant">{{ complaint.get_category_display }}</td>
+                                    <td class="py-3 px-3">
+                                        {% if complaint.status == 'resolved' %}
+                                            {% include 'partials/_badge.html' with text=complaint.get_status_display type='success' %}
+                                        {% else %}
+                                            {% include 'partials/_badge.html' with text=complaint.get_status_display type='warning' %}
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-3 px-3 text-on-surface-variant">{{ complaint.created_at|date:'Y-m-d H:i' }}</td>
+                                    <td class="py-3 px-3 text-left">
+                                        <a class="text-primary hover:underline font-bold" href="{% url 'complaints:detail' complaint.pk %}">عرض</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-xs text-on-surface-variant">لا توجد شكاوى أو نزاعات مسجلة بخصوص هذا الحجز.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar Actions Column -->
+        <div class="lg:col-span-1 flex flex-col gap-6">
+            <!-- Quick Actions Container -->
+            <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm">
+                <h3 class="font-bold text-primary mb-4 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
+                    <span class="material-symbols-outlined">settings</span> إدارة الحجز
+                </h3>
+
+                <!-- Messaging Chat -->
+                <div class="mb-4">
+                    <h4 class="text-xs font-semibold text-on-surface mb-2">محادثة الحجز والتواصل:</h4>
+                    <a class="w-full btn btn-secondary text-xs py-2.5" href="{% url 'messaging:booking_thread' booking.pk %}">
+                        <span class="material-symbols-outlined text-[16px] mr-1">chat</span> فتح المحادثة الخاصة
+                    </a>
+                </div>
+
+                <!-- Teacher Actions (Accept / Reject requests) -->
+                {% if is_teacher_view and booking.booking_status == 'pending_teacher_acceptance' %}
+                <div class="border-t border-outline-variant/30 pt-4 mb-4 flex flex-col gap-3">
+                    <h4 class="text-xs font-semibold text-on-surface">طلب حجز وارد:</h4>
+                    <form method="post" action="{% url 'bookings:teacher_action' booking.pk 'accept' %}" class="w-full">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full btn btn-primary text-xs py-2.5">قبول الحجز</button>
+                    </form>
+                    <form method="post" action="{% url 'bookings:teacher_action' booking.pk 'reject' %}" class="w-full mt-2">
+                        {% csrf_token %}
+                        <div class="mb-2">
+                            <label for="reason" class="block text-[11px] text-on-surface-variant mb-1">سبب الرفض (اختياري)</label>
+                            <textarea id="reason" name="reason" class="w-full text-xs p-2 bg-surface-container border border-outline-variant rounded-xl focus:border-primary focus:outline-none" rows="2"></textarea>
+                        </div>
+                        <button type="submit" class="w-full btn btn-secondary text-xs py-2.5 text-error hover:bg-error-container/20">رفض الحجز</button>
+                    </form>
+                </div>
+                {% endif %}
+
+                <!-- Student Payment actions -->
+                {% if not is_teacher_view %}
+                    {% if booking.booking_status == 'pending_payment' or booking.booking_status == 'awaiting_student_payment' %}
+                    <div class="border-t border-outline-variant/30 pt-4 mb-4">
+                        <h4 class="text-xs font-semibold text-on-surface mb-2">الدفع مطلوب:</h4>
+                        <p class="text-[11px] text-on-surface-variant mb-3">يرجى رفع إيصال الدفع عبر فودافون كاش أو انستاباي لتفعيل الحجز.</p>
+                        <a class="w-full btn btn-primary text-xs py-2.5" href="{% url 'payments:instructions' booking.pk %}">
+                            <span class="material-symbols-outlined text-[16px] mr-1">receipt</span> رفع إيصال التحويل
+                        </a>
+                    </div>
+                    {% endif %}
+                {% endif %}
+
+                <!-- Attendance Codes (Teacher show, student enter) -->
+                {% if is_teacher_view and booking.booking_status == 'confirmed' or is_teacher_view and booking.booking_status == 'in_progress' %}
+                <div class="border-t border-outline-variant/30 pt-4 mb-4">
+                    <h4 class="text-xs font-semibold text-on-surface mb-2">رمز تأكيد الحضور:</h4>
+                    <p class="text-[11px] text-on-surface-variant mb-3">شارك الرمز مع الطالب بعد إتمام الحصّة ليقوم بتأكيد الحضور.</p>
+                    <a class="w-full btn btn-primary text-xs py-2.5" href="{% url 'bookings:teacher_attendance_code' booking.pk %}">
+                        <span class="material-symbols-outlined text-[16px] mr-1">pin</span> عرض كود الحضور
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if not is_teacher_view and booking.booking_status == 'confirmed' or not is_teacher_view and booking.booking_status == 'in_progress' %}
+                <div class="border-t border-outline-variant/30 pt-4 mb-4">
+                    <h4 class="text-xs font-semibold text-on-surface mb-2">تأكيد حضور الحصة:</h4>
+                    <p class="text-[11px] text-on-surface-variant mb-3">أدخل الرمز المستلم من المعلم عند انتهاء اللقاء التعليمي.</p>
+                    <a class="w-full btn btn-primary text-xs py-2.5" href="{% url 'bookings:student_confirm_attendance' booking.pk %}">
+                        <span class="material-symbols-outlined text-[16px] mr-1">check_circle</span> تأكيد الحضور الآن
+                    </a>
+                </div>
+                {% endif %}
+
+                <!-- Ratings / Reviews after completion -->
+                {% if not is_teacher_view and booking.booking_status == 'completed' %}
+                <div class="border-t border-outline-variant/30 pt-4 mb-4">
+                    <h4 class="text-xs font-semibold text-on-surface mb-2">تقييم اللقاء:</h4>
+                    <a class="w-full btn btn-primary text-xs py-2.5" href="{% url 'reviews:create' booking.pk %}">
+                        <span class="material-symbols-outlined text-[16px] mr-1">star</span> إضافة تقييم ومراجعة
+                    </a>
+                </div>
+                {% endif %}
+
+                <!-- Reports (Teacher create / view) -->
+                {% if is_teacher_view and booking.booking_status == 'completed' %}
+                <div class="border-t border-outline-variant/30 pt-4 mb-4">
+                    <h4 class="text-xs font-semibold text-on-surface mb-2">تقرير ما بعد الحصة:</h4>
+                    {% if booking.report %}
+                        <a class="w-full btn btn-secondary text-xs py-2.5" href="{% url 'reports:detail' booking.report.pk %}">
+                            <span class="material-symbols-outlined text-[16px]">visibility</span> عرض التقرير الدراسي
+                        </a>
+                    {% else %}
+                        <a class="w-full btn btn-primary text-xs py-2.5" href="{% url 'reports:create' booking.pk %}">
+                            <span class="material-symbols-outlined text-[16px]">add_task</span> إنشاء تقرير أكاديمي
+                        </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Cancellations and Rescheduling Options -->
+                {% if not is_teacher_view and booking.booking_status == 'confirmed' or not is_teacher_view and booking.booking_status == 'pending_payment' or not is_teacher_view and booking.booking_status == 'awaiting_student_payment' or not is_teacher_view and booking.booking_status == 'awaiting_receipt_verification' %}
+                <div class="border-t border-outline-variant/30 pt-4 flex flex-col gap-2">
+                    <h4 class="text-xs font-semibold text-on-surface">خيارات التعديل:</h4>
+                    <a class="w-full btn btn-secondary text-xs py-2" href="{% url 'bookings:student_reschedule' booking.pk %}">إعادة الجدولة</a>
+                    <a class="w-full btn btn-secondary text-xs py-2 text-error hover:bg-error-container/20" href="{% url 'bookings:student_cancel' booking.pk %}">إلغاء الحجز</a>
+                </div>
+                {% endif %}
+
+                {% if is_teacher_view and booking.booking_status == 'confirmed' %}
+                <div class="border-t border-outline-variant/30 pt-4 flex flex-col gap-2">
+                    <h4 class="text-xs font-semibold text-on-surface">خيارات التعديل:</h4>
+                    <a class="w-full btn btn-secondary text-xs py-2" href="{% url 'bookings:teacher_reschedule' booking.pk %}">إعادة الجدولة</a>
+                    <a class="w-full btn btn-secondary text-xs py-2 text-error hover:bg-error-container/20" href="{% url 'bookings:teacher_cancel' booking.pk %}">إلغاء الحجز</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </section>
 {% endblock %}

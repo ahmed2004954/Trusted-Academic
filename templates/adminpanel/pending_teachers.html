@@ -1,26 +1,42 @@
 {% extends 'base.html' %}
 
-{% block title %}طلبات المدرسين - منصة الدروس الخصوصية{% endblock %}
+{% block title %}طلبات المدرسين - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content dashboard">
-    <h1>طلبات المدرسين قيد المراجعة</h1>
+<section class="page-content text-right">
+    <div class="border-b border-outline-variant/30 pb-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="font-display-lg text-primary font-bold">طلبات الاعتماد قيد المراجعة</h1>
+            <p class="text-xs text-on-surface-variant mt-1">تفعيل ومراجعة طلبات الانضمام الجديدة لمعلمي منصة ثقة أكاديمية.</p>
+        </div>
+        <a class="btn btn-secondary text-xs" href="{% url 'adminpanel:dashboard' %}">العودة للوحة الإدارة</a>
+    </div>
 
     {% if profiles %}
-        <ul class="item-list">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             {% for profile in profiles %}
-                <li>
-                    <strong>{{ profile.user.get_full_name }}</strong>
-                    <span>{{ profile.user.email }}</span>
-                    <span>{{ profile.headline|default:'لم يتم إدخال عنوان مختصر' }}</span>
-                    <a class="btn btn-primary" href="{% url 'adminpanel:review_teacher' profile.pk %}">مراجعة</a>
-                </li>
+                <div class="bg-surface border border-outline-variant/50 rounded-2xl p-5 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="font-bold text-sm text-on-surface">{{ profile.user.get_full_name }}</h3>
+                                <span class="text-[10px] text-on-surface-variant font-medium block mt-0.5">{{ profile.user.email }}</span>
+                            </div>
+                            {% include 'partials/_badge.html' with text='قيد المراجعة' type='warning' %}
+                        </div>
+                        <p class="text-xs text-on-surface-variant leading-relaxed h-8 overflow-hidden mt-3">
+                            {{ profile.headline|default:'لم يتم إدخال عنوان مختصر بعد.' }}
+                        </p>
+                    </div>
+                    
+                    <div class="mt-5 pt-3 border-t border-outline-variant/30 flex justify-end">
+                        <a class="btn btn-primary text-xs py-2 px-6" href="{% url 'adminpanel:review_teacher' profile.pk %}">مراجعة الملف والشهادات</a>
+                    </div>
+                </div>
             {% endfor %}
-        </ul>
+        </div>
     {% else %}
-        <p>لا توجد طلبات مدرسين قيد المراجعة حالياً.</p>
+        {% include 'partials/_empty_state.html' with icon='checklist' title='لا توجد طلبات معلقة' desc='جميع طلبات المعلمين الحالية تمت معالجتها واعتمادها بنجاح.' action_url='/adminpanel/' action_text='لوحة الإدارة' %}
     {% endif %}
-
-    <a class="btn" href="{% url 'adminpanel:dashboard' %}">العودة للوحة الإدارة</a>
 </section>
 {% endblock %}

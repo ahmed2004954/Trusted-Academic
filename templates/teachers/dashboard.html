@@ -1,67 +1,149 @@
 {% extends 'base.html' %}
 
-{% block title %}لوحة المدرس - منصة الدروس الخصوصية{% endblock %}
+{% block title %}لوحة التحكم للمعلم - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content dashboard">
-    <h1>لوحة المدرس</h1>
-    <p>مرحباً بك في حساب المدرس. من هنا يمكنك تجهيز بروفايلك ومتابعة حالة المراجعة.</p>
+<section class="page-content dashboard text-right">
+    <!-- Welcome Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 border-b border-outline-variant/30 pb-6">
+        <div>
+            <h1 class="font-display-lg text-primary font-bold mb-1">لوحة تحكم المعلم</h1>
+            <p class="text-sm text-on-surface-variant">مرحباً بك في بوابتك الأكاديمية. يمكنك هنا التحكم بملفك العام، مواعيد حصصك، والمحفظة المالية.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                {{ user.first_name|first }}
+            </div>
+            <div>
+                <span class="font-semibold block text-on-surface">{{ user.get_full_name }}</span>
+                {% if profile %}
+                    <span class="text-xs text-on-surface-variant">معلم {{ profile.get_approval_status_display }}</span>
+                {% else %}
+                    <span class="text-xs text-on-surface-variant">عضو جديد</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 
     {% if profile %}
-        <div class="status-card status-{{ profile.approval_status }}">
-            <h2>حالة الاعتماد: {{ profile.get_approval_status_display }}</h2>
-            {% if profile.verification_notes %}
-                <p><strong>ملاحظات الإدارة:</strong> {{ profile.verification_notes }}</p>
-            {% endif %}
+        <!-- Status card Alert -->
+        <div class="status-card border rounded-2xl p-5 mb-8 flex items-start gap-4 shadow-sm bg-surface
+            {% if profile.approval_status == 'approved' %}
+                border-success/30 bg-success-container/10 text-success-ink
+            {% elif profile.approval_status == 'rejected' or profile.approval_status == 'suspended' %}
+                border-error/30 bg-error-container/10 text-error-ink
+            {% else %}
+                border-warning/30 bg-warning-container/10 text-warning-ink
+            {% endif %}">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
+                {% if profile.approval_status == 'approved' %} bg-success/15 {% else %} bg-warning/15 {% endif %}">
+                <span class="material-symbols-outlined">
+                    {% if profile.approval_status == 'approved' %}verified{% else %}pending_actions{% endif %}
+                </span>
+            </div>
+            <div>
+                <h2 class="font-bold text-sm mb-1">حالة الاعتماد: {{ profile.get_approval_status_display }}</h2>
+                {% if profile.verification_notes %}
+                    <p class="text-xs opacity-85"><strong>ملاحظات الإدارة:</strong> {{ profile.verification_notes }}</p>
+                {% else %}
+                    <p class="text-xs opacity-85">
+                        {% if profile.approval_status == 'approved' %}
+                            تهانينا، تم اعتماد ملفك الشخصي وهو معروض حالياً للطلاب في محركات البحث.
+                        {% else %}
+                            ملفك قيد المراجعة حالياً من قبل الإدارة وسوف يظهر للطلاب فور تفعيله.
+                        {% endif %}
+                    </p>
+                {% endif %}
+            </div>
         </div>
 
-        <div class="dashboard-grid">
-            <div class="dashboard-card">
-                <h3>اكتمال البروفايل</h3>
-                {% if profile.is_complete %}
-                    <p>بياناتك الأساسية مكتملة وجاهزة للمراجعة.</p>
-                {% else %}
-                    <p>أكمل العنوان المختصر، النبذة، وملف السيرة الذاتية لتحسين فرصة قبولك.</p>
-                {% endif %}
-                <a class="btn btn-primary" href="{% url 'teachers:setup_profile' %}">تحديث البروفايل</a>
+        <!-- Quick Action Buttons -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <a class="btn btn-primary text-xs py-3" href="{% url 'teachers:setup_profile' %}">
+                <span class="material-symbols-outlined text-[16px]">edit_note</span> تحديث البروفايل
+            </a>
+            <a class="btn btn-secondary text-xs py-3" href="{% url 'teachers:manage_subjects' %}">
+                <span class="material-symbols-outlined text-[16px]">book</span> المواد والأسعار
+            </a>
+            <a class="btn btn-secondary text-xs py-3" href="{% url 'teachers:manage_availability' %}">
+                <span class="material-symbols-outlined text-[16px]">calendar_month</span> مواعيد المتاحة
+            </a>
+            <a class="btn btn-secondary text-xs py-3" href="{% url 'bookings:teacher_list' %}">
+                <span class="material-symbols-outlined text-[16px]">event_note</span> إدارة الحجوزات
+            </a>
+        </div>
+
+        <!-- Dashboard Widgets Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Col 1: Profile Completeness -->
+            <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                <div>
+                    <h3 class="font-bold text-primary mb-3 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
+                        <span class="material-symbols-outlined text-[18px]">verified_user</span> حالة الملف العام
+                    </h3>
+                    <p class="text-xs text-on-surface-variant leading-relaxed">
+                        {% if profile.is_complete %}
+                            بياناتك الأساسية مكتملة وجاهزة للمراجعة الأكاديمية من فريق الإدارة.
+                        {% else %}
+                            أكمل العنوان المختصر، النبذة الذاتية، وصورة الملف الشخصي لتسريع عملية قبول حسابك.
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-outline-variant/30 flex justify-between items-center">
+                    <span class="text-xs font-semibold text-on-surface-variant">الملف التعريفي</span>
+                    {% if profile.is_complete %}
+                        {% include 'partials/_badge.html' with text='مكتمل' type='success' %}
+                    {% else %}
+                        {% include 'partials/_badge.html' with text='ناقص' type='warning' %}
+                    {% endif %}
+                </div>
             </div>
-            <div class="dashboard-card">
-                <h3>الشهادات</h3>
-                <p>أضف شهاداتك وخبراتك لدعم طلب الاعتماد.</p>
-                <a class="btn btn-primary" href="{% url 'teachers:upload_certificate' %}">إضافة شهادة</a>
+
+            <!-- Col 2: Wallet and Balance -->
+            <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                <div>
+                    <h3 class="font-bold text-primary mb-3 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
+                        <span class="material-symbols-outlined text-[18px]">payments</span> المحفظة المالية
+                    </h3>
+                    <p class="text-xs text-on-surface-variant leading-relaxed">
+                        تابع رصيد حصصك المكتملة والمعلقة، وقم بتقديم طلبات سحب الأرباح بسهولة.
+                    </p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-outline-variant/30 flex justify-between items-center">
+                    <a href="{% url 'payments:wallet' %}" class="text-xs text-primary font-bold hover:underline flex items-center gap-0.5">
+                        عرض المحفظة <span class="material-symbols-outlined text-xs">arrow_back</span>
+                    </a>
+                    {% include 'partials/_badge.html' with text='نشط' type='success' %}
+                </div>
             </div>
-            <div class="dashboard-card">
-                <h3>حالة المراجعة</h3>
-                <p>تابع قرار الإدارة وملاحظات التحقق من هنا.</p>
-                <a class="btn btn-primary" href="{% url 'teachers:my_status' %}">عرض الحالة</a>
-            </div>
-            <div class="dashboard-card">
-                <h3>الإتاحة والأسعار</h3>
-                <p>أدر المواد والأسعار والمواعيد الأسبوعية التي يمكنك استقبال الدروس خلالها.</p>
-                <a class="btn btn-primary" href="{% url 'teachers:manage_subjects' %}">إدارة المواد</a>
-                <a class="btn btn-primary" href="{% url 'teachers:manage_availability' %}">إدارة الإتاحة</a>
-            </div>
-            <div class="dashboard-card">
-                <h3>الحجوزات</h3>
-                <p>راجع طلبات الحجز القادمة واقبل أو ارفض الطلبات اليدوية.</p>
-                <a class="btn btn-primary" href="{% url 'bookings:teacher_list' %}">إدارة الحجوزات</a>
-            </div>
-            <div class="dashboard-card">
-                <h3>الرسائل</h3>
-                <p>تابع محادثات الحجوزات والملفات المرفقة من الطلاب وأولياء الأمور.</p>
-                <a class="btn btn-primary" href="{% url 'messaging:inbox' %}">صندوق الرسائل{% if messaging_unread_count %} ({{ messaging_unread_count }}){% endif %}</a>
-            </div>
-            <div class="dashboard-card">
-                <h3>المحفظة والسحب</h3>
-                <p>تابع الرصيد المتاح والمعلق وأرسل طلبات السحب.</p>
-                <a class="btn btn-primary" href="{% url 'payments:wallet' %}">عرض المحفظة</a>
+
+            <!-- Col 3: Messaging and Certificates -->
+            <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                <div>
+                    <h3 class="font-bold text-primary mb-3 flex items-center gap-2 border-b border-outline-variant/30 pb-2">
+                        <span class="material-symbols-outlined text-[18px]">workspace_premium</span> الشهادات والخبرات
+                    </h3>
+                    <p class="text-xs text-on-surface-variant leading-relaxed">
+                        ارفع شهادات التخرج، الماجستير، أو خبرات العمل لتعزيز مصداقيتك وجذب المزيد من أولياء الأمور.
+                    </p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-outline-variant/30 flex justify-between items-center">
+                    <a href="{% url 'teachers:upload_certificate' %}" class="text-xs text-primary font-bold hover:underline">
+                        إضافة شهادة جديدة +
+                    </a>
+                </div>
             </div>
         </div>
+
     {% else %}
-        <div class="status-card status-pending">
-            <h2>لم يتم إنشاء بروفايل المدرس بعد</h2>
-            <p>ابدأ بإكمال بياناتك الأساسية ليدخل طلبك إلى المراجعة.</p>
-            <a class="btn btn-primary" href="{% url 'teachers:setup_profile' %}">إعداد البروفايل</a>
+        <!-- No Profile Created yet -->
+        <div class="status-card border border-warning/30 bg-warning-container/10 text-warning-ink rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-sm max-w-lg mx-auto py-10">
+            <span class="material-symbols-outlined text-[48px] mb-3">account_box</span>
+            <h2 class="font-bold text-lg mb-2">لم تقم بتهيئة ملف المعلم بعد</h2>
+            <p class="text-xs opacity-90 leading-relaxed mb-6">
+                يرجى البدء بتسجيل بياناتك الأساسية والنبذة وخبرات العمل حتى نتمكن من عرض حسابك في محرك البحث للمنصة.
+            </p>
+            <a class="btn btn-primary font-semibold px-8" href="{% url 'teachers:setup_profile' %}">إعداد البروفايل الآن</a>
         </div>
     {% endif %}
 </section>

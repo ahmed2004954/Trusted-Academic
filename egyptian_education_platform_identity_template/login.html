@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html class="light" dir="rtl" lang="ar">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>ثقة أكاديمية - تسجيل الدخول</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#1a1c1a",
+                        "on-secondary-fixed": "#2f1500",
+                        "tertiary": "#3b3d3a",
+                        "on-secondary-fixed-variant": "#6e3900",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#525451",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#faf9f6",
+                        "primary-fixed-dim": "#8bd6b6",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#454745",
+                        "on-secondary-container": "#663500",
+                        "inverse-surface": "#2f312f",
+                        "on-primary-fixed": "#002116",
+                        "on-primary-fixed-variant": "#00513b",
+                        "surface-variant": "#e3e2e0",
+                        "surface-container": "#efeeeb",
+                        "secondary-fixed-dim": "#ffb77d",
+                        "outline": "#6f7973",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#bec9c2",
+                        "surface-tint": "#1b6b51",
+                        "surface-container-high": "#e9e8e5",
+                        "inverse-on-surface": "#f2f1ee",
+                        "on-tertiary-fixed": "#1a1c1a",
+                        "background": "#faf9f6",
+                        "on-surface-variant": "#3f4944",
+                        "secondary-fixed": "#ffdcc3",
+                        "surface": "#faf9f6",
+                        "on-primary-container": "#8bd6b7",
+                        "primary-container": "#065f46",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#fe932c",
+                        "on-tertiary-container": "#c7c8c4",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f4f3f1",
+                        "primary": "#004532",
+                        "tertiary-fixed-dim": "#c6c7c3",
+                        "surface-dim": "#dbdad7",
+                        "surface-container-highest": "#e3e2e0",
+                        "tertiary-fixed": "#e2e3df",
+                        "primary-fixed": "#a6f2d1",
+                        "on-surface": "#1a1c1a",
+                        "secondary": "#904d00",
+                        "inverse-primary": "#8bd6b6",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "16px",
+                        "lg": "40px",
+                        "base": "4px",
+                        "xl": "64px",
+                        "md": "24px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "xs": "8px",
+                        "margin-desktop": "48px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["IBM Plex Sans Arabic", "sans-serif"],
+                        "display-lg": ["IBM Plex Sans Arabic", "sans-serif"],
+                        "display-lg-mobile": ["IBM Plex Sans Arabic", "sans-serif"],
+                        "headline-md": ["IBM Plex Sans Arabic", "sans-serif"],
+                        "body-md": ["IBM Plex Sans Arabic", "sans-serif"],
+                        "title-lg": ["IBM Plex Sans Arabic", "sans-serif"],
+                        "label-md": ["IBM Plex Sans Arabic", "sans-serif"],
+                        "label-sm": ["IBM Plex Sans Arabic", "sans-serif"],
+                        "body-lg": ["IBM Plex Sans Arabic", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["30px", {"lineHeight": "42px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "60px", "fontWeight": "700"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "34px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "title-lg": ["20px", {"lineHeight": "30px", "fontWeight": "500"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "32px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            background-color: #faf9f6;
+            color: #1a1c1a;
+        }
+        .ambient-shadow {
+            box-shadow: 0 4px 24px -4px rgba(0, 69, 50, 0.04), 0 16px 48px -12px rgba(0, 69, 50, 0.08);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-background text-on-background pt-20">
+    <!-- TopNavBar -->
+    <nav class="bg-surface-container-lowest border-b border-outline-variant shadow-sm fixed top-0 w-full z-50 transition-all duration-200">
+        <div class="flex flex-row justify-between items-center px-margin-mobile md:px-margin-desktop h-20 w-full mx-auto max-w-[1440px]">
+            <!-- Brand -->
+            <a class="font-headline-md text-headline-md font-bold text-primary flex items-center gap-2" href="index.html">
+                <span class="material-symbols-outlined icon-fill text-secondary-container">school</span>
+                ثقة أكاديمية
+            </a>
+            <!-- Search (Hidden on Mobile) -->
+            <div class="hidden md:flex flex-1 max-w-md mx-gutter">
+                <div class="relative w-full">
+                    <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+                    <input class="w-full bg-surface-container border border-outline-variant text-on-surface rounded-full py-2 pr-10 pl-4 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary font-body-md text-body-md transition-colors" placeholder="ابحث عن مادة أو معلم..." type="text"/>
+                </div>
+            </div>
+            <!-- Nav Links (Hidden on Mobile) -->
+            <div class="hidden md:flex items-center gap-gutter">
+                <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="index.html">الرئيسية</a>
+                <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="teachers.html">المعلمون</a>
+                <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="messages.html">الرسائل</a>
+            </div>
+            <!-- Actions -->
+            <div class="flex items-center gap-sm">
+                <a href="login.html" class="hidden md:block font-label-md text-label-md text-primary border-b-2 border-primary pb-1 transition-colors">تسجيل الدخول</a>
+                <a href="register.html" class="font-label-md text-label-md bg-primary text-on-primary px-4 py-2 rounded-lg hover:bg-surface-tint transition-colors active:scale-[0.98]">إنشاء حساب</a>
+                <!-- Mobile Menu Toggle -->
+                <button class="md:hidden text-on-surface-variant" onclick="toggleMobileMenu()">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="fixed inset-0 bg-black/50 z-40 hidden transition-all duration-300">
+        <div class="w-64 bg-surface h-full p-md flex flex-col gap-md shadow-lg transition-transform transform translate-x-full duration-300 mr-auto">
+            <div class="flex items-center justify-between pb-sm border-b border-outline-variant">
+                <span class="font-headline-md text-primary font-bold">ثقة أكاديمية</span>
+                <button onclick="toggleMobileMenu()" class="text-on-surface-variant">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <a class="font-label-md text-on-surface-variant" href="index.html">الرئيسية</a>
+            <a class="font-label-md text-on-surface-variant" href="teachers.html">المعلمون</a>
+            <a class="font-label-md text-on-surface-variant" href="messages.html">الرسائل</a>
+            <hr class="border-outline-variant my-xs">
+            <a class="font-label-md text-primary font-bold" href="login.html">تسجيل الدخول</a>
+            <a class="font-label-md text-on-primary bg-primary px-4 py-2 rounded text-center" href="register.html">إنشاء حساب</a>
+        </div>
+    </div>
+
+    <!-- Main Content Canvas -->
+    <main class="flex-grow flex items-center justify-center pt-8 pb-xl px-margin-mobile md:px-margin-desktop relative overflow-hidden">
+        <!-- Decorative Background Elements -->
+        <div class="absolute top-0 right-0 w-1/3 h-1/2 bg-gradient-to-bl from-surface-container to-transparent opacity-50 -z-10 rounded-bl-full pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-1/4 h-1/3 bg-gradient-to-tr from-surface-container to-transparent opacity-50 -z-10 rounded-tr-full pointer-events-none"></div>
+        <!-- Login Card -->
+        <div class="w-full max-w-[480px] bg-surface-container-lowest rounded-xl ambient-shadow p-lg md:p-xl border border-outline-variant/30 relative z-10">
+            <!-- Header -->
+            <div class="text-center mb-lg">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-low mb-sm">
+                    <span class="material-symbols-outlined text-primary text-[32px]" style="font-variation-settings: 'FILL' 1;">
+                        school
+                    </span>
+                </div>
+                <h1 class="font-headline-lg text-headline-lg text-on-background mb-xs">تسجيل الدخول</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant">مرحباً بك مجدداً في منصة ثقة الأكاديمية</p>
+            </div>
+            <!-- Role Selection (Subtle Pills) -->
+            <div class="flex justify-center space-x-reverse space-x-2 mb-lg bg-surface-container-low p-1 rounded-lg">
+                <button id="btn-role-student" onclick="selectRole('student')" class="flex-1 py-2 px-4 rounded font-label-md text-label-md bg-surface-container-lowest text-primary shadow-sm transition-all" type="button">
+                    طالب
+                </button>
+                <button id="btn-role-teacher" onclick="selectRole('teacher')" class="flex-1 py-2 px-4 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary transition-all" type="button">
+                    معلم
+                </button>
+                <button id="btn-role-parent" onclick="selectRole('parent')" class="flex-1 py-2 px-4 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary transition-all" type="button">
+                    ولي أمر
+                </button>
+            </div>
+            <!-- Form -->
+            <form action="#" class="space-y-md" method="POST" id="login-form">
+                <!-- Email/Phone Field -->
+                <div>
+                    <label class="block font-label-md text-label-md text-on-background mb-xs" for="identifier">البريد الإلكتروني أو رقم الهاتف</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">
+                                person
+                            </span>
+                        </div>
+                        <input class="block w-full pl-3 pr-10 py-3 bg-surface-bright border border-outline-variant rounded-lg text-on-background font-body-md text-body-md placeholder-on-surface-variant/50 focus:ring-2 focus:ring-primary focus:border-primary transition-colors" id="identifier" name="identifier" placeholder="أدخل بريدك الإلكتروني أو رقمك" type="text"/>
+                    </div>
+                </div>
+                <!-- Password Field -->
+                <div>
+                    <label class="block font-label-md text-label-md text-on-background mb-xs" for="password">كلمة المرور</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">
+                                lock
+                            </span>
+                        </div>
+                        <input class="block w-full pl-10 pr-10 py-3 bg-surface-bright border border-outline-variant rounded-lg text-on-background font-body-md text-body-md placeholder-on-surface-variant/50 focus:ring-2 focus:ring-primary focus:border-primary transition-colors" id="password" name="password" placeholder="••••••••" type="password"/>
+                        <button class="absolute inset-y-0 left-0 pl-3 flex items-center text-on-surface-variant hover:text-primary transition-colors focus:outline-none" type="button">
+                            <span class="material-symbols-outlined text-[20px]">
+                                visibility_off
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between mt-sm">
+                    <div class="flex items-center">
+                        <input class="h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary bg-surface-bright cursor-pointer" id="remember-me" name="remember-me" type="checkbox"/>
+                        <label class="mr-2 block font-label-md text-label-md text-on-surface-variant cursor-pointer" for="remember-me">
+                            تذكرني
+                        </label>
+                    </div>
+                    <div class="text-sm">
+                        <a class="font-label-md text-label-md text-primary hover:text-primary-container transition-colors" href="#">
+                            نسيت كلمة المرور؟
+                        </a>
+                    </div>
+                </div>
+                <!-- Submit Button -->
+                <div class="pt-sm">
+                    <button id="submit-btn" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm font-label-md text-label-md text-on-primary bg-primary hover:bg-on-primary-fixed-variant focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200" type="submit">
+                        تسجيل الدخول كطالب
+                    </button>
+                </div>
+                <!-- Trust Badge -->
+                <div class="mt-sm flex justify-center items-center text-secondary font-label-sm text-label-sm">
+                    <span class="material-symbols-outlined text-[16px] ml-1" style="font-variation-settings: 'FILL' 1;">
+                        verified_user
+                    </span>
+                    نظام موثق وآمن
+                </div>
+            </form>
+            <!-- Divider -->
+            <div class="mt-lg relative">
+                <div aria-hidden="true" class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-outline-variant"></div>
+                </div>
+                <div class="relative flex justify-center">
+                    <span class="px-2 bg-surface-container-lowest font-label-sm text-label-sm text-on-surface-variant">أو</span>
+                </div>
+            </div>
+            <!-- Sign Up Link -->
+            <div class="mt-lg text-center">
+                <p class="font-body-md text-body-md text-on-surface-variant">
+                    ليس لديك حساب؟ 
+                    <a class="font-label-md text-label-md text-primary hover:text-primary-container font-semibold transition-colors" href="register.html">
+                        إنشاء حساب جديد
+                    </a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Component -->
+    <footer class="w-full bg-surface-container-high dark:bg-surface-container-lowest flex flex-col items-center py-xl px-margin-desktop border-t border-outline-variant mt-auto">
+        <div class="w-full max-w-7xl flex flex-col md:flex-row justify-between items-center md:items-start gap-lg mb-lg">
+            <!-- Brand & Description -->
+            <div class="flex flex-col items-center md:items-start text-center md:text-right max-w-sm">
+                <span class="font-headline-md text-headline-md text-primary dark:text-primary-fixed font-bold mb-sm">
+                    ثقة أكاديمية
+                </span>
+                <p class="font-body-md text-body-md text-on-surface-variant">
+                    منصة تعليمية رائدة تقدم تجربة أكاديمية موثوقة للطلاب والمعلمين، مع التزام كامل بالتميز والمعايير العلمية.
+                </p>
+            </div>
+            <!-- Links -->
+            <div class="flex flex-wrap justify-center md:justify-end gap-x-lg gap-y-sm">
+                <a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface-variant hover:underline decoration-primary transition-all opacity-100 hover:opacity-80" href="#">عن المنصة</a>
+                <a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface-variant hover:underline decoration-primary transition-all opacity-100 hover:opacity-80" href="#">سياسة الخصوصية</a>
+                <a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface-variant hover:underline decoration-primary transition-all opacity-100 hover:opacity-80" href="#">شروط الاستخدام</a>
+                <a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface-variant hover:underline decoration-primary transition-all opacity-100 hover:opacity-80" href="#">الدعم الفني</a>
+                <a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface-variant hover:underline decoration-primary transition-all opacity-100 hover:opacity-80" href="#">التحقق الأكاديمي</a>
+            </div>
+        </div>
+        <div class="w-full border-t border-outline-variant pt-sm flex justify-center text-center">
+            <p class="font-body-md text-body-md text-on-surface-variant opacity-80">
+                © 2024 ثقة أكاديمية. جميع الحقوق محفوظة لجامعة الثقة.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Template Quick Navigator Widget -->
+    <div id="template-navigator" class="fixed bottom-4 left-4 z-50">
+        <button onclick="toggleNavigator()" class="bg-primary text-on-primary p-3 rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all">
+            <span class="material-symbols-outlined">menu_book</span>
+        </button>
+        <div id="navigator-menu" class="hidden absolute bottom-14 left-0 w-80 max-h-[70vh] overflow-y-auto bg-surface-container-lowest border border-outline-variant rounded-lg shadow-xl p-sm flex flex-col gap-xs z-50">
+            <p class="font-label-sm text-outline border-b border-outline-variant pb-xs px-xs">روابط التيمبلت السريعة (35 صفحة)</p>
+            
+            <details class="group" open>
+                <summary class="font-label-md text-primary font-bold cursor-pointer p-xs hover:bg-surface-container rounded flex justify-between items-center select-none">
+                    <span>صفحات عامة (12)</span>
+                    <span class="material-symbols-outlined text-sm group-open:rotate-180 transition-transform">expand_more</span>
+                </summary>
+                <div class="flex flex-col gap-xs pl-xs mt-xs border-r border-outline-variant/30 pr-xs">
+                    <a href="index.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">الرئيسية (Landing)</a>
+                    <a href="teachers.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">دليل المعلمين</a>
+                    <a href="teacher-profile.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">ملف المعلم (عام)</a>
+                    <a href="subjects-browse.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">تصفح المواد الدراسية</a>
+                    <a href="checkout.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">الدفع والحجز (شيك أوت)</a>
+                    <a href="login.html" class="font-label-md text-primary font-bold bg-primary-container/10 p-xs rounded">تسجيل الدخول</a>
+                    <a href="register.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">إنشاء حساب</a>
+                    <a href="about.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">من نحن</a>
+                    <a href="faq.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">الأسئلة الشائعة</a>
+                    <a href="terms.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">الشروط والأحكام</a>
+                    <a href="privacy.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">سياسة الخصوصية</a>
+                    <a href="contact.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">تواصل معنا</a>
+                </div>
+            </details>
+            
+            <hr class="border-outline-variant">
+            
+            <details class="group">
+                <summary class="font-label-md text-primary font-bold cursor-pointer p-xs hover:bg-surface-container rounded flex justify-between items-center select-none">
+                    <span>الطالب وولي الأمر (7)</span>
+                    <span class="material-symbols-outlined text-sm group-open:rotate-180 transition-transform">expand_more</span>
+                </summary>
+                <div class="flex flex-col gap-xs pl-xs mt-xs border-r border-outline-variant/30 pr-xs">
+                    <a href="student-dashboard.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">داشبورد الطالب</a>
+                    <a href="parent-dashboard.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">داشبورد ولي الأمر</a>
+                    <a href="profile.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">الملف الشخصي والربط</a>
+                    <a href="my-bookings.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">حجوزاتي وحضور الحصص</a>
+                    <a href="my-payments.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">مدفوعاتي وفواتيري</a>
+                    <a href="review.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">تقييم المدرس</a>
+                    <a href="report.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">تقرير الأداء الدراسي</a>
+                </div>
+            </details>
+            
+            <hr class="border-outline-variant">
+            
+            <details class="group">
+                <summary class="font-label-md text-primary font-bold cursor-pointer p-xs hover:bg-surface-container rounded flex justify-between items-center select-none">
+                    <span>المعلم (8)</span>
+                    <span class="material-symbols-outlined text-sm group-open:rotate-180 transition-transform">expand_more</span>
+                </summary>
+                <div class="flex flex-col gap-xs pl-xs mt-xs border-r border-outline-variant/30 pr-xs">
+                    <a href="teacher-dashboard.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">داشبورد المعلم</a>
+                    <a href="teacher-profile-edit.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">تعديل الملف الشخصي</a>
+                    <a href="teacher-documents.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">رفع المستندات والشهادات</a>
+                    <a href="subjects.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">إدارة المواد والأسعار</a>
+                    <a href="teacher-availability.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">جدول المواعيد والتوفر</a>
+                    <a href="teacher-bookings.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">الطلبات والحصص القادمة</a>
+                    <a href="teacher-wallet.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">المحفظة والأرباح والسحب</a>
+                    <a href="teacher-reviews.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">تقييمات الطلاب</a>
+                </div>
+            </details>
+            
+            <hr class="border-outline-variant">
+            
+            <details class="group">
+                <summary class="font-label-md text-primary font-bold cursor-pointer p-xs hover:bg-surface-container rounded flex justify-between items-center select-none">
+                    <span>لوحة الإدارة - Admin (8)</span>
+                    <span class="material-symbols-outlined text-sm group-open:rotate-180 transition-transform">expand_more</span>
+                </summary>
+                <div class="flex flex-col gap-xs pl-xs mt-xs border-r border-outline-variant/30 pr-xs">
+                    <a href="admin-dashboard.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">لوحة التحكم الرئيسية</a>
+                    <a href="admin-users.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">إدارة المستخدمين والأدوار</a>
+                    <a href="admin-teachers.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">مراجعة واعتماد المعلمين</a>
+                    <a href="admin-bookings.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">إدارة ومراقبة الحجوزات</a>
+                    <a href="admin-payments.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">مراجعة المدفوعات والرفع</a>
+                    <a href="admin-complaints.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">إدارة الشكاوى والنزاعات</a>
+                    <a href="admin-subjects.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">إدارة المواد والتسعير</a>
+                    <a href="messages.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">غرفة الشات والدعم</a>
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <!-- Interactive Scripts -->
+    <script>
+        let currentRole = 'student';
+
+        function selectRole(role) {
+            currentRole = role;
+            
+            // Reset all buttons styling
+            ['student', 'teacher', 'parent'].forEach(r => {
+                const btn = document.getElementById('btn-role-' + r);
+                if (btn) {
+                    btn.classList.remove('bg-surface-container-lowest', 'shadow-sm', 'text-primary');
+                    btn.classList.add('text-on-surface-variant');
+                }
+            });
+
+            // Set active style for selected button
+            const activeBtn = document.getElementById('btn-role-' + role);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-on-surface-variant');
+                activeBtn.classList.add('bg-surface-container-lowest', 'shadow-sm', 'text-primary');
+            }
+
+            // Update submit button text and form action dynamically for realistic mock flow
+            const submitBtn = document.getElementById('submit-btn');
+            const form = document.getElementById('login-form');
+            if (role === 'student') {
+                submitBtn.innerText = 'تسجيل الدخول كطالب';
+                form.action = 'student-dashboard.html';
+            } else if (role === 'teacher') {
+                submitBtn.innerText = 'تسجيل الدخول كمعلم';
+                form.action = 'teacher-dashboard.html';
+            } else if (role === 'parent') {
+                submitBtn.innerText = 'تسجيل الدخول كولي أمر';
+                form.action = 'parent-dashboard.html';
+            }
+        }
+
+        // Set default action for student
+        document.getElementById('login-form').action = 'student-dashboard.html';
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                setTimeout(() => {
+                    menu.querySelector('.transform').classList.remove('translate-x-full');
+                }, 10);
+            } else {
+                menu.querySelector('.transform').classList.add('translate-x-full');
+                setTimeout(() => {
+                    menu.classList.add('hidden');
+                }, 300);
+            }
+        }
+        function toggleNavigator() {
+            const menu = document.getElementById('navigator-menu');
+            menu.classList.toggle('hidden');
+        }
+        document.addEventListener('click', function(e) {
+            const nav = document.getElementById('template-navigator');
+            if (nav && !nav.contains(e.target)) {
+                document.getElementById('navigator-menu').classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

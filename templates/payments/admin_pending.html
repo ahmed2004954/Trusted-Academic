@@ -1,41 +1,51 @@
 {% extends 'base.html' %}
 
-{% block title %}مراجعة المدفوعات - منصة الدروس الخصوصية{% endblock %}
+{% block title %}مراجعة المدفوعات - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>مدفوعات بانتظار التحقق</h1>
+<section class="page-content text-right">
+    <!-- Header -->
+    <div class="border-b border-outline-variant/30 pb-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="font-display-lg text-primary font-bold">مدفوعات الحصص المعلقة</h1>
+            <p class="text-xs text-on-surface-variant mt-1">تأكيد ومراجعة إيصالات التحويل اليدوي المرفوعة من الطلاب لتفعيل الحصص.</p>
+        </div>
+        <a class="btn btn-secondary text-xs" href="{% url 'adminpanel:dashboard' %}">العودة للوحة الإدارة</a>
+    </div>
+
     {% if payments %}
-        <div class="table-wrap">
+        <div class="overflow-x-auto">
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>الحجز</th>
-                        <th>الطالب</th>
-                        <th>المدرس</th>
-                        <th>المبلغ</th>
-                        <th>طريقة الدفع</th>
-                        <th>تاريخ الرفع</th>
-                        <th></th>
+                        <th class="py-3 px-4">رقم الحجز</th>
+                        <th class="py-3 px-4">الطالب</th>
+                        <th class="py-3 px-4">المعلم</th>
+                        <th class="py-3 px-4">مبلغ الحصّة</th>
+                        <th class="py-3 px-4">طريقة الدفع</th>
+                        <th class="py-3 px-4">تاريخ رفع الإيصال</th>
+                        <th class="py-3 px-4"></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for payment in payments %}
-                        <tr>
-                            <td>#{{ payment.booking.pk }}</td>
-                            <td>{{ payment.booking.student.get_full_name }}</td>
-                            <td>{{ payment.booking.teacher.user.get_full_name }}</td>
-                            <td>{{ payment.amount }} {{ payment.currency }}</td>
-                            <td>{{ payment.get_payment_method_display }}</td>
-                            <td>{{ payment.updated_at|date:'Y-m-d H:i' }}</td>
-                            <td><a class="btn btn-primary" href="{% url 'payments:admin_detail' payment.pk %}">مراجعة</a></td>
+                        <tr class="hover:bg-surface-container-lowest/50 transition-colors">
+                            <td class="py-4 px-4 font-bold text-on-surface">#{{ payment.booking.pk }}</td>
+                            <td class="py-4 px-4 font-semibold text-xs text-on-surface-variant">{{ payment.booking.student.get_full_name }}</td>
+                            <td class="py-4 px-4 font-semibold text-xs text-on-surface-variant">{{ payment.booking.teacher.user.get_full_name }}</td>
+                            <td class="py-4 px-4 font-bold text-primary text-xs">{{ payment.amount }} {{ payment.currency }}</td>
+                            <td class="py-4 px-4 text-xs text-on-surface-variant">{{ payment.get_payment_method_display }}</td>
+                            <td class="py-4 px-4 text-xs text-on-surface-variant">{{ payment.updated_at|date:'Y-m-d H:i' }}</td>
+                            <td class="py-4 px-4 text-left">
+                                <a class="btn btn-primary text-[11px] py-1.5 px-4 font-semibold" href="{% url 'payments:admin_detail' payment.pk %}">مراجعة الإيصال</a>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     {% else %}
-        <p class="empty-state compact">لا توجد مدفوعات بانتظار التحقق.</p>
+        {% include 'partials/_empty_state.html' with icon='payments' title='لا توجد مدفوعات معلقة' desc='تم التحقق من كافة إيصالات سداد الطلاب وتفعيل جميع الحصص بنجاح.' action_url='/adminpanel/' action_text='لوحة الإدارة' %}
     {% endif %}
 </section>
 {% endblock %}

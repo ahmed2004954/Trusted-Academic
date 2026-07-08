@@ -201,3 +201,118 @@ def filtered_users(query, role):
 def audit_logs(request):
     logs = AuditLog.objects.select_related('actor')[:100]
     return render(request, 'adminpanel/audit_logs.html', {'logs': logs})
+
+
+@staff_member_required
+def manage_subjects(request):
+    from subjects.models import Subject, GradeLevel
+    from teachers.models import PlatformPricingRange, LessonType
+    subjects = Subject.objects.all()
+    grade_levels = GradeLevel.objects.all()
+    pricing_ranges = PlatformPricingRange.objects.select_related('subject', 'grade_level').all()
+    return render(request, 'adminpanel/manage_subjects.html', {
+        'subjects': subjects,
+        'grade_levels': grade_levels,
+        'pricing_ranges': pricing_ranges,
+        'lesson_types': LessonType.choices,
+    })
+
+
+@staff_member_required
+def add_subject(request):
+    from subjects.models import Subject
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        if name:
+            Subject.objects.create(name=name)
+            messages.success(request, _('Subject created successfully.'))
+            return redirect('adminpanel:manage_subjects')
+        messages.error(request, _('Subject name is required.'))
+    return redirect('adminpanel:manage_subjects')
+
+
+@staff_member_required
+def edit_subject(request, subject_id):
+    from subjects.models import Subject
+    subject = get_object_or_404(Subject, pk=subject_id)
+    if request.method == 'POST':
+        subject.name = request.POST.get('name', subject.name).strip()
+        subject.is_active = request.POST.get('is_active') == 'on'
+        subject.save()
+        messages.success(request, _('Subject updated successfully.'))
+    return redirect('adminpanel:manage_subjects')
+
+
+@staff_member_required
+def delete_subject(request, subject_id):
+    from subjects.models import Subject
+    if request.method == 'POST':
+        Subject.objects.filter(pk=subject_id).delete()
+        messages.success(request, _('Subject deleted.'))
+    return redirect('adminpanel:manage_subjects')
+
+
+@staff_member_required
+def add_grade_level(request):
+    from subjects.models import GradeLevel
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        category = request.POST.get('category', 'secondary')
+        order = request.POST.get('order', 0)
+        if name:
+            GradeLevel.objects.create(name=name, category=category, order=order)
+            messages.success(request, _('Grade level created successfully.'))
+            return redirect('adminpanel:manage_subjects')
+        messages.error(request, _('Grade level name is required.'))
+    return redirect('adminpanel:manage_subjects')
+
+
+@staff_member_required
+def edit_grade_level(request, gl_id):
+    from subjects.models import GradeLevel
+    gl = get_object_or_404(GradeLevel, pk=gl_id)
+    if request.method == 'POST':
+        gl.name = request.POST.get('name', gl.name).strip()
+        gl.category = request.POST.get('category', gl.category)
+        gl.order = request.POST.get('order', gl.order)
+        gl.is_active = request.POST.get('is_active') == 'on'
+        gl.save()
+        messages.success(request, _('Grade level updated successfully.'))
+    return redirect('adminpanel:manage_subjects')
+
+
+@staff_member_required
+def add_pricing_range(request):
+    from subjects.models import Subject, GradeLevel
+    from teachers.models import PlatformPricingRange, LessonType
+    if request.method == 'POST':
+        subject_id = request.POST.get('subject')
+        grade_level_id = request.POST.get('grade_level')
+        lesson_type = request.POST.get('lesson_type')
+        min_price = request.POST.get('min_price')
+        max_price = request.POST.get('max_price')
+        if all([subject_id, grade_level_id, lesson_type, min_price, max_price]):
+            PlatformPricingRange.objects.create(
+                subject_id=subject_id,
+                grade_level_id=grade_level_id,
+                lesson_type=lesson_type,
+                min_price=min_price,
+                max_price=max_price,
+            )
+            messages.success(request, _('Pricing range created successfully.'))
+            return redirect('adminpanel:manage_subjects')
+        messages.error(request, _('All fields are required.'))
+    return redirect('adminpanel:manage_subjects')
+
+
+@staff_member_required
+def edit_pricing_range(request, pr_id):
+    from teachers.models import PlatformPricingRange
+    pr = get_object_or_404(PlatformPricingRange, pk=pr_id)
+    if request.method == 'POST':
+        pr.min_price = request.POST.get('min_price', pr.min_price)
+        pr.max_price = request.POST.get('max_price', pr.max_price)
+        pr.is_active = request.POST.get('is_active') == 'on'
+        pr.save()
+        messages.success(request, _('Pricing range updated successfully.'))
+    return redirect('adminpanel:manage_subjects')

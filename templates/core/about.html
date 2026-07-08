@@ -1,11 +1,57 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
 
-{% block title %}من نحن - منصة الدروس الخصوصية{% endblock %}
+{% block title %}من نحن - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>من نحن</h1>
-    <p>منصة الدروس الخصوصية هي Marketplace تعليمي يربط بين الطلاب وأولياء الأمور والمدرسين في مصر.</p>
-    <p>هدفنا تسهيل العثور على مدرس مناسب، إدارة الحجوزات، والدفع بطريقة واضحة وآمنة.</p>
-</section>
+<div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-lg w-full">
+    <!-- Hero Section -->
+    <div class="bg-surface-container rounded-2xl p-md md:p-xl mb-xl text-center flex flex-col items-center gap-sm">
+        <span class="material-symbols-outlined text-secondary-container text-5xl icon-fill">groups</span>
+        <h1 class="font-display-lg text-primary">من نحن؟</h1>
+        <p class="font-body-lg text-on-surface-variant max-w-2xl">ثقة أكاديمية هي منصة مصرية رائدة تربط بين الطلاب والمعلمين وأولياء الأمور لتقديم تجربة تعليمية متميزة وآمنة وموثوقة.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-lg mb-xl">
+        <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-md shadow-sm">
+            <h2 class="font-headline-md text-primary mb-sm flex items-center gap-xs">
+                <span class="material-symbols-outlined">visibility</span>
+                رؤيتنا
+            </h2>
+            <p class="font-body-md text-on-surface-variant">أن نصبح المنصة التعليمية الأولى في مصر والشرق الأوسط للعثور على أفضل المعلمين المعتمدين، وتسهيل عملية المتابعة لأولياء الأمور لضمان تحقيق أعلى الدرجات الأكاديمية وبناء جيل متفوق.</p>
+        </div>
+        <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-md shadow-sm">
+            <h2 class="font-headline-md text-primary mb-sm flex items-center gap-xs">
+                <span class="material-symbols-outlined">track_changes</span>
+                رسالتنا
+            </h2>
+            <p class="font-body-md text-on-surface-variant">توفير بيئة تعليمية ذكية تسهل الوصول للدروس الخصوصية بأعلى كفاءة وأقل مجهود مالي وجغرافي، مع توفير نظام تقارير دورية متطور يضمن بقاء ولي الأمر على علم كامل بتقدم ابنه الدراسي.</p>
+        </div>
+    </div>
+
+    <!-- Pillars -->
+    <h2 class="font-headline-lg text-center text-on-surface mb-lg">لماذا يثق بنا الجميع؟</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-xl">
+        <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md text-center flex flex-col items-center gap-xs">
+            <div class="w-12 h-12 rounded-full bg-primary-container/10 flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined text-2xl icon-fill">verified_user</span>
+            </div>
+            <h3 class="font-title-lg font-bold text-on-surface">معلمون معتمدون</h3>
+            <p class="font-body-md text-on-surface-variant">نقوم بالتحقق يدوياً من الهوية والشهادات والخبرات الأكاديمية لكل معلم قبل قبوله في المنصة.</p>
+        </div>
+        <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md text-center flex flex-col items-center gap-xs">
+            <div class="w-12 h-12 rounded-full bg-primary-container/10 flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined text-2xl icon-fill">analytics</span>
+            </div>
+            <h3 class="font-title-lg font-bold text-on-surface">متابعة دقيقة</h3>
+            <p class="font-body-md text-on-surface-variant">يتلقى ولي الأمر تقريراً أكاديمياً مفصلاً بعد كل حصة يوضح نقاط القوة والضعف والواجبات المطلوبة.</p>
+        </div>
+        <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md text-center flex flex-col items-center gap-xs">
+            <div class="w-12 h-12 rounded-full bg-primary-container/10 flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined text-2xl icon-fill">payments</span>
+            </div>
+            <h3 class="font-title-lg font-bold text-on-surface">دفع يدوّي سهل</h3>
+            <p class="font-body-md text-on-surface-variant">دعم كامل لوسائل التحويل المحلية كـ Vodafone Cash وInstapay لتوفير أقصى درجات السهولة والراحة.</p>
+        </div>
+    </div>
+</div>
 {% endblock %}

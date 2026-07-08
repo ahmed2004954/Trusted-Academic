@@ -288,3 +288,13 @@ def delete_availability(request, pk):
         'teachers/manage_availability.html',
         {'availability_slot': availability_slot, 'confirm_delete': True, 'profile': profile},
     )
+
+
+@teacher_required
+def my_reviews(request):
+    profile = get_object_or_404(TeacherProfile, user=request.user)
+    from reviews.models import Review
+    reviews = Review.objects.filter(teacher=profile, is_visible=True).select_related(
+        'student', 'booking__subject', 'booking__grade_level'
+    ).order_by('-created_at')
+    return render(request, 'teachers/my_reviews.html', {'profile': profile, 'reviews': reviews})

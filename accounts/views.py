@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
@@ -51,5 +52,38 @@ def register_view(request, role=None):
 
 @login_required
 def profile_view(request):
-    """Placeholder profile view."""
-    return render(request, 'accounts/profile.html')
+    """User profile view with role-specific data."""
+    context = {'user_profile': request.user}
+    student_profile = None
+    if request.user.role == 'student':
+        from students.models import StudentProfile
+        from subjects.models import GradeLevel
+        student_profile, _created = StudentProfile.objects.get_or_create(user=request.user)
+        student_profile.generate_linking_code()
+        context['student_profile'] = student_profile
+        context['grade_levels'] = GradeLevel.objects.all()
+        context['linked_parents'] = [
+            link.parent.user for link in request.user.parent_links.select_related('parent__user')
+        ]
+    elif request.user.role == 'teacher':
+        from teachers.models import TeacherProfile
+        profile, _created = TeacherProfile.objects.get_or_create(user=request.user)
+        context['teacher_profile'] = profile
+    elif request.user.role == 'parent':
+        from parents.models import ParentProfile
+        profile, _created = ParentProfile.objects.get_or_create(user=request.user)
+        context['parent_profile'] = profile
+        context['linked_students'] = profile.students.all()
+    if request.method == 'POST':
+        request.user.full_name = request.POST.get('full_name', request.user.full_name)
+        request.user.phone = request.POST.get('phone', request.user.phone)
+        request.user.save()
+        if student_profile is not None:
+            from subjects.models import GradeLevel
+            grade_id = request.POST.get('grade_level')
+            student_profile.grade_level = GradeLevel.objects.filter(pk=grade_id).first() if grade_id else None
+            student_profile.school_name = request.POST.get('school_name', student_profile.school_name)
+            student_profile.save()
+        messages.success(request, _('Profile updated successfully.'))
+        return redirect('accounts:profile')
+    return render(request, 'accounts/profile.html', context)

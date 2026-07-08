@@ -1,48 +1,98 @@
 {% extends 'base.html' %}
 
-{% block title %}لوحة الإدارة - منصة الدروس الخصوصية{% endblock %}
+{% block title %}لوحة الإدارة العامة - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content dashboard">
-    <h1>لوحة الإدارة</h1>
-    <p>مرحباً بك في لوحة الإدارة. من هنا يمكنك مراجعة المدرسين والحجوزات والمدفوعات.</p>
-
-    <h2>ملخص التشغيل</h2>
-    <div class="dashboard-grid">
-        <div class="card"><strong>إجمالي المستخدمين</strong><span>{{ metrics.total_users }}</span></div>
-        <div class="card"><strong>حجوزات اليوم</strong><span>{{ metrics.today_bookings }}</span></div>
-        <div class="card"><strong>حجوزات هذا الأسبوع</strong><span>{{ metrics.week_bookings }}</span></div>
-        <div class="card"><strong>الحجوزات المكتملة</strong><span>{{ metrics.completed_bookings }}</span></div>
-        <div class="card"><strong>مدفوعات بانتظار التحقق</strong><span>{{ metrics.pending_payments }}</span></div>
-        <div class="card"><strong>شكاوى مفتوحة/قيد المراجعة</strong><span>{{ metrics.open_complaints }}</span></div>
-        <div class="card"><strong>طلبات سحب معلقة</strong><span>{{ metrics.pending_withdrawals }}</span></div>
+<section class="page-content dashboard text-right">
+    <!-- Welcome Header -->
+    <div class="border-b border-outline-variant/30 pb-4 mb-8">
+        <h1 class="font-display-lg text-primary font-bold">لوحة الإدارة والتحكم الإشرافي</h1>
+        <p class="text-xs text-on-surface-variant mt-1">متابعة سير العمليات، مراجعة طلبات تفعيل المعلمين، وتأكيد الإيصالات المالية والشكاوى.</p>
     </div>
 
-    <h2>المستخدمون حسب الدور</h2>
-    <ul class="item-list">
-        {% for row in metrics.users_by_role %}
-            <li><strong>{{ row.role }}</strong><span>{{ row.count }}</span></li>
-        {% empty %}
-            <li>لا يوجد مستخدمون بعد.</li>
-        {% endfor %}
-    </ul>
-
-    <h2>حالات المدرسين</h2>
-    <div class="dashboard-grid">
-        <div class="card"><strong>قيد المراجعة</strong><span>{{ metrics.teacher_counts.pending }}</span></div>
-        <div class="card"><strong>معتمد</strong><span>{{ metrics.teacher_counts.approved }}</span></div>
-        <div class="card"><strong>مرفوض</strong><span>{{ metrics.teacher_counts.rejected }}</span></div>
-        <div class="card"><strong>موقوف</strong><span>{{ metrics.teacher_counts.suspended }}</span></div>
-    </div>
-
-    <h2>إجراءات سريعة</h2>
-    <div class="dashboard-grid">
+    <!-- Quick Action Links Grid -->
+    <h2 class="font-bold text-sm text-primary mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px]">bolt</span> الإجراءات الإدارية السريعة
+    </h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {% for action in quick_actions %}
-            <a class="card" href="{{ action.url }}">
-                <strong>{{ action.label }}</strong>
-                {% if action.count != None %}<span>{{ action.count }}</span>{% endif %}
+            <a class="bg-surface border border-outline-variant/50 rounded-2xl p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex justify-between items-center text-xs" href="{{ action.url }}">
+                <span class="font-bold text-on-surface">{{ action.label }}</span>
+                {% if action.count != None %}
+                    {% include 'partials/_badge.html' with text=action.count type='error' %}
+                {% endif %}
             </a>
         {% endfor %}
+    </div>
+
+    <!-- Metrics Column Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <!-- Col 1: Operational Summary -->
+        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm">
+            <h3 class="font-bold text-primary mb-4 border-b border-outline-variant/30 pb-2 text-sm flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">query_stats</span> ملخص التشغيل
+            </h3>
+            <div class="flex flex-col gap-3 text-xs">
+                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
+                    <span class="text-on-surface-variant font-medium">إجمالي المستخدمين:</span>
+                    <span class="text-on-surface font-bold">{{ metrics.total_users }}</span>
+                </div>
+                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
+                    <span class="text-on-surface-variant font-medium">حجوزات اليوم:</span>
+                    <span class="text-on-surface font-bold">{{ metrics.today_bookings }}</span>
+                </div>
+                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
+                    <span class="text-on-surface-variant font-medium">حجوزات هذا الأسبوع:</span>
+                    <span class="text-on-surface font-bold">{{ metrics.week_bookings }}</span>
+                </div>
+                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
+                    <span class="text-on-surface-variant font-medium">الحجوزات المكتملة:</span>
+                    <span class="text-on-surface font-bold">{{ metrics.completed_bookings }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Col 2: Users Roles -->
+        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm">
+            <h3 class="font-bold text-primary mb-4 border-b border-outline-variant/30 pb-2 text-sm flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">groups</span> المستخدمون حسب الدور
+            </h3>
+            <div class="flex flex-col gap-3 text-xs">
+                {% for row in metrics.users_by_role %}
+                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
+                    <span class="text-on-surface-variant font-medium">{{ row.role }}:</span>
+                    <span class="text-on-surface font-bold">{{ row.count }}</span>
+                </div>
+                {% empty %}
+                <p class="text-xs text-on-surface-variant py-4">لا يوجد مستخدمون بعد.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Col 3: Teacher statuses -->
+        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm">
+            <h3 class="font-bold text-primary mb-4 border-b border-outline-variant/30 pb-2 text-sm flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">badge</span> حالات حسابات المعلمين
+            </h3>
+            <div class="flex flex-col gap-3 text-xs">
+                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
+                    <span class="text-on-surface-variant font-medium">معلمون قيد المراجعة:</span>
+                    {% include 'partials/_badge.html' with text=metrics.teacher_counts.pending type='warning' %}
+                </div>
+                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
+                    <span class="text-on-surface-variant font-medium">معلمون معتمدون:</span>
+                    {% include 'partials/_badge.html' with text=metrics.teacher_counts.approved type='success' %}
+                </div>
+                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
+                    <span class="text-on-surface-variant font-medium">طلبات مرفوضة:</span>
+                    {% include 'partials/_badge.html' with text=metrics.teacher_counts.rejected type='error' %}
+                </div>
+                <div class="flex justify-between items-center bg-surface-container-low px-4 py-2.5 rounded-xl">
+                    <span class="text-on-surface-variant font-medium">حسابات موقوفة:</span>
+                    {% include 'partials/_badge.html' with text=metrics.teacher_counts.suspended type='error' %}
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 {% endblock %}

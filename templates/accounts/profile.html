@@ -1,13 +1,96 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}الملف الشخصي - منصة الدروس الخصوصية{% endblock %}
+{% block title %}الملف الشخصي - ثقة أكاديمية{% endblock %}
+{% block nav_active %}profile{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>الملف الشخصي</h1>
-    <p><strong>الاسم:</strong> {{ user.full_name }}</p>
-    <p><strong>البريد الإلكتروني:</strong> {{ user.email }}</p>
-    <p><strong>رقم الهاتف:</strong> {{ user.phone|default:"غير متوفر" }}</p>
-    <p><strong>نوع الحساب:</strong> {{ user.get_role_display }}</p>
-</section>
+<div class="max-w-[1200px] mx-auto px-margin-mobile md:px-margin-desktop py-lg w-full">
+    <h1 class="font-headline-lg text-headline-lg text-primary mb-lg">إدارة الملف الشخصي</h1>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+        <!-- Details Form -->
+        <div class="col-span-1 {% if user.role == 'student' %}lg:col-span-8{% else %}lg:col-span-12{% endif %} bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-md md:p-lg shadow-sm flex flex-col gap-md">
+            <h2 class="font-title-lg text-title-lg font-bold text-on-surface flex items-center gap-xs pb-xs border-b border-outline-variant/30">
+                <span class="material-symbols-outlined text-primary">person</span>
+                البيانات الشخصية
+            </h2>
+            <form method="post" class="flex flex-col gap-sm">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                    <div class="flex flex-col gap-base">
+                        <label class="font-label-sm text-label-sm text-on-surface-variant" for="full_name">الاسم بالكامل</label>
+                        <input id="full_name" name="full_name" type="text" value="{{ user.full_name }}" required class="bg-surface-container border border-outline-variant rounded-lg p-xs text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                    </div>
+                    <div class="flex flex-col gap-base">
+                        <label class="font-label-sm text-label-sm text-on-surface-variant" for="phone">رقم الهاتف</label>
+                        <input id="phone" name="phone" type="tel" value="{{ user.phone }}" class="bg-surface-container border border-outline-variant rounded-lg p-xs text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                    </div>
+                </div>
+                <div class="flex flex-col gap-base">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant" for="email">البريد الإلكتروني</label>
+                    <input id="email" type="email" value="{{ user.email }}" disabled class="bg-surface-container-high border border-outline-variant rounded-lg p-xs text-on-surface-variant cursor-not-allowed">
+                    <span class="font-label-sm text-label-sm text-outline">لا يمكن تغيير البريد الإلكتروني.</span>
+                </div>
+                <div class="flex flex-col gap-base">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant">نوع الحساب</label>
+                    <input type="text" value="{{ user.get_role_display }}" disabled class="bg-surface-container-high border border-outline-variant rounded-lg p-xs text-on-surface-variant cursor-not-allowed w-fit px-md">
+                </div>
+                {% if user.role == 'student' %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                    <div class="flex flex-col gap-base">
+                        <label class="font-label-sm text-label-sm text-on-surface-variant" for="grade_level">المرحلة التعليمية</label>
+                        <select id="grade_level" name="grade_level" class="bg-surface-container border border-outline-variant rounded-lg p-xs text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                            <option value="">غير محددة</option>
+                            {% for grade in grade_levels %}
+                                <option value="{{ grade.id }}" {% if student_profile.grade_level_id == grade.id %}selected{% endif %}>{{ grade.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-base">
+                        <label class="font-label-sm text-label-sm text-on-surface-variant" for="school_name">المدرسة</label>
+                        <input id="school_name" name="school_name" type="text" value="{{ student_profile.school_name }}" class="bg-surface-container border border-outline-variant rounded-lg p-xs text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                    </div>
+                </div>
+                {% endif %}
+                <button type="submit" class="bg-primary text-on-primary font-label-md text-label-md py-2 rounded-lg hover:bg-surface-tint transition-all active:scale-[0.98] w-fit px-lg mt-sm">حفظ التغييرات</button>
+            </form>
+        </div>
+
+        {% if user.role == 'student' %}
+        <!-- Parent linking card -->
+        <div class="col-span-1 lg:col-span-4 bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-md shadow-sm flex flex-col gap-md h-fit">
+            <h2 class="font-title-lg text-title-lg font-bold text-on-surface flex items-center gap-xs pb-xs border-b border-outline-variant/30">
+                <span class="material-symbols-outlined text-primary">family_restroom</span>
+                ربط حساب ولي الأمر
+            </h2>
+
+            <div class="bg-surface-container rounded-xl p-md border border-outline-variant/30 flex flex-col gap-xs">
+                <p class="font-label-sm text-label-sm text-outline">كود الربط الخاص بك (يستخدمه ولي الأمر لربط حسابه بحسابك)</p>
+                <div class="flex gap-sm items-center mt-xs">
+                    <span id="linking-code" class="font-headline-md text-headline-md text-primary font-mono tracking-wider bg-surface border border-outline-variant/60 px-md py-xs rounded-lg select-all">{{ student_profile.linking_code }}</span>
+                    <button type="button" onclick="navigator.clipboard.writeText('{{ student_profile.linking_code }}');" class="text-on-surface-variant hover:text-primary transition-all" aria-label="نسخ">
+                        <span class="material-symbols-outlined text-2xl">content_copy</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="border-t border-outline-variant/30 pt-sm mt-xs">
+                <h3 class="font-label-md text-label-md font-bold text-on-surface mb-xs">أولياء الأمور المرتبطون:</h3>
+                {% for parent in linked_parents %}
+                <div class="flex items-center gap-sm bg-primary-container/10 p-sm rounded-lg border border-primary-container/20 mb-xs">
+                    <span class="material-symbols-outlined text-primary text-3xl icon-fill">account_circle</span>
+                    <div>
+                        <p class="font-label-md text-label-md font-bold text-on-surface">{{ parent.get_full_name }}</p>
+                        <p class="font-label-sm text-label-sm text-on-surface-variant">{{ parent.email }}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="font-body-md text-body-md text-on-surface-variant">لا يوجد ولي أمر مرتبط بحسابك حالياً.</p>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

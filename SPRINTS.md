@@ -520,29 +520,29 @@
 **Goal:**Complete public-facing pages, improve UX, and prepare for launch.
 
 ### Tasks
-- [ ] Homepage with subjects and featured teachers
-- [ ] About us page
-- [ ] FAQ page
-- [ ] Terms and conditions page
-- [ ] Privacy policy page
-- [ ] Contact us page
-- [ ] Improve mobile responsiveness
-- [ ] Add loading states and HTMX interactions
-- [ ] Add flash messages/toast notifications
-- [ ] Review and tighten permissions
-- [ ] Add CSRF protection and security headers
-- [ ] Write key tests:
-  - teacher onboarding seam
-  - teacher discovery seam
-  - booking seam
-  - payment verification seam
-  - attendance/completion seam
-  - wallet/withdrawal seam
-  - parent linkage seam
-  - complaints seam
-- [ ] Add fixtures for demo data
-- [ ] Prepare deployment checklist
-- [ ] Write launch README
+- [x] Homepage with subjects and featured teachers
+- [x] About us page
+- [x] FAQ page
+- [x] Terms and conditions page
+- [x] Privacy policy page
+- [x] Contact us page
+- [x] Improve mobile responsiveness
+- [x] Add loading states and HTMX interactions
+- [x] Add flash messages/toast notifications
+- [x] Review and tighten permissions
+- [x] Add CSRF protection and security headers
+- [x] Write key tests:
+  - [x] teacher onboarding seam
+  - [x] teacher discovery seam
+  - [x] booking seam
+  - [x] payment verification seam
+  - [x] attendance/completion seam
+  - [x] wallet/withdrawal seam
+  - [x] parent linkage seam
+  - [x] complaints seam
+- [x] Add fixtures for demo data
+- [x] Prepare deployment checklist
+- [x] Write launch README
 
 **Deliverables:**
 - Complete public pages

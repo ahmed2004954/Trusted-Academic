@@ -19,4 +19,5 @@ urlpatterns = [
     path('availability/add/', views.add_availability, name='add_availability'),
     path('availability/<int:pk>/edit/', views.edit_availability, name='edit_availability'),
     path('availability/<int:pk>/delete/', views.delete_availability, name='delete_availability'),
+    path('reviews/', views.my_reviews, name='my_reviews'),
 ]

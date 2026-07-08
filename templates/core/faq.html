@@ -1,19 +1,59 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
 
-{% block title %}الأسئلة الشائعة - منصة الدروس الخصوصية{% endblock %}
+{% block title %}الأسئلة الشائعة - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>الأسئلة الشائعة</h1>
-    <dl>
-        <dt>كيف يمكنني حجز حصة؟</dt>
-        <dd>اختر المادة والمرحلة، استعرض المدرسين، اختر موعدًا مناسبًا، ثم أكمل الدفع.</dd>
+<div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-lg w-full">
+    <div class="text-center mb-xl">
+        <h1 class="font-display-lg text-primary mb-xs">الأسئلة الشائعة</h1>
+        <p class="font-body-lg text-on-surface-variant max-w-2xl mx-auto">كل ما تريد معرفته عن منصة ثقة أكاديمية، وكيفية حجز الحصص والدفع والمتابعة.</p>
+    </div>
 
-        <dt>هل يمكنني التصفح بدون تسجيل؟</dt>
-        <dd>نعم، يمكنك تصفح المدرسين والمواد بدون حساب. الحجز يتطلب إنشاء حساب.</dd>
+    <div class="max-w-3xl mx-auto flex flex-col gap-sm">
+        <!-- FAQ 1 -->
+        <details class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm group">
+            <summary class="font-title-lg font-bold text-on-surface cursor-pointer select-none flex justify-between items-center list-none">
+                <span>كيف يمكنني حجز حصة مع مدرس؟</span>
+                <span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform">expand_more</span>
+            </summary>
+            <p class="font-body-md text-on-surface-variant mt-sm pr-xs">يمكنك تصفح المواد الدراسية أو قائمة المدرسين، واختيار المدرس المناسب وتحديد وقت التوفر المناسب لك، ثم إنشاء الحساب ودفع قيمة الحصة يدوياً وتأكيدها برفع الإيصال.</p>
+        </details>
 
-        <dt>كيف يتم الدفع؟</dt>
-        <dd>في النسخة الأولى يتم الدفع يدويًا عبر فودافون كاش أو انستاباي، مع رفع إيصال للتأكيد.</dd>
-    </dl>
-</section>
+        <!-- FAQ 2 -->
+        <details class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm group">
+            <summary class="font-title-lg font-bold text-on-surface cursor-pointer select-none flex justify-between items-center list-none">
+                <span>ما هي وسائل الدفع المتاحة؟</span>
+                <span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform">expand_more</span>
+            </summary>
+            <p class="font-body-md text-on-surface-variant mt-sm pr-xs">ندعم حالياً الدفع اليدوي من خلال المحافظ الإلكترونية مثل فودافون كاش، أو عبر تطبيق انستاباي (Instapay)، وتأكيد الحجز يتم فور مراجعة الإدارة للصورة المرفوعة للإيصال.</p>
+        </details>
+
+        <!-- FAQ 3 -->
+        <details class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm group">
+            <summary class="font-title-lg font-bold text-on-surface cursor-pointer select-none flex justify-between items-center list-none">
+                <span>ما هي سياسة إلغاء الحصص أو إعادة جدولتها؟</span>
+                <span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform">expand_more</span>
+            </summary>
+            <p class="font-body-md text-on-surface-variant mt-sm pr-xs">إذا قمت بالإلغاء قبل موعد الحصة بأكثر من 6 ساعات، تحصل على استرداد كامل للمبلغ. أما إذا كان الإلغاء قبل الحصة بأقل من 6 ساعات فيتم خصم 20% كرسوم حجز للمدرس. في حال غياب المعلم يُرد كامل المبلغ أو يتم توفير جدولة مجانية.</p>
+        </details>
+
+        <!-- FAQ 4 -->
+        <details class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm group">
+            <summary class="font-title-lg font-bold text-on-surface cursor-pointer select-none flex justify-between items-center list-none">
+                <span>كيف يتم حضور الحصص أونلاين؟</span>
+                <span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform">expand_more</span>
+            </summary>
+            <p class="font-body-md text-on-surface-variant mt-sm pr-xs">تتم الحصص حالياً عبر أدوات الفصول الافتراضية الخارجية مثل Zoom أو Google Meet. بعد تأكيد الحجز، ستجد رابط اللقاء في داشبورد الطالب/ولي الأمر الخاص بك.</p>
+        </details>
+
+        <!-- FAQ 5 -->
+        <details class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm group">
+            <summary class="font-title-lg font-bold text-on-surface cursor-pointer select-none flex justify-between items-center list-none">
+                <span>كيف يمكن لولي الأمر متابعة أداء ابنه؟</span>
+                <span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform">expand_more</span>
+            </summary>
+            <p class="font-body-md text-on-surface-variant mt-sm pr-xs">يمكن لولي الأمر ربط حسابه بحساب ابنه باستخدام كود الربط، وسيبدأ في تلقي إيميلات تحتوي على تقرير الأداء المكتوب من قِبل المعلم بعد كل حصة، بالإضافة إلى إمكانية استعراض التقارير كاملة من لوحته الخاصة.</p>
+        </details>
+    </div>
+</div>
 {% endblock %}

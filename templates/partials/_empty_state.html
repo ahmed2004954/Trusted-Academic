@@ -1,0 +1,12 @@
+<div class="bg-surface border border-outline-variant/50 rounded-2xl p-12 text-center shadow-sm w-full">
+    <span class="material-symbols-outlined text-primary text-[56px]">{{ icon|default:'search_off' }}</span>
+    <h3 class="font-headline-md text-headline-md text-on-surface font-bold mt-4">{{ title }}</h3>
+    <p class="font-body-md text-body-md text-on-surface-variant mt-2 max-w-md mx-auto leading-relaxed">
+        {{ desc }}
+    </p>
+    {% if action_url and action_text %}
+    <a href="{{ action_url }}" class="inline-flex items-center gap-2 bg-primary text-on-primary font-semibold px-6 py-2.5 rounded-xl hover:bg-primary-hover hover:shadow-sm hover:-translate-y-0.5 transition-all mt-6 active:scale-[0.98]">
+        {{ action_text }}
+    </a>
+    {% endif %}
+</div>

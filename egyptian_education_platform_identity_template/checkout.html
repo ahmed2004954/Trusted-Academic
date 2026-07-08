@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" dir="rtl" lang="ar">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>الدفع وإتمام الحجز | ثقة أكاديمية</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #faf9f6; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #bec9c2; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6f7973; 
+        }
+        @keyframes pulse-border {
+            0% { border-color: #bec9c2; }
+            50% { border-color: #004532; }
+            100% { border-color: #bec9c2; }
+        }
+        .upload-drag-active {
+            animation: pulse-border 1.5s infinite;
+            background-color: #f4f3f1;
+        }
+    </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-fixed": "#1a1c1a",
+                      "surface-dim": "#dbdad7",
+                      "primary-container": "#065f46",
+                      "on-secondary-container": "#663500",
+                      "background": "#faf9f6",
+                      "surface-container-low": "#f4f3f1",
+                      "on-error": "#ffffff",
+                      "surface-container-high": "#e9e8e5",
+                      "on-primary-fixed": "#002116",
+                      "on-surface": "#1a1c1a",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-container": "#c7c8c4",
+                      "secondary-fixed-dim": "#ffb77d",
+                      "on-tertiary": "#ffffff",
+                      "primary": "#004532",
+                      "tertiary-fixed-dim": "#c6c7c3",
+                      "tertiary-fixed": "#e2e3df",
+                      "outline": "#6f7973",
+                      "surface": "#faf9f6",
+                      "surface-container-lowest": "#ffffff",
+                      "on-background": "#1a1c1a",
+                      "surface-tint": "#1b6b51",
+                      "on-tertiary-fixed-variant": "#454745",
+                      "inverse-surface": "#2f312f",
+                      "tertiary-container": "#525451",
+                      "secondary": "#904d00",
+                      "primary-fixed": "#a6f2d1",
+                      "tertiary": "#3b3d3a",
+                      "primary-fixed-dim": "#8bd6b6",
+                      "on-secondary-fixed-variant": "#6e3900",
+                      "inverse-primary": "#8bd6b6",
+                      "on-secondary": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "surface-bright": "#faf9f6",
+                      "on-secondary-fixed": "#2f1500",
+                      "outline-variant": "#bec9c2",
+                      "on-primary-fixed-variant": "#00513b",
+                      "secondary-container": "#fe932c",
+                      "surface-container": "#efeeeb",
+                      "error-container": "#ffdad6",
+                      "surface-container-highest": "#e3e2e0",
+                      "surface-variant": "#e3e2e0",
+                      "on-surface-variant": "#3f4944",
+                      "secondary-fixed": "#ffdcc3",
+                      "on-primary-container": "#8bd6b7",
+                      "inverse-on-surface": "#f2f1ee",
+                      "error": "#ba1a1a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-desktop": "48px",
+                      "md": "24px",
+                      "sm": "16px",
+                      "xs": "8px",
+                      "lg": "40px",
+                      "gutter": "24px",
+                      "xl": "64px",
+                      "margin-mobile": "16px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "display-lg-mobile": ["IBM Plex Sans Arabic", "sans-serif"],
+                      "label-md": ["IBM Plex Sans Arabic", "sans-serif"],
+                      "headline-lg": ["IBM Plex Sans Arabic", "sans-serif"],
+                      "body-lg": ["IBM Plex Sans Arabic", "sans-serif"],
+                      "label-sm": ["IBM Plex Sans Arabic", "sans-serif"],
+                      "headline-md": ["IBM Plex Sans Arabic", "sans-serif"],
+                      "display-lg": ["IBM Plex Sans Arabic", "sans-serif"],
+                      "title-lg": ["IBM Plex Sans Arabic", "sans-serif"],
+                      "body-md": ["IBM Plex Sans Arabic", "sans-serif"]
+              },
+              "fontSize": {
+                      "display-lg-mobile": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                      "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                      "headline-lg": ["30px", { "lineHeight": "42px", "fontWeight": "600" }],
+                      "body-lg": ["18px", { "lineHeight": "32px", "fontWeight": "400" }],
+                      "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+                      "headline-md": ["24px", { "lineHeight": "34px", "fontWeight": "600" }],
+                      "display-lg": ["48px", { "lineHeight": "60px", "fontWeight": "700" }],
+                      "title-lg": ["20px", { "lineHeight": "30px", "fontWeight": "500" }],
+                      "body-md": ["16px", { "lineHeight": "28px", "fontWeight": "400" }]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col pt-20">
+    <!-- TopNavBar -->
+    <nav class="bg-surface-container-lowest border-b border-outline-variant shadow-sm fixed top-0 w-full z-50 transition-all duration-200">
+        <div class="flex flex-row justify-between items-center px-margin-mobile md:px-margin-desktop h-20 w-full mx-auto max-w-[1440px]">
+            <!-- Brand -->
+            <a class="font-headline-md text-headline-md font-bold text-primary flex items-center gap-2" href="index.html">
+                <span class="material-symbols-outlined icon-fill text-secondary-container">school</span>
+                ثقة أكاديمية
+            </a>
+            <!-- Safe Badge -->
+            <div class="flex items-center gap-sm">
+                <span class="material-symbols-outlined text-on-surface-variant">lock</span>
+                <span class="font-label-md text-label-md text-on-surface-variant">دفع آمن للدروس</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Canvas -->
+    <main class="flex-grow w-full max-w-[1200px] mx-auto px-margin-mobile md:px-margin-desktop py-xl">
+        <!-- Header Section -->
+        <div class="mb-lg text-center md:text-right">
+            <h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">إتمام الحجز والدفع</h1>
+            <p class="font-body-md text-body-md text-on-surface-variant">يرجى مراجعة تفاصيل الحجز واتباع خطوات الدفع اليدوي لتأكيد مقعدك.</p>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+            <!-- Right Column: Booking Summary & Trust Signals -->
+            <aside class="lg:col-span-4 order-2 lg:order-1 flex flex-col gap-md">
+                <!-- Booking Summary Card -->
+                <div class="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-[0_4px_16px_rgba(0,69,50,0.06)] p-md">
+                    <div class="flex items-center justify-between mb-sm border-b border-outline-variant pb-sm">
+                        <h2 class="font-title-lg text-title-lg text-on-surface">ملخص الحجز</h2>
+                        <span class="font-label-sm text-label-sm bg-surface-container-low text-on-surface-variant px-xs py-base rounded-full">معرف: #TQA-8924</span>
+                    </div>
+                    <div class="space-y-sm mb-md">
+                        <div class="flex items-start gap-sm">
+                            <img class="w-12 h-12 rounded-full object-cover border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGsfMBTPsQnd_CTS-xK5IQ6ggoium3nw_SGnRvG3dvzTdtlYwaY2BR_VypJo80ChNdDrf1662rCTXI7adAaeDkWcdjT8IcBZiClOgHaN7dFQBvFoUjGyz64ahYgsFQs4cob9dGZ14BeOYt-kvXdnubXFu1J5hoyonugXL1AalVzeEjJeLY0M-dyF8NlErxVFRdINiGtBndQV2V-CebrewqAP6DfFRAUcSWR3Cn4_YN8nEy55AOxaDMmLhGMKIMdCt0zd-v1QHUrrk"/>
+                            <div>
+                                <p class="font-label-sm text-label-sm text-on-surface-variant">المعلم</p>
+                                <p class="font-body-md text-body-md text-on-surface font-semibold">د. أحمد محمود</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center py-xs border-b border-surface-variant">
+                            <span class="font-body-md text-body-md text-on-surface-variant">المادة</span>
+                            <span class="font-body-md text-body-md text-on-surface">الفيزياء المتقدمة - الصف العاشر</span>
+                        </div>
+                        <div class="flex justify-between items-center py-xs border-b border-surface-variant">
+                            <span class="font-body-md text-body-md text-on-surface-variant">التاريخ والوقت</span>
+                            <span class="font-body-md text-body-md text-on-surface" dir="ltr">15 أكتوبر, 10:00 ص</span>
+                        </div>
+                        <div class="flex justify-between items-center py-xs">
+                            <span class="font-body-md text-body-md text-on-surface-variant">النوع</span>
+                            <span class="font-label-sm text-label-sm bg-[#e6f4ea] text-primary px-xs py-base rounded-full flex items-center gap-base">
+                                <span class="material-symbols-outlined text-[14px]">videocam</span> أونلاين
+                            </span>
+                        </div>
+                    </div>
+                    <div class="bg-surface-container-low p-sm rounded-DEFAULT border border-outline-variant flex justify-between items-center mt-sm">
+                        <span class="font-title-lg text-title-lg text-on-surface">الإجمالي</span>
+                        <span class="font-headline-md text-headline-md text-primary font-bold">150 ج.م</span>
+                    </div>
+                </div>
+                <!-- Trust Signals Card -->
+                <div class="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-[0_4px_16px_rgba(0,69,50,0.04)] p-md flex flex-col gap-sm">
+                    <div class="flex items-center gap-sm">
+                        <div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-secondary">
+                            <span class="material-symbols-outlined text-[20px]">shield_lock</span>
+                        </div>
+                        <div>
+                            <p class="font-label-md text-label-md text-on-surface font-semibold">ضمان أكاديمي موثق</p>
+                            <p class="font-label-sm text-label-sm text-on-surface-variant">جميع المعلمين معتمدون</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+            <!-- Left Column: Payment Process -->
+            <div class="lg:col-span-8 order-1 lg:order-2 flex flex-col gap-lg">
+                <!-- Step 1: Payment Guide -->
+                <section class="bg-surface-container-lowest rounded-xl shadow-[0_8px_24px_rgba(0,69,50,0.06)] border border-outline-variant overflow-hidden relative">
+                    <div class="h-1 w-full bg-primary absolute top-0 left-0"></div>
+                    <div class="p-lg">
+                        <div class="flex items-center gap-sm mb-md">
+                            <span class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-headline-md text-headline-md">1</span>
+                            <h2 class="font-title-lg text-title-lg text-on-surface">اختر طريقة الدفع وقم بالتحويل</h2>
+                        </div>
+                        <!-- Payment Methods Tab -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-sm mb-md" id="payment-methods">
+                            <!-- Vodafone Cash -->
+                            <label class="cursor-pointer">
+                                <input checked="" class="peer sr-only" name="payment_method" type="radio" value="vodafone"/>
+                                <div class="p-sm rounded-lg border-2 border-outline-variant peer-checked:border-primary peer-checked:bg-[rgba(0,69,50,0.04)] hover:bg-surface-container-low transition-colors h-full flex flex-col items-center justify-center text-center gap-xs relative">
+                                    <span class="material-symbols-outlined text-[32px] text-[#e60000]">phone_iphone</span>
+                                    <span class="font-label-md text-label-md text-on-surface">محفظة إلكترونية (فودافون كاش)</span>
+                                    <div class="absolute top-sm left-sm opacity-0 peer-checked:opacity-100 text-primary transition-opacity">
+                                        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1">check_circle</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <!-- InstaPay -->
+                            <label class="cursor-pointer">
+                                <input class="peer sr-only" name="payment_method" type="radio" value="instapay"/>
+                                <div class="p-sm rounded-lg border-2 border-outline-variant peer-checked:border-primary peer-checked:bg-[rgba(0,69,50,0.04)] hover:bg-surface-container-low transition-colors h-full flex flex-col items-center justify-center text-center gap-xs relative">
+                                    <span class="material-symbols-outlined text-[32px] text-[#5e2d91]">account_balance_wallet</span>
+                                    <span class="font-label-md text-label-md text-on-surface">إنستاباي (InstaPay)</span>
+                                    <div class="absolute top-sm left-sm opacity-0 peer-checked:opacity-100 text-primary transition-opacity">
+                                        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1">check_circle</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <!-- Bank Transfer -->
+                            <label class="cursor-pointer">
+                                <input class="peer sr-only" name="payment_method" type="radio" value="bank"/>
+                                <div class="p-sm rounded-lg border-2 border-outline-variant peer-checked:border-primary peer-checked:bg-[rgba(0,69,50,0.04)] hover:bg-surface-container-low transition-colors h-full flex flex-col items-center justify-center text-center gap-xs relative">
+                                    <span class="material-symbols-outlined text-[32px] text-on-surface-variant">account_balance</span>
+                                    <span class="font-label-md text-label-md text-on-surface">تحويل بنكي</span>
+                                    <div class="absolute top-sm left-sm opacity-0 peer-checked:opacity-100 text-primary transition-opacity">
+                                        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1">check_circle</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        <!-- Dynamic Details -->
+                        <div class="bg-surface-container-low p-md rounded-lg border border-outline-variant">
+                            <h3 class="font-label-md text-label-md text-on-surface mb-sm">تفاصيل التحويل:</h3>
+                            <!-- Vodafone Details -->
+                            <div class="payment-detail-panel flex flex-col md:flex-row items-center justify-between gap-sm bg-surface-container-lowest p-sm rounded border border-outline-variant" id="details-vodafone">
+                                <div class="flex items-center gap-sm w-full">
+                                    <div class="w-12 h-12 bg-[#e60000] bg-opacity-10 rounded flex items-center justify-center text-[#e60000]">
+                                        <span class="material-symbols-outlined">numbers</span>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <p class="font-label-sm text-label-sm text-on-surface-variant">رقم المحفظة (فودافون كاش)</p>
+                                        <p class="font-headline-md text-headline-md text-on-surface tracking-wider" dir="ltr" id="vodafone-number">010 1234 5678</p>
+                                    </div>
+                                </div>
+                                <button class="shrink-0 flex items-center gap-xs px-sm py-xs border border-outline rounded hover:bg-surface-container-high transition-colors font-label-md text-label-md text-on-surface" onclick="copyToClipboard('vodafone-number')" type="button">
+                                    <span class="material-symbols-outlined text-[18px]">content_copy</span> نسخ الرقم
+                                </button>
+                            </div>
+                            <!-- InstaPay Details -->
+                            <div class="payment-detail-panel hidden flex flex-col md:flex-row items-center justify-between gap-sm bg-surface-container-lowest p-sm rounded border border-outline-variant" id="details-instapay">
+                                <div class="flex items-center gap-sm w-full">
+                                    <div class="w-12 h-12 bg-[#5e2d91] bg-opacity-10 rounded flex items-center justify-center text-[#5e2d91]">
+                                        <span class="material-symbols-outlined">alternate_email</span>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <p class="font-label-sm text-label-sm text-on-surface-variant">عنوان الدفع (IPA)</p>
+                                        <p class="font-headline-md text-headline-md text-on-surface" dir="ltr" id="instapay-address">thiqah@instapay</p>
+                                    </div>
+                                </div>
+                                <button class="shrink-0 flex items-center gap-xs px-sm py-xs border border-outline rounded hover:bg-surface-container-high transition-colors font-label-md text-label-md text-on-surface" onclick="copyToClipboard('instapay-address')" type="button">
+                                    <span class="material-symbols-outlined text-[18px]">content_copy</span> نسخ العنوان
+                                </button>
+                            </div>
+                            <!-- Bank Details -->
+                            <div class="payment-detail-panel hidden flex flex-col gap-sm bg-surface-container-lowest p-sm rounded border border-outline-variant" id="details-bank">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+                                    <div>
+                                        <p class="font-label-sm text-label-sm text-on-surface-variant">اسم البنك</p>
+                                        <p class="font-body-md text-body-md text-on-surface">البنك الأهلي المصري</p>
+                                    </div>
+                                    <div>
+                                        <p class="font-label-sm text-label-sm text-on-surface-variant">اسم المستفيد</p>
+                                        <p class="font-body-md text-body-md text-on-surface">مؤسسة ثقة التعليمية</p>
+                                    </div>
+                                    <div class="md:col-span-2 flex justify-between items-end border-t border-outline-variant pt-sm mt-xs">
+                                        <div>
+                                            <p class="font-label-sm text-label-sm text-on-surface-variant">رقم الحساب (IBAN)</p>
+                                            <p class="font-body-lg text-body-lg text-on-surface break-all" dir="ltr" id="bank-iban">EG48 0003 0045 0000 1234 5678 9012</p>
+                                        </div>
+                                        <button class="shrink-0 flex items-center gap-xs px-sm py-xs border border-outline rounded hover:bg-surface-container-high transition-colors font-label-md text-label-md text-on-surface mb-1" onclick="copyToClipboard('bank-iban')" type="button">
+                                            <span class="material-symbols-outlined text-[18px]">content_copy</span> نسخ
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mt-sm font-body-md text-body-md text-on-surface-variant flex items-start gap-xs">
+                                <span class="material-symbols-outlined text-[20px] text-secondary mt-1">info</span>
+                                يرجى تحويل مبلغ <strong class="text-on-surface">150 ج.م</strong> بالضبط. بعد إتمام التحويل، قم بأخذ لقطة شاشة للإيصال.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+                <!-- Step 2: Upload -->
+                <section class="bg-surface-container-lowest rounded-xl shadow-[0_8px_24px_rgba(0,69,50,0.06)] border border-outline-variant overflow-hidden">
+                    <div class="p-lg">
+                        <div class="flex items-center gap-sm mb-md">
+                            <span class="w-8 h-8 rounded-full border-2 border-outline text-on-surface-variant flex items-center justify-center font-headline-md text-headline-md">2</span>
+                            <h2 class="font-title-lg text-title-lg text-on-surface">إرفاق إيصال الدفع والتأكيد</h2>
+                        </div>
+                        <div class="mb-lg">
+                            <label class="block font-label-md text-label-md text-on-surface mb-xs">صورة إيصال التحويل <span class="text-error">*</span></label>
+                            <div class="border-2 border-dashed border-outline-variant rounded-lg bg-surface flex flex-col items-center justify-center p-xl transition-all duration-300 hover:bg-surface-container-low cursor-pointer relative group" id="drop-zone">
+                                <input accept="image/*,.pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" id="file-upload" type="file"/>
+                                <div class="w-16 h-16 rounded-full bg-[rgba(0,69,50,0.08)] flex items-center justify-center text-primary mb-sm group-hover:scale-110 transition-transform">
+                                    <span class="material-symbols-outlined text-[32px]">cloud_upload</span>
+                                </div>
+                                <p class="font-title-lg text-title-lg text-on-surface mb-xs">اسحب وأفلت صورة الإيصال هنا</p>
+                                <p class="font-body-md text-body-md text-on-surface-variant mb-sm">أو اضغط لاختيار ملف من جهازك</p>
+                                <div class="hidden absolute inset-0 bg-surface-container-lowest flex flex-col items-center justify-center p-sm rounded-lg border border-primary" id="upload-preview">
+                                    <span class="material-symbols-outlined text-primary text-[40px] mb-xs" style="font-variation-settings: 'FILL' 1">check_circle</span>
+                                    <p class="font-title-lg text-title-lg text-primary">تم إرفاق الملف بنجاح</p>
+                                    <p class="font-body-md text-body-md text-on-surface-variant mb-sm" id="file-name-display">receipt.jpg</p>
+                                    <button class="font-label-sm text-label-sm text-error underline relative z-10" onclick="resetUpload(event)" type="button">حذف وإعادة الرفع</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border-t border-outline-variant pt-md flex flex-col sm:flex-row items-center justify-between gap-sm">
+                            <p class="font-label-sm text-label-sm text-on-surface-variant order-2 sm:order-1">
+                                بالضغط على التأكيد، أنت توافق على شروط الاستخدام.
+                            </p>
+                            <a href="student-dashboard.html" class="w-full sm:w-auto bg-primary text-on-primary font-label-md text-label-md px-xl py-sm rounded-DEFAULT shadow-sm hover:bg-[#003828] transition-colors flex items-center justify-center gap-xs order-1 sm:order-2 group text-center">
+                                تأكيد وإرسال الإيصال
+                                <span class="material-symbols-outlined group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full bg-surface-container-high border-t border-outline-variant py-sm px-margin-desktop mt-auto text-center">
+        <p class="font-body-md text-body-md text-on-surface-variant">© 2024 ثقة أكاديمية. منصة تعليمية موثوقة.</p>
+    </footer>
+
+    <!-- Template Quick Navigator Widget -->
+    <div id="template-navigator" class="fixed bottom-4 left-4 z-50">
+        <button onclick="toggleNavigator()" class="bg-primary text-on-primary p-3 rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all">
+            <span class="material-symbols-outlined">menu_book</span>
+        </button>
+        <div id="navigator-menu" class="hidden absolute bottom-14 left-0 w-80 max-h-[70vh] overflow-y-auto bg-surface-container-lowest border border-outline-variant rounded-lg shadow-xl p-sm flex flex-col gap-xs z-50">
+            <p class="font-label-sm text-outline border-b border-outline-variant pb-xs px-xs">روابط التيمبلت السريعة (35 صفحة)</p>
+            
+            <details class="group" open>
+                <summary class="font-label-md text-primary font-bold cursor-pointer p-xs hover:bg-surface-container rounded flex justify-between items-center select-none">
+                    <span>صفحات عامة (12)</span>
+                    <span class="material-symbols-outlined text-sm group-open:rotate-180 transition-transform">expand_more</span>
+                </summary>
+                <div class="flex flex-col gap-xs pl-xs mt-xs border-r border-outline-variant/30 pr-xs">
+                    <a href="index.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">الرئيسية (Landing)</a>
+                    <a href="teachers.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">دليل المعلمين</a>
+                    <a href="teacher-profile.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">ملف المعلم (عام)</a>
+                    <a href="subjects-browse.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">تصفح المواد الدراسية</a>
+                    <a href="checkout.html" class="font-label-md text-primary font-bold bg-primary-container/10 p-xs rounded">الدفع والحجز (شيك أوت)</a>
+                    <a href="login.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">تسجيل الدخول</a>
+                    <a href="register.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">إنشاء حساب</a>
+                    <a href="about.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">من نحن</a>
+                    <a href="faq.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">الأسئلة الشائعة</a>
+                    <a href="terms.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">الشروط والأحكام</a>
+                    <a href="privacy.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">سياسة الخصوصية</a>
+                    <a href="contact.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">تواصل معنا</a>
+                </div>
+            </details>
+            
+            <hr class="border-outline-variant">
+            
+            <details class="group">
+                <summary class="font-label-md text-primary font-bold cursor-pointer p-xs hover:bg-surface-container rounded flex justify-between items-center select-none">
+                    <span>الطالب وولي الأمر (7)</span>
+                    <span class="material-symbols-outlined text-sm group-open:rotate-180 transition-transform">expand_more</span>
+                </summary>
+                <div class="flex flex-col gap-xs pl-xs mt-xs border-r border-outline-variant/30 pr-xs">
+                    <a href="student-dashboard.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">داشبورد الطالب</a>
+                    <a href="parent-dashboard.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">داشبورد ولي الأمر</a>
+                    <a href="profile.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">الملف الشخصي والربط</a>
+                    <a href="my-bookings.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">حجوزاتي وحضور الحصص</a>
+                    <a href="my-payments.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">مدفوعاتي وفواتيري</a>
+                    <a href="review.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">تقييم المدرس</a>
+                    <a href="report.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">تقرير الأداء الدراسي</a>
+                </div>
+            </details>
+            
+            <hr class="border-outline-variant">
+            
+            <details class="group">
+                <summary class="font-label-md text-primary font-bold cursor-pointer p-xs hover:bg-surface-container rounded flex justify-between items-center select-none">
+                    <span>المعلم (8)</span>
+                    <span class="material-symbols-outlined text-sm group-open:rotate-180 transition-transform">expand_more</span>
+                </summary>
+                <div class="flex flex-col gap-xs pl-xs mt-xs border-r border-outline-variant/30 pr-xs">
+                    <a href="teacher-dashboard.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">داشبورد المعلم</a>
+                    <a href="teacher-profile-edit.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">تعديل الملف الشخصي</a>
+                    <a href="teacher-documents.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">رفع المستندات والشهادات</a>
+                    <a href="subjects.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">إدارة المواد والأسعار</a>
+                    <a href="teacher-availability.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">جدول المواعيد والتوفر</a>
+                    <a href="teacher-bookings.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">الطلبات والحصص القادمة</a>
+                    <a href="teacher-wallet.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">المحفظة والأرباح والسحب</a>
+                    <a href="teacher-reviews.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">تقييمات الطلاب</a>
+                </div>
+            </details>
+            
+            <hr class="border-outline-variant">
+            
+            <details class="group">
+                <summary class="font-label-md text-primary font-bold cursor-pointer p-xs hover:bg-surface-container rounded flex justify-between items-center select-none">
+                    <span>لوحة الإدارة - Admin (8)</span>
+                    <span class="material-symbols-outlined text-sm group-open:rotate-180 transition-transform">expand_more</span>
+                </summary>
+                <div class="flex flex-col gap-xs pl-xs mt-xs border-r border-outline-variant/30 pr-xs">
+                    <a href="admin-dashboard.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">لوحة التحكم الرئيسية</a>
+                    <a href="admin-users.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">إدارة المستخدمين والأدوار</a>
+                    <a href="admin-teachers.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">مراجعة واعتماد المعلمين</a>
+                    <a href="admin-bookings.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">إدارة ومراقبة الحجوزات</a>
+                    <a href="admin-payments.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">مراجعة المدفوعات والرفع</a>
+                    <a href="admin-complaints.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">إدارة الشكاوى والنزاعات</a>
+                    <a href="admin-subjects.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">إدارة المواد والتسعير</a>
+                    <a href="messages.html" class="font-label-md text-on-surface-variant p-xs rounded hover:bg-surface-container">غرفة الشات والدعم</a>
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function copyToClipboard(elementId) {
+            const textToCopy = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert('تم نسخ النص: ' + textToCopy);
+            });
+        }
+
+        document.querySelectorAll('input[name="payment_method"]').forEach((elem) => {
+            elem.addEventListener("change", function(event) {
+                document.querySelectorAll('.payment-detail-panel').forEach(panel => {
+                    panel.classList.add('hidden');
+                });
+                document.getElementById('details-' + event.target.value).classList.remove('hidden');
+            });
+        });
+
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-upload');
+        const uploadPreview = document.getElementById('upload-preview');
+        const fileNameDisplay = document.getElementById('file-name-display');
+
+        fileInput.addEventListener('change', function() {
+            if(this.files.length > 0) {
+                fileNameDisplay.textContent = this.files[0].name;
+                uploadPreview.classList.remove('hidden');
+            }
+        });
+
+        function resetUpload(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            fileInput.value = '';
+            uploadPreview.classList.add('hidden');
+        }
+
+        function toggleNavigator() {
+            const menu = document.getElementById('navigator-menu');
+            menu.classList.toggle('hidden');
+        }
+        document.addEventListener('click', function(e) {
+            const nav = document.getElementById('template-navigator');
+            if (nav && !nav.contains(e.target)) {
+                document.getElementById('navigator-menu').classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

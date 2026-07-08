@@ -1,26 +1,48 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}المواد - منصة الدروس الخصوصية{% endblock %}
+{% block title %}استكشف المواد الدراسية - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <div class="page-heading">
-        <h1>استكشف المواد</h1>
-        <p>اختر مادة للعثور على مدرسين معتمدين يناسبون المرحلة التعليمية المطلوبة.</p>
+<div class="px-margin-mobile md:px-margin-desktop py-12 w-full max-w-[1440px] mx-auto text-right">
+    <!-- Page Heading -->
+    <div class="mb-10">
+        <h1 class="font-display-lg text-primary font-bold mb-2">استكشف المواد الدراسية</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+            اختر المادة الدراسية لتصفح ومقارنة المعلمين المعتمدين والمتاحين لتدريسها، ومراجعة الأسعار المناسبة للمرحلة المطلوبة.
+        </p>
     </div>
 
     {% if subjects %}
-        <div class="card-grid">
+        <!-- Card Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {% for subject in subjects %}
-                <article class="listing-card">
-                    <h2>{{ subject.name }}</h2>
-                    <p>اعرض المدرسين المتاحين لهذه المادة وقارن بين الأسعار وأنواع الحصص.</p>
-                    <a class="btn btn-primary" href="{% url 'teachers:public_list' %}?subject={{ subject.id }}">عرض المدرسين</a>
+                <article class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col items-start text-right">
+                    <!-- Icon Circle -->
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4 flex-shrink-0 self-start">
+                        <span class="material-symbols-outlined text-2xl icon-fill">menu_book</span>
+                    </div>
+                    
+                    <h2 class="font-headline-md text-headline-md text-on-surface font-bold mb-2 self-stretch truncate">{{ subject.name }}</h2>
+                    <p class="font-body-md text-sm text-on-surface-variant leading-relaxed mb-6 h-12 overflow-hidden self-stretch">
+                        تصفح المعلمين المعتمدين لمادة {{ subject.name }} وقارن بين أسعار الحصص ومواعيدهم الأسبوعية.
+                    </p>
+                    
+                    <a class="w-full text-center bg-primary text-on-primary font-semibold py-2.5 rounded-xl hover:bg-primary-hover hover:shadow-sm transition-all duration-200 mt-auto text-xs active:scale-[0.98]" href="{% url 'teachers:public_list' %}?subject={{ subject.id }}">
+                        عرض المعلمين المتاحين
+                    </a>
                 </article>
             {% endfor %}
         </div>
     {% else %}
-        <p class="empty-state">لا توجد مواد متاحة حالياً.</p>
+        <!-- Empty State -->
+        <div class="bg-surface border border-outline-variant/50 rounded-2xl p-16 text-center shadow-sm">
+            <span class="material-symbols-outlined text-primary text-[64px]">book_off</span>
+            <h3 class="font-headline-md text-headline-md text-on-surface font-bold mt-4">لا توجد مواد مضافة</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mt-2 max-w-md mx-auto">
+                لم يتم إدخال أي مواد دراسية نشطة على المنصة حالياً. يرجى مراجعة لوحة الإدارة لاحقاً.
+            </p>
+        </div>
     {% endif %}
-</section>
+</div>
 {% endblock %}
