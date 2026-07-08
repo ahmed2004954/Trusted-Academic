@@ -123,18 +123,20 @@ class TeacherSubject(models.Model):
         'subjects.Subject',
         on_delete=models.CASCADE,
         related_name='teacher_subjects',
+        verbose_name=_('subject'),
     )
     grade_level = models.ForeignKey(
         'subjects.GradeLevel',
         on_delete=models.CASCADE,
         related_name='teacher_subjects',
+        verbose_name=_('grade level'),
     )
-    lesson_type = models.CharField(max_length=20, choices=LessonType.choices)
-    price_min = models.DecimalField(max_digits=10, decimal_places=2)
-    price_max = models.DecimalField(max_digits=10, decimal_places=2)
-    default_price = models.DecimalField(max_digits=10, decimal_places=2)
-    group_capacity = models.PositiveIntegerField(blank=True, null=True)
-    is_active = models.BooleanField(default=True)
+    lesson_type = models.CharField(_('lesson type'), max_length=20, choices=LessonType.choices)
+    price_min = models.DecimalField(_('minimum price'), max_digits=10, decimal_places=2)
+    price_max = models.DecimalField(_('maximum price'), max_digits=10, decimal_places=2)
+    default_price = models.DecimalField(_('default price'), max_digits=10, decimal_places=2)
+    group_capacity = models.PositiveIntegerField(_('group capacity'), blank=True, null=True)
+    is_active = models.BooleanField(_('active'), default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

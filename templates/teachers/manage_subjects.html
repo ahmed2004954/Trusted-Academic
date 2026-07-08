@@ -1,52 +1,214 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}إدارة المواد والأسعار - منصة الدروس الخصوصية{% endblock %}
+{% block title %}إدارة المواد والأسعار - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content auth-form">
-    <h1>إدارة المواد والأسعار</h1>
-    <p>حدد المواد والصفوف ونوع الدرس ونطاق السعر الذي تقدمه.</p>
+<style>
+    select, input[type="number"], input[type="checkbox"] {
+        background-color: #faf9f6;
+        border: 1px solid #bec9c2;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        font-family: 'IBM Plex Sans Arabic', sans-serif;
+        font-size: 14px;
+        color: #1a1c1a;
+        transition: all 0.2s ease;
+    }
+    select, input[type="number"] { width: 100%; }
+    input:focus, select:focus {
+        border-color: #004532;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 69, 50, 0.1);
+    }
+</style>
 
-    {% if form %}
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button class="btn btn-primary" type="submit">حفظ المادة</button>
-            <a class="btn" href="{% url 'teachers:manage_subjects' %}">إلغاء</a>
-        </form>
-    {% elif confirm_delete %}
-        <div class="status-card status-rejected">
-            <h2>تأكيد حذف المادة</h2>
-            <p>هل تريد حذف {{ teacher_subject.subject }} - {{ teacher_subject.grade_level }}؟</p>
-            <form method="post">
-                {% csrf_token %}
-                <button class="btn btn-primary" type="submit">نعم، حذف</button>
-                <a class="btn" href="{% url 'teachers:manage_subjects' %}">إلغاء</a>
-            </form>
-        </div>
-    {% else %}
-        <a class="btn btn-primary" href="{% url 'teachers:add_subject' %}">إضافة مادة</a>
+<main class="flex-grow pt-4 pb-xl px-margin-mobile md:px-margin-desktop text-right">
+    <div class="max-w-6xl mx-auto space-y-lg">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md border-b border-outline-variant/30 pb-6">
+            <div>
+                <p class="font-label-md text-label-md text-primary font-bold mb-xs">الاعتماد الأكاديمي</p>
+                <h1 class="font-headline-lg text-headline-lg text-on-background">المواد والأسعار المقترحة</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant mt-xs">حدد الصفوف والمواد التي تقدمها ونطاق تسعير الحصة.</p>
+            </div>
+            <div class="flex flex-wrap gap-sm">
+                {% if not form and not confirm_delete %}
+                    <a href="{% url 'teachers:add_subject' %}" class="inline-flex items-center gap-2 bg-primary text-on-primary px-md py-2 rounded-lg font-label-md font-bold hover:bg-surface-tint transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">add</span>
+                        إضافة مادة
+                    </a>
+                {% endif %}
+                <a href="{% url 'teachers:dashboard' %}" class="inline-flex items-center gap-2 border border-outline-variant text-on-surface px-md py-2 rounded-lg font-label-md hover:bg-surface-container transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                    لوحة المعلم
+                </a>
+            </div>
+        </header>
 
-        <h2>المواد الحالية</h2>
-        {% if teacher_subjects %}
-            <ul class="item-list">
-                {% for teacher_subject in teacher_subjects %}
-                    <li>
-                        <strong>{{ teacher_subject.subject }} - {{ teacher_subject.grade_level }}</strong>
-                        <span>{{ teacher_subject.get_lesson_type_display }} | {{ teacher_subject.price_min }} - {{ teacher_subject.price_max }} | الافتراضي: {{ teacher_subject.default_price }}</span>
-                        {% if teacher_subject.group_capacity %}
-                            <span>السعة: {{ teacher_subject.group_capacity }}</span>
-                        {% endif %}
-                        <span>{% if teacher_subject.is_active %}نشط{% else %}غير نشط{% endif %}</span>
-                        <a href="{% url 'teachers:edit_subject' teacher_subject.pk %}">تعديل</a>
-                        <a href="{% url 'teachers:delete_subject' teacher_subject.pk %}">حذف</a>
-                    </li>
-                {% endfor %}
-            </ul>
+        {% if form %}
+            <section class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 shadow-sm p-md md:p-lg">
+                <div class="flex items-center gap-sm mb-md">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined">menu_book</span>
+                    </div>
+                    <div>
+                        <h2 class="font-title-lg text-title-lg text-on-surface">تفاصيل المادة والتسعير</h2>
+                        <p class="font-label-sm text-label-sm text-on-surface-variant">الرجاء إدخال تفاصيل تسعير المادة ونوع الحصة.</p>
+                    </div>
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="mb-md bg-error-container text-on-error-container rounded-lg p-sm font-label-md">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <form method="post" class="space-y-md">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-sm">
+                        <div class="flex flex-col gap-base">
+                            <label for="{{ form.subject.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.subject.label }}</label>
+                            {{ form.subject }}
+                            {% for error in form.subject.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+                        <div class="flex flex-col gap-base">
+                            <label for="{{ form.grade_level.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.grade_level.label }}</label>
+                            {{ form.grade_level }}
+                            {% for error in form.grade_level.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+                        <div class="flex flex-col gap-base">
+                            <label for="{{ form.lesson_type.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.lesson_type.label }}</label>
+                            {{ form.lesson_type }}
+                            {% for error in form.lesson_type.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-sm">
+                        <div class="flex flex-col gap-base">
+                            <label for="{{ form.price_min.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.price_min.label }}</label>
+                            {{ form.price_min }}
+                            {% for error in form.price_min.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+                        <div class="flex flex-col gap-base">
+                            <label for="{{ form.price_max.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.price_max.label }}</label>
+                            {{ form.price_max }}
+                            {% for error in form.price_max.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+                        <div class="flex flex-col gap-base">
+                            <label for="{{ form.default_price.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.default_price.label }}</label>
+                            {{ form.default_price }}
+                            {% for error in form.default_price.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+                        <div class="flex flex-col gap-base">
+                            <label for="{{ form.group_capacity.id_for_label }}" class="font-label-md text-label-md text-on-surface font-bold">{{ form.group_capacity.label }}</label>
+                            {{ form.group_capacity }}
+                            {% for error in form.group_capacity.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+                        <div class="flex items-center gap-sm mt-md">
+                            <label class="inline-flex items-center gap-2 font-label-md text-label-md text-on-surface font-bold">
+                                {{ form.is_active }}
+                                {{ form.is_active.label }}
+                            </label>
+                            {% for error in form.is_active.errors %}<span class="text-error text-xs font-bold">{{ error }}</span>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="flex gap-sm justify-end border-t border-outline-variant/30 pt-md">
+                        <button type="submit" class="bg-primary text-on-primary px-lg py-2.5 rounded-lg font-label-md font-bold hover:bg-surface-tint transition-colors">حفظ المادة</button>
+                        <a href="{% url 'teachers:manage_subjects' %}" class="text-center border border-outline-variant text-on-surface px-lg py-2.5 rounded-lg font-label-md hover:bg-surface-container transition-colors">إلغاء</a>
+                    </div>
+                </form>
+            </section>
+        {% elif confirm_delete %}
+            <section class="bg-error-container/10 border border-error/30 rounded-xl p-md md:p-lg text-center max-w-lg mx-auto space-y-md">
+                <span class="material-symbols-outlined text-[48px] text-error">warning</span>
+                <h2 class="font-title-lg font-bold text-on-surface">تأكيد حذف المادة</h2>
+                <p class="font-body-md text-on-surface-variant">هل تريد حقاً حذف تقديم مادة <strong>{{ teacher_subject.subject.name }}</strong> لصف <strong>{{ teacher_subject.grade_level.name }}</strong>؟</p>
+                <form method="post" class="flex gap-sm justify-center">
+                    {% csrf_token %}
+                    <button type="submit" class="bg-error text-on-error px-lg py-2.5 rounded-lg font-label-md font-bold hover:bg-red-700 transition-colors">نعم، حذف</button>
+                    <a href="{% url 'teachers:manage_subjects' %}" class="text-center border border-outline-variant text-on-surface px-lg py-2.5 rounded-lg font-label-md hover:bg-surface-container transition-colors">إلغاء</a>
+                </form>
+            </section>
         {% else %}
-            <p>لم تقم بإضافة أي مواد بعد.</p>
+            <section class="space-y-md">
+                <div class="flex items-center justify-between">
+                    <h2 class="font-title-lg text-title-lg text-on-background font-bold">المواد الحالية المسجلة</h2>
+                    <span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-sm py-xs rounded-full">{{ teacher_subjects|length }} مادة</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
+                    {% for ts in teacher_subjects %}
+                        <article class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 shadow-sm p-md flex flex-col gap-sm">
+                            <div class="flex justify-between items-start gap-sm">
+                                <div class="flex items-center gap-sm">
+                                    <div class="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                                        <span class="material-symbols-outlined">menu_book</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-title-lg text-title-lg text-on-surface font-bold">{{ ts.subject.name }}</h3>
+                                        <p class="font-label-sm text-label-sm text-on-surface-variant">{{ ts.grade_level.name }}</p>
+                                    </div>
+                                </div>
+                                {% if ts.is_active %}
+                                    <span class="inline-flex items-center gap-1 bg-primary-container/15 text-primary rounded-full px-sm py-xs font-label-sm text-label-sm font-bold">
+                                        <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                        نشط
+                                    </span>
+                                {% else %}
+                                    <span class="inline-flex items-center gap-1 bg-surface-container text-on-surface-variant rounded-full px-sm py-xs font-label-sm text-label-sm font-bold">
+                                        <span class="material-symbols-outlined text-[14px]">pause_circle</span>
+                                        متوقف
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <div class="bg-surface-container rounded-lg p-sm border border-outline-variant/40 space-y-1 text-xs">
+                                <div class="flex justify-between">
+                                    <span class="text-on-surface-variant">نوع الدرس:</span>
+                                    <span class="font-bold text-on-surface">{{ ts.get_lesson_type_display }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-on-surface-variant">نطاق السعر:</span>
+                                    <span class="font-bold text-primary">{{ ts.price_min }} - {{ ts.price_max }} ج.م</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-on-surface-variant">السعر الافتراضي:</span>
+                                    <span class="font-bold text-primary">{{ ts.default_price }} ج.م</span>
+                                </div>
+                                {% if ts.group_capacity %}
+                                    <div class="flex justify-between">
+                                        <span class="text-on-surface-variant">السعة الاستيعابية:</span>
+                                        <span class="font-bold text-on-surface">{{ ts.group_capacity }} طلاب</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="flex gap-sm pt-sm border-t border-outline-variant/30 mt-auto">
+                                <a href="{% url 'teachers:edit_subject' ts.pk %}" class="flex-1 inline-flex items-center justify-center gap-1 border border-outline-variant text-on-surface px-sm py-2 rounded-lg font-label-md hover:bg-surface-container transition-colors">
+                                    <span class="material-symbols-outlined text-[16px]">edit</span>
+                                    تعديل
+                                </a>
+                                <a href="{% url 'teachers:delete_subject' ts.pk %}" class="flex-1 inline-flex items-center justify-center gap-1 border border-error text-error px-sm py-2 rounded-lg font-label-md hover:bg-error-container/10 transition-colors">
+                                    <span class="material-symbols-outlined text-[16px]">delete</span>
+                                    حذف
+                                </a>
+                            </div>
+                        </article>
+                    {% empty %}
+                        <div class="md:col-span-2 xl:col-span-3 text-center py-12 bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-md shadow-sm">
+                            <span class="material-symbols-outlined text-[48px] text-on-surface-variant mb-2">menu_book</span>
+                            <h3 class="font-title-lg font-bold text-on-surface">لم تقم بإضافة مواد بعد</h3>
+                            <p class="font-body-md text-on-surface-variant mt-2 max-w-md mx-auto">أضف المواد والصفوف الدراسية التي تدرسها لتظهر للطلاب وتبدأ في استقبال الحجوزات.</p>
+                            <a href="{% url 'teachers:add_subject' %}" class="inline-block mt-4 bg-primary text-on-primary px-lg py-2.5 rounded-lg font-label-md hover:bg-surface-tint font-bold">إضافة مادة</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
         {% endif %}
-        <a class="btn" href="{% url 'teachers:dashboard' %}">العودة للوحة المدرس</a>
-    {% endif %}
-</section>
+    </div>
+</main>
 {% endblock %}

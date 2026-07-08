@@ -3,6 +3,8 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+from subjects.models import GradeLevel, Subject
+
 from .models import AvailabilitySlot, BookingMode, LessonType, PlatformPricingRange, TeacherCertificate, TeacherProfile, TeacherSubject
 
 
@@ -74,6 +76,16 @@ class TeacherSubjectForm(forms.ModelForm):
             'group_capacity',
             'is_active',
         )
+        labels = {
+            'subject': 'المادة الدراسية',
+            'grade_level': 'الصف الدراسي',
+            'lesson_type': 'نوع الدرس',
+            'price_min': 'الحد الأدنى للسعر',
+            'price_max': 'الحد الأقصى للسعر',
+            'default_price': 'السعر الافتراضي',
+            'group_capacity': 'السعة الاستيعابية للمجموعة',
+            'is_active': 'نشط',
+        }
         widgets = {
             'subject': forms.Select(attrs={'class': 'form-control'}),
             'grade_level': forms.Select(attrs={'class': 'form-control'}),
@@ -83,6 +95,12 @@ class TeacherSubjectForm(forms.ModelForm):
             'default_price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
             'group_capacity': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Only show active subjects and grade levels in the dropdowns
+        self.fields['subject'].queryset = Subject.objects.filter(is_active=True).order_by('name')
+        self.fields['grade_level'].queryset = GradeLevel.objects.filter(is_active=True).order_by('category', 'order', 'name')
 
     def clean(self) -> dict:
         cleaned_data = super().clean()
@@ -149,6 +167,12 @@ class AvailabilitySlotForm(forms.ModelForm):
     class Meta:
         model = AvailabilitySlot
         fields = ('day_of_week', 'start_time', 'end_time', 'is_active')
+        labels = {
+            'day_of_week': 'اليوم',
+            'start_time': 'وقت البدء',
+            'end_time': 'وقت الانتهاء',
+            'is_active': 'نشط',
+        }
         widgets = {
             'day_of_week': forms.Select(attrs={'class': 'form-control'}),
             'start_time': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),

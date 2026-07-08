@@ -169,7 +169,7 @@ def dashboard(request):
 
 @teacher_required
 def setup_profile(request):
-    profile, _ = TeacherProfile.objects.get_or_create(user=request.user)
+    profile, created = TeacherProfile.objects.get_or_create(user=request.user)
 
     if request.method == 'POST':
         form = TeacherProfileForm(request.POST, request.FILES, instance=profile)
@@ -185,7 +185,7 @@ def setup_profile(request):
 
 @teacher_required
 def upload_certificate(request):
-    profile, _ = TeacherProfile.objects.get_or_create(user=request.user)
+    profile, created = TeacherProfile.objects.get_or_create(user=request.user)
 
     if request.method == 'POST':
         form = TeacherCertificateForm(request.POST, request.FILES)
@@ -208,13 +208,13 @@ def upload_certificate(request):
 
 @teacher_required
 def my_status(request):
-    profile, _ = TeacherProfile.objects.get_or_create(user=request.user)
+    profile, created = TeacherProfile.objects.get_or_create(user=request.user)
     return render(request, 'teachers/my_status.html', {'profile': profile})
 
 
 @teacher_required
 def manage_subjects(request):
-    profile, _ = TeacherProfile.objects.get_or_create(user=request.user)
+    profile, created = TeacherProfile.objects.get_or_create(user=request.user)
     teacher_subjects = profile.subjects.select_related('subject', 'grade_level')
     return render(
         request,
@@ -225,7 +225,7 @@ def manage_subjects(request):
 
 @teacher_required
 def add_subject(request):
-    profile, _ = TeacherProfile.objects.get_or_create(user=request.user)
+    profile, created = TeacherProfile.objects.get_or_create(user=request.user)
     if request.method == 'POST':
         teacher_subject = TeacherSubject(teacher_profile=profile)
         form = TeacherSubjectForm(request.POST, instance=teacher_subject)
@@ -241,7 +241,7 @@ def add_subject(request):
 
 @teacher_required
 def edit_subject(request, pk):
-    profile, _ = TeacherProfile.objects.get_or_create(user=request.user)
+    profile, created = TeacherProfile.objects.get_or_create(user=request.user)
     teacher_subject = get_object_or_404(TeacherSubject, pk=pk, teacher_profile=profile)
     if request.method == 'POST':
         form = TeacherSubjectForm(request.POST, instance=teacher_subject)
@@ -261,7 +261,7 @@ def edit_subject(request, pk):
 
 @teacher_required
 def delete_subject(request, pk):
-    profile, _ = TeacherProfile.objects.get_or_create(user=request.user)
+    profile, created = TeacherProfile.objects.get_or_create(user=request.user)
     teacher_subject = get_object_or_404(TeacherSubject, pk=pk, teacher_profile=profile)
     if request.method == 'POST':
         teacher_subject.delete()
@@ -277,7 +277,7 @@ def delete_subject(request, pk):
 
 @teacher_required
 def manage_availability(request):
-    profile, _ = TeacherProfile.objects.get_or_create(user=request.user)
+    profile, created = TeacherProfile.objects.get_or_create(user=request.user)
     availability_slots = profile.availability_slots.all()
     return render(
         request,
@@ -288,7 +288,7 @@ def manage_availability(request):
 
 @teacher_required
 def add_availability(request):
-    profile, _ = TeacherProfile.objects.get_or_create(user=request.user)
+    profile, created = TeacherProfile.objects.get_or_create(user=request.user)
     if request.method == 'POST':
         availability_slot = AvailabilitySlot(teacher_profile=profile)
         form = AvailabilitySlotForm(request.POST, instance=availability_slot)
@@ -304,7 +304,7 @@ def add_availability(request):
 
 @teacher_required
 def edit_availability(request, pk):
-    profile, _ = TeacherProfile.objects.get_or_create(user=request.user)
+    profile, created = TeacherProfile.objects.get_or_create(user=request.user)
     availability_slot = get_object_or_404(AvailabilitySlot, pk=pk, teacher_profile=profile)
     if request.method == 'POST':
         form = AvailabilitySlotForm(request.POST, instance=availability_slot)
@@ -324,7 +324,7 @@ def edit_availability(request, pk):
 
 @teacher_required
 def delete_availability(request, pk):
-    profile, _ = TeacherProfile.objects.get_or_create(user=request.user)
+    profile, created = TeacherProfile.objects.get_or_create(user=request.user)
     availability_slot = get_object_or_404(AvailabilitySlot, pk=pk, teacher_profile=profile)
     if request.method == 'POST':
         availability_slot.delete()
