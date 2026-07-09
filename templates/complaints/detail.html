@@ -1,31 +1,91 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}تفاصيل الشكوى - منصة الدروس الخصوصية{% endblock %}
+{% block title %}تفاصيل الشكوى #{{ complaint.pk }} - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>تفاصيل الشكوى #{{ complaint.pk }}</h1>
-    <div class="status-card">
-        <p><strong>الحجز:</strong> #{{ complaint.booking.pk }}</p>
-        <p><strong>مقدم الشكوى:</strong> {{ complaint.created_by.get_full_name }}</p>
-        <p><strong>ضد:</strong> {{ complaint.against_user.get_full_name }}</p>
-        <p><strong>التصنيف:</strong> {{ complaint.get_category_display }}</p>
-        <p><strong>الحالة:</strong> {{ complaint.get_status_display }}</p>
-        <p><strong>تاريخ الإنشاء:</strong> {{ complaint.created_at|date:'Y-m-d H:i' }}</p>
-        {% if complaint.resolved_at %}
-            <p><strong>تاريخ الإغلاق:</strong> {{ complaint.resolved_at|date:'Y-m-d H:i' }}</p>
-        {% endif %}
-    </div>
-    <div class="status-card">
-        <h2>الوصف</h2>
-        <p>{{ complaint.description|linebreaksbr }}</p>
-    </div>
-    {% if complaint.resolution_notes %}
-        <div class="status-card">
-            <h2>ملاحظات المعالجة</h2>
-            <p>{{ complaint.resolution_notes|linebreaksbr }}</p>
+<main class="flex-grow pt-4 pb-xl px-margin-mobile md:px-margin-desktop text-right">
+    <div class="max-w-4xl mx-auto space-y-lg">
+        <header class="border-b border-outline-variant/30 pb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-sm">
+            <div>
+                <p class="font-label-md text-label-md text-primary font-bold mb-xs">دعم ومتابعة</p>
+                <h1 class="font-headline-lg text-headline-lg text-on-background">تفاصيل الشكوى #{{ complaint.pk }}</h1>
+            </div>
+            {% if complaint.status == 'open' %}
+                <span class="inline-flex items-center gap-2 self-start bg-tertiary-container text-on-tertiary-container px-md py-2 rounded-full font-label-md font-bold">
+                    <span class="material-symbols-outlined text-[18px]">error</span>{{ complaint.get_status_display }}
+                </span>
+            {% elif complaint.status == 'under_review' %}
+                <span class="inline-flex items-center gap-2 self-start bg-secondary-container text-on-secondary-container px-md py-2 rounded-full font-label-md font-bold">
+                    <span class="material-symbols-outlined text-[18px]">hourglass_top</span>{{ complaint.get_status_display }}
+                </span>
+            {% elif complaint.status == 'resolved' %}
+                <span class="inline-flex items-center gap-2 self-start bg-primary-container text-on-primary-container px-md py-2 rounded-full font-label-md font-bold">
+                    <span class="material-symbols-outlined text-[18px]">check_circle</span>{{ complaint.get_status_display }}
+                </span>
+            {% else %}
+                <span class="inline-flex items-center gap-2 self-start bg-error-container text-on-error-container px-md py-2 rounded-full font-label-md font-bold">
+                    <span class="material-symbols-outlined text-[18px]">cancel</span>{{ complaint.get_status_display }}
+                </span>
+            {% endif %}
+        </header>
+
+        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 shadow-sm p-md md:p-lg">
+            <h2 class="font-title-lg text-title-lg text-on-surface mb-md">بيانات الشكوى</h2>
+            <div class="space-y-xs">
+                <div class="flex justify-between gap-sm border-b border-outline-variant/30 pb-xs">
+                    <span class="font-body-md text-on-surface-variant">رقم الحجز</span>
+                    <span class="font-body-md text-on-surface font-bold">#{{ complaint.booking.pk }}</span>
+                </div>
+                <div class="flex justify-between gap-sm border-b border-outline-variant/30 pb-xs">
+                    <span class="font-body-md text-on-surface-variant">مقدم الشكوى</span>
+                    <span class="font-body-md text-on-surface font-bold">{{ complaint.created_by.get_full_name|default:complaint.created_by.email }}</span>
+                </div>
+                <div class="flex justify-between gap-sm border-b border-outline-variant/30 pb-xs">
+                    <span class="font-body-md text-on-surface-variant">الطرف الآخر</span>
+                    <span class="font-body-md text-on-surface font-bold">{{ complaint.against_user.get_full_name|default:complaint.against_user.email }}</span>
+                </div>
+                <div class="flex justify-between gap-sm border-b border-outline-variant/30 pb-xs">
+                    <span class="font-body-md text-on-surface-variant">التصنيف</span>
+                    <span class="font-body-md text-on-surface font-bold">{{ complaint.get_category_display }}</span>
+                </div>
+                <div class="flex justify-between gap-sm border-b border-outline-variant/30 pb-xs">
+                    <span class="font-body-md text-on-surface-variant">تاريخ الإنشاء</span>
+                    <span class="font-body-md text-on-surface font-bold">{{ complaint.created_at|date:'Y-m-d H:i' }}</span>
+                </div>
+                {% if complaint.resolved_at %}
+                <div class="flex justify-between gap-sm">
+                    <span class="font-body-md text-on-surface-variant">تاريخ الإغلاق</span>
+                    <span class="font-body-md text-on-surface font-bold">{{ complaint.resolved_at|date:'Y-m-d H:i' }}</span>
+                </div>
+                {% endif %}
+            </div>
         </div>
-    {% endif %}
-    <a class="btn btn-secondary" href="{% url 'complaints:list' %}">رجوع للشكاوى</a>
-</section>
+
+        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 shadow-sm p-md md:p-lg">
+            <div class="flex items-center gap-sm mb-sm">
+                <span class="material-symbols-outlined text-primary">description</span>
+                <h2 class="font-title-lg text-title-lg text-on-surface">وصف المشكلة</h2>
+            </div>
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">{{ complaint.description|linebreaksbr }}</p>
+        </div>
+
+        {% if complaint.resolution_notes %}
+        <div class="bg-primary-container/40 rounded-xl border border-primary/30 shadow-sm p-md md:p-lg">
+            <div class="flex items-center gap-sm mb-sm">
+                <span class="material-symbols-outlined text-primary">task_alt</span>
+                <h2 class="font-title-lg text-title-lg text-on-surface">ملاحظات المعالجة</h2>
+            </div>
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">{{ complaint.resolution_notes|linebreaksbr }}</p>
+        </div>
+        {% endif %}
+
+        <div class="flex justify-start border-t border-outline-variant/30 pt-md">
+            <a href="{% url 'complaints:list' %}" class="inline-flex items-center justify-center gap-2 border border-outline-variant text-on-surface px-lg py-3 rounded-lg font-label-md font-bold hover:bg-surface-container-high transition-all">
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                رجوع للشكاوى
+            </a>
+        </div>
+    </div>
+</main>
 {% endblock %}
