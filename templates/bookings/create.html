@@ -1,35 +1,475 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}إنشاء حجز - منصة الدروس الخصوصية{% endblock %}
+{% block title %}إنشاء حجز مع {{ teacher.user.get_full_name }} - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>إنشاء حجز مع {{ teacher.user.get_full_name }}</h1>
-    {% if parent_student %}
-        <p class="muted">سيتم إنشاء الحجز للطالب: {{ parent_student.get_full_name }}</p>
-    {% endif %}
-    <p class="muted">اختر العرض والوقت المناسب. سيتم تحديد حالة الحجز حسب طريقة قبول المدرس للحجوزات.</p>
+<style>
+  /* ── Entry Animation ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.94); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  @keyframes slideRight {
+    from { opacity: 0; transform: translateX(-24px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
 
-    <form method="post" class="form-card">
-        {% csrf_token %}
-        {{ form.non_field_errors }}
-        <div class="form-group">
-            {{ form.teacher_subject.label_tag }}
-            {{ form.teacher_subject }}
-            {{ form.teacher_subject.errors }}
+  .anim-fade-up  { animation: fadeUp  0.6s cubic-bezier(.22,1,.36,1) both; }
+  .anim-scale-in { animation: scaleIn 0.55s cubic-bezier(.22,1,.36,1) both; }
+  .anim-slide-r  { animation: slideRight 0.55s cubic-bezier(.22,1,.36,1) both; }
+
+  .delay-1 { animation-delay: .08s; }
+  .delay-2 { animation-delay: .16s; }
+  .delay-3 { animation-delay: .24s; }
+  .delay-4 { animation-delay: .32s; }
+  .delay-5 { animation-delay: .40s; }
+
+  /* ── Custom Form Controls ── */
+  .booking-input {
+    width: 100%;
+    background: #f5f3ef;
+    border: 1.5px solid #c8d4cc;
+    border-radius: 0.75rem;
+    padding: 0.85rem 1rem;
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    font-size: 15px;
+    color: #1a1c1a;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .booking-input:focus {
+    border-color: #004532;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(0,69,50,.12);
+  }
+  select.booking-input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24'%3E%3Cpath fill='%23004532' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 0.75rem center;
+    padding-left: 2.5rem;
+  }
+
+  /* ── Magnetic Submit ── */
+  .btn-book {
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #004532;
+    color: #fff;
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 0.9rem 2rem;
+    border-radius: 0.875rem;
+    border: none;
+    cursor: pointer;
+    transition: transform .2s cubic-bezier(.22,1,.36,1), box-shadow .2s;
+    will-change: transform;
+  }
+  .btn-book::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% -20%, rgba(255,255,255,.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .btn-book:hover {
+    box-shadow: 0 8px 32px rgba(0,69,50,.3);
+    transform: translateY(-2px) scale(1.02);
+  }
+  .btn-book:active { transform: scale(.97); }
+
+  /* ── Ripple ── */
+  .ripple { position: absolute; border-radius: 50%; background: rgba(255,255,255,.25); transform: scale(0); animation: rippleAnim .55s linear; pointer-events: none; }
+  @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+
+  /* ── Teacher card avatar ring ── */
+  .avatar-ring {
+    background: conic-gradient(from 0deg, #004532, #5bb892, #004532);
+    border-radius: 50%;
+    animation: spin 6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Glassmorphism panel ── */
+  .glass-panel {
+    background: rgba(255,255,255,.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(255,255,255,.7);
+  }
+
+  /* ── Step indicators ── */
+  .step-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #c8d4cc;
+    transition: background .3s, transform .3s;
+  }
+  .step-dot.active { background: #004532; transform: scale(1.4); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
+</style>
+
+<!-- ── Background Atmosphere ── -->
+<div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+  <div class="absolute -top-32 -right-32 w-[600px] h-[600px] rounded-full bg-primary/8 blur-[100px]"></div>
+  <div class="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full bg-secondary-container/10 blur-[80px]"></div>
+</div>
+
+<main class="min-h-screen flex flex-col items-center justify-center py-24 px-4 md:px-8" dir="rtl">
+
+  <!-- ── Page Header ── -->
+  <div class="w-full max-w-4xl text-center mb-12 anim-fade-up">
+    <span class="inline-flex items-center gap-1.5 bg-primary/10 text-primary font-bold text-sm px-4 py-1.5 rounded-full mb-4 anim-fade-up delay-1">
+      <span class="material-symbols-outlined text-[16px]">calendar_add_on</span>
+      طلب حجز جلسة
+    </span>
+    <h1 class="text-4xl md:text-5xl font-bold text-on-background leading-tight mb-3 anim-fade-up delay-2"
+        style="font-family:'IBM Plex Sans Arabic',sans-serif;">
+      إنشاء حجز مع<br>
+      <span class="text-primary">{{ teacher.user.get_full_name }}</span>
+    </h1>
+    <p class="text-on-surface-variant text-base md:text-lg anim-fade-up delay-3">
+      اختر العرض والوقت المناسب. سيتم تحديد حالة الحجز حسب طريقة قبول المدرس للحجوزات.
+    </p>
+    {% if parent_student %}
+    <p class="mt-2 text-sm text-secondary font-bold anim-fade-up delay-4">
+      <span class="material-symbols-outlined text-[16px] align-middle">family_restroom</span>
+      الحجز باسم الطالب: {{ parent_student.get_full_name }}
+    </p>
+    {% endif %}
+  </div>
+
+  <!-- ── Main Card ── -->
+  <div class="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-5 gap-6 anim-scale-in delay-3">
+
+    <!-- ── Left: Teacher Profile Sidebar ── -->
+    <aside class="lg:col-span-2 flex flex-col gap-4">
+
+      <!-- Teacher Card -->
+      <div class="glass-panel rounded-2xl p-6 shadow-lg anim-slide-r delay-2">
+        <div class="flex flex-col items-center text-center gap-4">
+
+          <!-- Avatar with rotating ring -->
+          <div class="relative w-24 h-24 flex items-center justify-center">
+            <div class="avatar-ring absolute inset-0 p-[3px] rounded-full opacity-70"></div>
+            <div class="relative w-[86px] h-[86px] rounded-full overflow-hidden bg-surface-container border-2 border-white flex items-center justify-center">
+              {% if teacher.photo %}
+                <img src="{{ teacher.photo.url }}" alt="{{ teacher.user.get_full_name }}" class="w-full h-full object-cover">
+              {% else %}
+                <span class="material-symbols-outlined text-primary text-[40px] icon-fill">account_circle</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-center gap-1.5 mb-1">
+              <h2 class="font-bold text-on-surface text-lg">{{ teacher.user.get_full_name }}</h2>
+              <span class="material-symbols-outlined text-secondary-container text-[18px] icon-fill">verified</span>
+            </div>
+            {% if teacher.headline %}
+              <p class="text-sm text-on-surface-variant">{{ teacher.headline }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Stats Row -->
+          <div class="grid grid-cols-3 gap-3 w-full border-t border-outline-variant/30 pt-4 mt-1">
+            <div class="text-center">
+              <p class="text-xl font-bold text-primary">{{ teacher.experience_years }}</p>
+              <p class="text-[11px] text-on-surface-variant">سنة خبرة</p>
+            </div>
+            <div class="text-center border-x border-outline-variant/30">
+              <p class="text-xl font-bold text-primary">{{ teacher.total_lessons }}</p>
+              <p class="text-[11px] text-on-surface-variant">حصة مكتملة</p>
+            </div>
+            <div class="text-center">
+              <div class="flex items-center justify-center gap-0.5">
+                <p class="text-xl font-bold text-primary">{{ teacher.average_rating|floatformat:1 }}</p>
+                <span class="material-symbols-outlined text-secondary-container text-[16px] icon-fill">star</span>
+              </div>
+              <p class="text-[11px] text-on-surface-variant">تقييم</p>
+            </div>
+          </div>
+
+          <!-- Booking mode badge -->
+          <div class="w-full flex items-center gap-2 bg-surface-container rounded-xl px-4 py-3">
+            {% if teacher.booking_mode == 'automatic' %}
+              <span class="material-symbols-outlined text-[20px] text-green-600 icon-fill">bolt</span>
+              <div class="text-right">
+                <p class="text-xs font-bold text-on-surface">قبول فوري</p>
+                <p class="text-[11px] text-on-surface-variant">الحجز يُقبل تلقائياً</p>
+              </div>
+            {% else %}
+              <span class="material-symbols-outlined text-[20px] text-amber-500 icon-fill">pending</span>
+              <div class="text-right">
+                <p class="text-xs font-bold text-on-surface">مراجعة يدوية</p>
+                <p class="text-[11px] text-on-surface-variant">المعلم سيراجع طلبك</p>
+              </div>
+            {% endif %}
+          </div>
         </div>
-        <div class="form-group">
-            {{ form.scheduled_start.label_tag }}
-            {{ form.scheduled_start }}
-            {{ form.scheduled_start.errors }}
+      </div>
+
+      <!-- Tips Card -->
+      <div class="glass-panel rounded-2xl p-5 shadow-sm anim-slide-r delay-4">
+        <p class="text-xs font-bold text-on-surface-variant mb-3 flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px] text-primary">tips_and_updates</span>
+          نصائح قبل الحجز
+        </p>
+        <ul class="space-y-2.5 text-sm text-on-surface-variant">
+          <li class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-[14px] text-primary mt-0.5 shrink-0">check_circle</span>
+            تأكد من توافر المعلم في الوقت المختار
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-[14px] text-primary mt-0.5 shrink-0">check_circle</span>
+            يمكنك إلغاء الحجز قبل 24 ساعة دون رسوم
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-[14px] text-primary mt-0.5 shrink-0">check_circle</span>
+            ستصلك رسالة تأكيد فور قبول المعلم
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- ── Right: Booking Form ── -->
+    <div class="lg:col-span-3">
+      <div class="glass-panel rounded-2xl p-7 md:p-9 shadow-xl anim-fade-up delay-3">
+
+        <!-- Form header -->
+        <div class="flex items-center gap-3 mb-8 pb-6 border-b border-outline-variant/40">
+          <div class="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+            <span class="material-symbols-outlined text-[22px]">edit_calendar</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-on-surface text-lg">تفاصيل الحجز</h3>
+            <p class="text-xs text-on-surface-variant mt-0.5">أكمل الحقول أدناه لإتمام طلبك</p>
+          </div>
+          <!-- Step dots -->
+          <div class="mr-auto flex items-center gap-1.5">
+            <div class="step-dot active" id="dot-1"></div>
+            <div class="step-dot" id="dot-2"></div>
+            <div class="step-dot" id="dot-3"></div>
+          </div>
         </div>
-        <div class="form-group">
-            {{ form.duration_minutes.label_tag }}
-            {{ form.duration_minutes }}
-            {{ form.duration_minutes.errors }}
-        </div>
-        <button type="submit" class="btn btn-primary">تأكيد طلب الحجز</button>
-        <a class="btn btn-secondary" href="{% url 'teachers:public_detail' teacher.pk %}">رجوع</a>
-    </form>
-</section>
+
+        {% if form.non_field_errors %}
+          <div class="mb-6 bg-red-50 border border-red-200 text-red-700 rounded-xl px-5 py-4 text-sm flex items-start gap-3">
+            <span class="material-symbols-outlined text-[20px] shrink-0 mt-0.5">error</span>
+            <div>{{ form.non_field_errors }}</div>
+          </div>
+        {% endif %}
+
+        <form method="post" class="space-y-6" id="booking-form">
+          {% csrf_token %}
+
+          <!-- Offering Field -->
+          <div class="anim-fade-up delay-3">
+            <label for="{{ form.teacher_subject.id_for_label }}"
+                   class="block text-sm font-bold text-on-surface mb-2 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-primary text-[18px]">menu_book</span>
+              المادة والعرض
+            </label>
+            <select name="teacher_subject" id="{{ form.teacher_subject.id_for_label }}" class="booking-input" required>
+              <option value="">— اختر المادة —</option>
+              {% for ts in form.teacher_subject.field.queryset %}
+                <option value="{{ ts.pk }}"
+                  {% if form.teacher_subject.value|stringformat:"s" == ts.pk|stringformat:"s" %}selected{% endif %}>
+                  {{ ts.subject.name }} — {{ ts.grade_level.name }}
+                  ({{ ts.get_lesson_type_display }})
+                  — {{ ts.default_price }} ج.م
+                </option>
+              {% endfor %}
+            </select>
+            {% for error in form.teacher_subject.errors %}
+              <p class="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">warning</span>{{ error }}
+              </p>
+            {% endfor %}
+          </div>
+
+          <!-- Date/Time Field -->
+          <div class="anim-fade-up delay-4">
+            <label for="{{ form.scheduled_start.id_for_label }}"
+                   class="block text-sm font-bold text-on-surface mb-2 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-primary text-[18px]">schedule</span>
+              تاريخ ووقت الحصة
+            </label>
+            <input type="datetime-local"
+                   name="scheduled_start"
+                   id="{{ form.scheduled_start.id_for_label }}"
+                   class="booking-input"
+                   value="{{ form.scheduled_start.value|default:'' }}"
+                   required>
+            {% for error in form.scheduled_start.errors %}
+              <p class="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">warning</span>{{ error }}
+              </p>
+            {% endfor %}
+          </div>
+
+          <!-- Duration Field -->
+          <div class="anim-fade-up delay-5">
+            <label for="{{ form.duration_minutes.id_for_label }}"
+                   class="block text-sm font-bold text-on-surface mb-2 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-primary text-[18px]">timer</span>
+              مدة الحصة
+            </label>
+            <select name="duration_minutes"
+                    id="{{ form.duration_minutes.id_for_label }}"
+                    class="booking-input"
+                    required>
+              {% for val, lbl in form.duration_minutes.field.choices %}
+                <option value="{{ val }}"
+                  {% if form.duration_minutes.value|stringformat:"s" == val|stringformat:"s" %}selected{% endif %}>
+                  {{ lbl }}
+                </option>
+              {% endfor %}
+            </select>
+            {% for error in form.duration_minutes.errors %}
+              <p class="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">warning</span>{{ error }}
+              </p>
+            {% endfor %}
+          </div>
+
+          <!-- Dynamic Price Preview -->
+          <div id="price-preview" class="hidden bg-primary/8 border border-primary/20 rounded-xl p-4 anim-fade-up delay-5">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-on-surface-variant">السعر المتوقع (تقديري)</span>
+              <span id="price-value" class="text-lg font-bold text-primary">—</span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-outline-variant/30 mt-2">
+            <button type="submit" class="btn-book flex-1" id="submit-btn">
+              <span class="material-symbols-outlined text-[20px]">check_circle</span>
+              تأكيد طلب الحجز
+            </button>
+            <a href="{% url 'teachers:public_detail' teacher.pk %}"
+               class="flex-1 inline-flex items-center justify-center gap-2 border-2 border-outline-variant text-on-surface font-bold px-6 py-3.5 rounded-[0.875rem] hover:bg-surface-container hover:border-primary/30 transition-all duration-200 text-sm">
+              <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+              العودة للملف الشخصي
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+(function() {
+  'use strict';
+
+  /* ── Ripple Effect on Submit Button ── */
+  const btn = document.getElementById('submit-btn');
+  if (btn) {
+    btn.addEventListener('click', function(e) {
+      const r = document.createElement('span');
+      r.className = 'ripple';
+      const rect = btn.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      r.style.cssText = `width:${size}px;height:${size}px;top:${e.clientY-rect.top-size/2}px;left:${e.clientX-rect.left-size/2}px`;
+      btn.appendChild(r);
+      r.addEventListener('animationend', () => r.remove());
+    });
+  }
+
+  /* ── Magnetic Hover on submit button (desktop only) ── */
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    btn && btn.addEventListener('mousemove', function(e) {
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width  / 2;
+      const y = e.clientY - rect.top  - rect.height / 2;
+      btn.style.transform = `translate(${x * .12}px, ${y * .12}px) scale(1.04)`;
+    });
+    btn && btn.addEventListener('mouseleave', function() {
+      btn.style.transform = '';
+    });
+  }
+
+  /* ── Dynamic Price Preview ── */
+  const offeringSelect  = document.getElementById('{{ form.teacher_subject.id_for_label }}');
+  const durationSelect  = document.getElementById('{{ form.duration_minutes.id_for_label }}');
+  const pricePreview    = document.getElementById('price-preview');
+  const priceValue      = document.getElementById('price-value');
+
+  // Build price map from server-rendered options (price embedded in text as "X ج.م")
+  const priceMap = {};
+  {% for ts in form.teacher_subject.field.queryset %}
+  priceMap['{{ ts.pk }}'] = {{ ts.default_price }};
+  {% endfor %}
+
+  function updatePrice() {
+    const offId = offeringSelect ? offeringSelect.value : '';
+    const dur   = durationSelect ? parseInt(durationSelect.value) : 60;
+    if (offId && priceMap[offId]) {
+      const hourlyPrice = priceMap[offId];
+      const estimated   = (hourlyPrice * dur / 60).toFixed(0);
+      priceValue.textContent = estimated + ' ج.م';
+      pricePreview.classList.remove('hidden');
+    } else {
+      pricePreview.classList.add('hidden');
+    }
+  }
+
+  offeringSelect && offeringSelect.addEventListener('change', updatePrice);
+  durationSelect && durationSelect.addEventListener('change', updatePrice);
+  updatePrice();
+
+  /* ── Step Dot Progress ── */
+  const dot1 = document.getElementById('dot-1');
+  const dot2 = document.getElementById('dot-2');
+  const dot3 = document.getElementById('dot-3');
+
+  function updateDots() {
+    const off = offeringSelect && offeringSelect.value;
+    const dt  = document.getElementById('{{ form.scheduled_start.id_for_label }}');
+    const dtVal = dt && dt.value;
+    const dur = durationSelect && durationSelect.value;
+
+    dot1.classList.toggle('active', true);
+    dot2.classList.toggle('active', !!(off && dtVal));
+    dot3.classList.toggle('active', !!(off && dtVal && dur));
+  }
+
+  offeringSelect && offeringSelect.addEventListener('change', updateDots);
+  durationSelect && durationSelect.addEventListener('change', updateDots);
+  const dtInput = document.getElementById('{{ form.scheduled_start.id_for_label }}');
+  dtInput && dtInput.addEventListener('change', updateDots);
+  updateDots();
+
+  /* ── Scroll Reveal (IntersectionObserver) ── */
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'none';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.anim-fade-up, .anim-scale-in, .anim-slide-r').forEach(el => {
+      observer.observe(el);
+    });
+  }
+})();
+</script>
 {% endblock %}

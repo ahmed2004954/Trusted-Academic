@@ -1,37 +1,295 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}إعادة جدولة الحجز - منصة الدروس الخصوصية{% endblock %}
+{% block title %}إعادة جدولة الحجز #{{ booking.pk }} - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>إعادة جدولة الحجز</h1>
-    <div class="status-card">
-        <p><strong>الطالب:</strong> {{ booking.student.get_full_name }}</p>
-        <p><strong>المدرس:</strong> {{ booking.teacher.user.get_full_name }}</p>
-        <p><strong>المادة:</strong> {{ booking.subject.name }} - {{ booking.grade_level.name }}</p>
-        <p><strong>الموعد الحالي:</strong> {{ booking.scheduled_start|date:'Y-m-d H:i' }} - {{ booking.scheduled_end|date:'H:i' }}</p>
-        <p><strong>عدد مرات إعادة الجدولة:</strong> {{ booking.reschedule_count }}</p>
+<style>
+  @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes spinOnce { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+  .anim-up { animation: fadeUp .55s cubic-bezier(.22,1,.36,1) both; }
+  .d1{animation-delay:.06s} .d2{animation-delay:.14s} .d3{animation-delay:.22s}
+
+  .gpanel {
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1.5px solid rgba(255,255,255,.75);
+    border-radius: 1.25rem;
+    box-shadow: 0 4px 32px rgba(0,0,0,.06);
+  }
+
+  .reschedule-icon-ring {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: linear-gradient(135deg, rgba(0,69,50,.12), rgba(0,69,50,.06));
+    display: flex; align-items: center; justify-content: center;
+    border: 3px solid rgba(0,69,50,.2);
+  }
+
+  .info-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: .6rem .9rem; border-radius: .75rem;
+    background: #f5f3ef; font-size: .84rem;
+  }
+  .info-row + .info-row { margin-top: .4rem; }
+
+  /* Old time struck through */
+  .old-time {
+    text-decoration: line-through;
+    color: #9ca3af;
+    font-size: .78rem;
+  }
+
+  .booking-input {
+    width: 100%;
+    background: #f5f3ef;
+    border: 1.5px solid #c8d4cc;
+    border-radius: .75rem;
+    padding: .75rem 1rem;
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    font-size: .9rem; color: #1a1c1a;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+    direction: rtl;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .booking-input:focus {
+    border-color: #004532;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(0,69,50,.1);
+  }
+  textarea.booking-input { resize: vertical; min-height: 80px; }
+
+  .btn-submit {
+    display: inline-flex; align-items: center; justify-content: center; gap: .45rem;
+    background: #004532; color: #fff;
+    border: none; border-radius: .875rem;
+    padding: .8rem 1.75rem;
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    font-weight: 700; font-size: .9rem;
+    cursor: pointer;
+    transition: transform .18s, box-shadow .18s;
+    position: relative; overflow: hidden;
+  }
+  .btn-submit::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% -20%, rgba(255,255,255,.15), transparent 70%);
+    pointer-events: none;
+  }
+  .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,69,50,.3); }
+  .btn-submit:active { transform: scale(.97); }
+
+  .btn-back {
+    display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+    background: transparent; color: #1a1c1a;
+    border: 1.5px solid #c8d4cc; border-radius: .875rem;
+    padding: .8rem 1.5rem;
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    font-weight: 700; font-size: .9rem;
+    text-decoration: none;
+    transition: background .18s, border-color .18s;
+  }
+  .btn-back:hover { background: #f5f3ef; border-color: #004532; }
+
+  /* Reschedule count badge */
+  .reschedule-count {
+    display: inline-flex; align-items: center; gap: .35rem;
+    background: {% if booking.reschedule_count >= 2 %}#fef9c3{% else %}#f0fdf4{% endif %};
+    border: 1px solid {% if booking.reschedule_count >= 2 %}#fde047{% else %}#bbf7d0{% endif %};
+    color: {% if booking.reschedule_count >= 2 %}#92400e{% else %}#065f46{% endif %};
+    font-size: .75rem; font-weight: 700;
+    padding: .25rem .65rem; border-radius: 999px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,*::before,*::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+  }
+</style>
+
+<!-- Atmospheric background -->
+<div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+  <div class="absolute -top-24 -right-24 w-[500px] h-[500px] rounded-full bg-primary/6 blur-[90px]"></div>
+  <div class="absolute -bottom-24 -left-24 w-[400px] h-[400px] rounded-full bg-secondary-container/8 blur-[80px]"></div>
+</div>
+
+<main class="min-h-screen flex items-center justify-center py-24 px-4" dir="rtl">
+  <div class="w-full max-w-lg flex flex-col gap-5">
+
+    <!-- Header Card -->
+    <div class="gpanel p-7 text-center anim-up d1">
+      <div class="reschedule-icon-ring mx-auto mb-4">
+        <span class="material-symbols-outlined text-primary text-[34px] icon-fill">event_repeat</span>
+      </div>
+      <h1 class="text-2xl font-black text-on-background mb-2" style="font-family:'IBM Plex Sans Arabic',sans-serif;">
+        إعادة جدولة الحجز
+      </h1>
+      <p class="text-sm text-on-surface-variant leading-relaxed">
+        اختر موعداً جديداً مناسباً لك. سيتم إخطار الطرف الآخر فوراً.
+      </p>
     </div>
 
-    <form method="post" class="form-card">
-        {% csrf_token %}
-        {{ form.non_field_errors }}
-        <div class="form-group">
-            {{ form.scheduled_start.label_tag }}
-            {{ form.scheduled_start }}
-            {{ form.scheduled_start.errors }}
+    <!-- Booking Summary -->
+    <div class="gpanel p-6 anim-up d2">
+      <div class="flex items-center gap-2 mb-4">
+        <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant">
+          <span class="material-symbols-outlined text-[18px] icon-fill">calendar_today</span>
         </div>
-        <div class="form-group">
-            {{ form.reason.label_tag }}
-            {{ form.reason }}
-            {{ form.reason.errors }}
+        <h2 class="font-bold text-on-surface text-sm">الحجز الحالي</h2>
+        <span class="mr-auto text-xs text-on-surface-variant bg-surface-container px-2.5 py-1 rounded-full">#{{ booking.pk }}</span>
+      </div>
+
+      <div>
+        <div class="info-row">
+          <span class="text-on-surface-variant">الطالب</span>
+          <span class="font-bold text-on-surface">{{ booking.student.get_full_name }}</span>
         </div>
-        <button type="submit" class="btn btn-primary">تأكيد إعادة الجدولة</button>
-        {% if is_teacher_view %}
-            <a class="btn btn-secondary" href="{% url 'bookings:teacher_detail' booking.pk %}">رجوع</a>
-        {% else %}
-            <a class="btn btn-secondary" href="{% url 'bookings:student_detail' booking.pk %}">رجوع</a>
+        <div class="info-row">
+          <span class="text-on-surface-variant">المعلم</span>
+          <span class="font-bold text-on-surface">{{ booking.teacher.user.get_full_name }}</span>
+        </div>
+        <div class="info-row">
+          <span class="text-on-surface-variant">المادة</span>
+          <span class="font-bold text-on-surface">{{ booking.subject.name }} — {{ booking.grade_level.name }}</span>
+        </div>
+        <div class="info-row">
+          <span class="text-on-surface-variant">الموعد الحالي</span>
+          <span class="old-time">
+            {{ booking.scheduled_start|date:'Y-m-d H:i' }} – {{ booking.scheduled_end|date:'H:i' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Reschedule counter warning -->
+      <div class="mt-4 flex items-center gap-2">
+        <span class="text-xs text-on-surface-variant">مرات إعادة الجدولة:</span>
+        <span class="reschedule-count">
+          <span class="material-symbols-outlined text-[13px]">refresh</span>
+          {{ booking.reschedule_count }} مرة
+        </span>
+        {% if booking.reschedule_count >= 2 %}
+          <span class="text-[11px] text-amber-600 font-bold">· تجاوز 2 يحتاج موافقة</span>
         {% endif %}
-    </form>
-</section>
+      </div>
+    </div>
+
+    <!-- Reschedule Form -->
+    <div class="gpanel p-6 anim-up d3">
+      {% if form.non_field_errors %}
+        <div class="mb-4 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm flex items-start gap-2">
+          <span class="material-symbols-outlined text-[18px] shrink-0 mt-0.5">error</span>
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+
+      <form method="post" id="reschedule-form">
+        {% csrf_token %}
+
+        <!-- New Date/Time -->
+        <div class="mb-5">
+          <label for="{{ form.scheduled_start.id_for_label }}"
+                 class="block text-sm font-bold text-on-surface mb-2 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-primary text-[16px]">schedule</span>
+            الموعد الجديد
+          </label>
+          <input type="datetime-local"
+                 name="{{ form.scheduled_start.html_name }}"
+                 id="{{ form.scheduled_start.id_for_label }}"
+                 class="booking-input"
+                 value="{{ form.scheduled_start.value|default:'' }}"
+                 required>
+          {% for error in form.scheduled_start.errors %}
+            <p class="mt-1 text-xs text-red-600 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[13px]">warning</span>{{ error }}
+            </p>
+          {% endfor %}
+        </div>
+
+        <!-- Reason -->
+        <div class="mb-5">
+          <label for="{{ form.reason.id_for_label }}"
+                 class="block text-sm font-bold text-on-surface mb-2 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px] text-on-surface-variant">edit_note</span>
+            سبب إعادة الجدولة
+            <span class="text-on-surface-variant font-normal">(اختياري)</span>
+          </label>
+          <textarea
+            name="{{ form.reason.html_name }}"
+            id="{{ form.reason.id_for_label }}"
+            class="booking-input"
+            placeholder="أخبر الطرف الآخر بسبب تغيير الموعد..."
+            rows="3"
+          >{{ form.reason.value|default:'' }}</textarea>
+          {% for error in form.reason.errors %}
+            <p class="mt-1 text-xs text-red-600 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[13px]">warning</span>{{ error }}
+            </p>
+          {% endfor %}
+        </div>
+
+        <!-- Info note -->
+        <div class="mb-5 flex items-start gap-2.5 bg-blue-50 border border-blue-200 rounded-xl p-3.5">
+          <span class="material-symbols-outlined text-blue-500 text-[18px] shrink-0 mt-0.5 icon-fill">info</span>
+          <p class="text-xs text-blue-700 leading-relaxed">
+            سيتم إشعار الطرف الآخر بالموعد الجديد، ويجب أن يكون الوقت المختار في المستقبل.
+          </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3">
+          <button type="submit" class="btn-submit flex-1" id="submit-reschedule-btn">
+            <span class="material-symbols-outlined text-[18px] icon-fill">event_repeat</span>
+            تأكيد الموعد الجديد
+          </button>
+          {% if is_teacher_view %}
+            <a href="{% url 'bookings:teacher_detail' booking.pk %}" class="btn-back flex-1">
+              <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+              رجوع للحجز
+            </a>
+          {% else %}
+            <a href="{% url 'bookings:student_detail' booking.pk %}" class="btn-back flex-1">
+              <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+              رجوع للحجز
+            </a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+
+  </div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  /* Magnetic hover on submit */
+  const btn = document.getElementById('submit-reschedule-btn');
+  if (btn && window.matchMedia('(hover:hover) and (pointer:fine)').matches) {
+    btn.addEventListener('mousemove', e => {
+      const r = btn.getBoundingClientRect();
+      const x = (e.clientX - r.left - r.width  / 2) * .1;
+      const y = (e.clientY - r.top  - r.height / 2) * .1;
+      btn.style.transform = `translate(${x}px,${y}px) translateY(-1px)`;
+    });
+    btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+  }
+
+  /* Disable button on submit */
+  const form = document.getElementById('reschedule-form');
+  if (form && btn) {
+    form.addEventListener('submit', () => {
+      btn.innerHTML = '<span class="material-symbols-outlined text-[18px]" style="animation:spin .8s linear infinite">hourglass_top</span> جارٍ الحفظ...';
+      btn.style.opacity = '.7';
+      btn.style.pointerEvents = 'none';
+    });
+  }
+
+  /* Spin keyframe */
+  const s = document.createElement('style');
+  s.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+  document.head.appendChild(s);
+})();
+</script>
 {% endblock %}

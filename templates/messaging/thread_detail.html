@@ -1,84 +1,460 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
 {% block title %}المحادثة الأكاديمية - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content text-right">
-    <!-- Header -->
-    <div class="border-b border-outline-variant/30 pb-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-            <h1 class="font-display-lg text-primary font-bold">المحادثة والمناقشة</h1>
-            {% if thread.booking %}
-                <p class="text-xs text-on-surface-variant mt-1">تواصل بخصوص حجز <strong>{{ thread.booking.subject.name }}</strong> مع المعلم <strong>{{ thread.booking.teacher.user.get_full_name }}</strong></p>
-            {% else %}
-                <p class="text-xs text-on-surface-variant mt-1">غرفة مراسلة وتواصل بخصوص الحصص التعليمية.</p>
-            {% endif %}
-        </div>
-        <div class="flex gap-2">
-            {% if thread.booking %}
-                <a class="btn btn-secondary text-xs" href="{% url 'bookings:student_detail' thread.booking.pk %}">تفاصيل الحجز</a>
-            {% endif %}
-            <a class="btn btn-secondary text-xs" href="{% url 'messaging:inbox' %}">عودة لصندوق الرسائل</a>
-        </div>
+<style>
+  /* ── Animations ── */
+  @keyframes fadeUp  { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
+  @keyframes msgIn   { from{opacity:0;transform:translateY(10px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+  @keyframes blinkDot{ 0%,80%,100%{opacity:0} 40%{opacity:1} }
+  @keyframes pulse   { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+
+  .anim-up { animation: fadeUp .5s cubic-bezier(.22,1,.36,1) both; }
+  .d1{animation-delay:.05s} .d2{animation-delay:.10s} .d3{animation-delay:.15s}
+
+  /* ── Chat Layout ── */
+  .chat-shell {
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 5.5rem); /* full height minus nav */
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 1rem;
+    gap: .75rem;
+  }
+
+  /* ── Glass ── */
+  .gpanel {
+    background: rgba(255,255,255,.9);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1.5px solid rgba(255,255,255,.75);
+    border-radius: 1.25rem;
+    box-shadow: 0 4px 28px rgba(0,69,50,.07);
+  }
+
+  /* ── Chat Header ── */
+  .chat-header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    padding: .85rem 1.2rem;
+  }
+
+  /* ── Message List ── */
+  .msg-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.25rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .85rem;
+    scroll-behavior: smooth;
+  }
+  .msg-list::-webkit-scrollbar { width: 4px; }
+  .msg-list::-webkit-scrollbar-track { background: transparent; }
+  .msg-list::-webkit-scrollbar-thumb { background: rgba(0,69,50,.2); border-radius: 99px; }
+
+  /* ── Message Bubbles ── */
+  .msg-bubble {
+    max-width: 72%;
+    display: flex;
+    flex-direction: column;
+    animation: msgIn .35s cubic-bezier(.22,1,.36,1) both;
+  }
+  .msg-bubble.mine  { align-self: flex-start; align-items: flex-start; }
+  .msg-bubble.theirs { align-self: flex-end;  align-items: flex-end;  }
+
+  .bubble-body {
+    padding: .7rem 1rem;
+    border-radius: 1rem;
+    font-size: .85rem;
+    line-height: 1.65;
+    position: relative;
+    word-break: break-word;
+  }
+  .mine  .bubble-body {
+    background: linear-gradient(135deg, #004532, #1a6b51);
+    color: #fff;
+    border-bottom-right-radius: .25rem;
+    box-shadow: 0 4px 14px rgba(0,69,50,.25);
+  }
+  .theirs .bubble-body {
+    background: #f0ede8;
+    color: #1a1c1a;
+    border-bottom-left-radius: .25rem;
+    border: 1px solid rgba(0,0,0,.06);
+  }
+
+  .bubble-meta {
+    font-size: .68rem;
+    color: #8a9490;
+    margin-top: .25rem;
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+  }
+  .mine  .bubble-meta { flex-direction: row; }
+  .theirs .bubble-meta { flex-direction: row-reverse; }
+
+  .sender-name {
+    font-weight: 700;
+    font-size: .72rem;
+    margin-bottom: .25rem;
+  }
+  .mine   .sender-name { color: #1a6b51; text-align: right; }
+  .theirs .sender-name { color: #6b4b1a; text-align: left;  }
+
+  /* ── Date Divider ── */
+  .date-divider {
+    display: flex; align-items: center; gap: .75rem;
+    font-size: .72rem; color: #8a9490; font-weight: 600;
+    padding: .25rem 0;
+  }
+  .date-divider::before, .date-divider::after {
+    content: ''; flex: 1; height: 1px; background: rgba(0,0,0,.1);
+  }
+
+  /* ── Attachment chip ── */
+  .attach-chip {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: rgba(255,255,255,.25); border: 1px solid rgba(255,255,255,.4);
+    border-radius: .5rem; padding: .3rem .6rem;
+    font-size: .72rem; font-weight: 700; color: #fff;
+    text-decoration: none; margin-top: .5rem;
+    transition: background .2s;
+  }
+  .attach-chip:hover { background: rgba(255,255,255,.4); }
+  .theirs .attach-chip {
+    background: rgba(0,69,50,.08); border-color: rgba(0,69,50,.2);
+    color: #004532;
+  }
+  .theirs .attach-chip:hover { background: rgba(0,69,50,.14); }
+
+  /* ── Compose Box ── */
+  .compose-bar {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    padding: .75rem 1rem 1rem;
+  }
+  .compose-textarea {
+    width: 100%;
+    min-height: 64px;
+    max-height: 160px;
+    resize: none;
+    background: #f5f3ef;
+    border: 1.5px solid #c8d4cc;
+    border-radius: .875rem;
+    padding: .75rem 1rem;
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    font-size: .9rem;
+    color: #1a1c1a;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+    direction: rtl;
+    line-height: 1.6;
+  }
+  .compose-textarea:focus {
+    border-color: #004532;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(0,69,50,.1);
+  }
+
+  /* ── Send Button ── */
+  .send-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+    background: #004532; color: #fff;
+    border: none; border-radius: .875rem;
+    padding: .65rem 1.4rem;
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    font-weight: 700; font-size: .88rem;
+    cursor: pointer;
+    transition: transform .18s, box-shadow .18s;
+    position: relative; overflow: hidden;
+  }
+  .send-btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% -20%, rgba(255,255,255,.15), transparent 70%);
+    pointer-events: none;
+  }
+  .send-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,69,50,.3); }
+  .send-btn:active { transform: scale(.97); }
+
+  /* ── Attachment button ── */
+  .attach-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 42px; height: 42px;
+    background: #f0ede8; border: 1.5px solid #c8d4cc;
+    border-radius: .75rem; cursor: pointer;
+    transition: background .2s, border-color .2s;
+    color: #004532;
+  }
+  .attach-btn:hover { background: #e8e4de; border-color: #004532; }
+
+  /* ── File label display ── */
+  .file-label-display {
+    font-size: .72rem; color: #5b6b63;
+    display: none; align-items: center; gap: .3rem;
+  }
+  .file-label-display.visible { display: inline-flex; }
+
+  /* ── Empty state ── */
+  .empty-chat {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: .75rem; padding: 2rem;
+  }
+
+  /* ── Typing indicator ── */
+  .typing-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #8a9490;
+    animation: blinkDot 1.4s infinite ease-in-out both;
+  }
+  .typing-dot:nth-child(2) { animation-delay: .2s; }
+  .typing-dot:nth-child(3) { animation-delay: .4s; }
+
+  /* ── Online badge ── */
+  .online-dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: #22c55e; border: 2px solid #fff;
+    position: absolute; bottom: 1px; left: 1px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,*::before,*::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+  }
+</style>
+
+<!-- ── Atmospheric Background ── -->
+<div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+  <div class="absolute -top-32 -right-32 w-[600px] h-[600px] rounded-full bg-primary/6 blur-[100px]"></div>
+  <div class="absolute bottom-0 -left-24 w-[400px] h-[400px] rounded-full bg-secondary-container/8 blur-[80px]"></div>
+</div>
+
+<div class="chat-shell" dir="rtl">
+
+  <!-- ── Chat Header ── -->
+  <div class="gpanel chat-header anim-up d1">
+    <!-- Avatar -->
+    <div class="relative shrink-0">
+      <div class="w-11 h-11 rounded-full bg-primary/15 flex items-center justify-center text-primary">
+        <span class="material-symbols-outlined text-[22px] icon-fill">
+          {% if thread.booking %}school{% else %}forum{% endif %}
+        </span>
+      </div>
+      <div class="online-dot"></div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        <!-- Message list thread -->
-        <div class="col-span-1 lg:col-span-8 flex flex-col gap-4">
-            <div class="bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm flex flex-col gap-4 min-h-[350px] max-h-[500px] overflow-y-auto">
-                {% for message in thread_messages %}
-                    <article class="p-4 rounded-2xl text-xs max-w-[85%] leading-relaxed shadow-sm
-                        {% if message.sender == user %}
-                            bg-primary/10 text-on-surface border border-primary/20 self-start text-right
-                        {% else %}
-                            bg-surface-container border border-outline-variant/30 self-end text-right
-                        {% endif %}">
-                        <div class="flex items-center justify-between gap-6 mb-2 border-b border-outline-variant/20 pb-1">
-                            <span class="font-bold text-primary">{{ message.sender.get_full_name|default:message.sender.email }}</span>
-                            <span class="text-[9px] text-on-surface-variant opacity-75">{{ message.created_at|date:'Y-m-d H:i' }}</span>
-                        </div>
-                        {% if message.body %}
-                            <p class="text-xs text-on-surface leading-loose whitespace-pre-line">{{ message.body }}</p>
-                        {% endif %}
-                        {% if message.attachment %}
-                            <div class="mt-3 pt-2 border-t border-outline-variant/20 flex justify-end">
-                                <a href="{{ message.attachment.url }}" class="inline-flex items-center gap-1 text-[10px] text-primary font-bold hover:underline" target="_blank">
-                                    <span class="material-symbols-outlined text-xs">download</span> تحميل المرفق
-                                </a>
-                            </div>
-                        {% endif %}
-                    </article>
-                {% empty %}
-                    <div class="text-center py-10 opacity-70 my-auto">
-                        <span class="material-symbols-outlined text-[48px] text-on-surface-variant">chat_bubble</span>
-                        <p class="text-xs mt-2">لا توجد رسائل في هذه المحادثة بعد. اكتب رسالتك الأولى بالأسفل.</p>
-                    </div>
-                {% endfor %}
-            </div>
+    <!-- Info -->
+    <div class="flex-1 min-w-0">
+      {% if thread.booking %}
+        <h1 class="font-bold text-on-surface text-base leading-tight truncate">
+          {{ thread.booking.subject.name }} — {{ thread.booking.grade_level.name }}
+        </h1>
+        <p class="text-xs text-on-surface-variant truncate">
+          مع {{ thread.booking.teacher.user.get_full_name }}
+          · حجز #{{ thread.booking.pk }}
+        </p>
+      {% else %}
+        <h1 class="font-bold text-on-surface text-base">المحادثة والمناقشة</h1>
+        <p class="text-xs text-on-surface-variant">غرفة مراسلة أكاديمية</p>
+      {% endif %}
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-2 shrink-0">
+      {% if thread.booking %}
+        <a href="{% url 'bookings:student_detail' thread.booking.pk %}"
+           class="inline-flex items-center gap-1.5 border border-outline-variant text-on-surface text-xs font-bold px-3 py-2 rounded-xl hover:bg-surface-container transition-colors">
+          <span class="material-symbols-outlined text-[15px]">receipt_long</span>
+          الحجز
+        </a>
+      {% endif %}
+      <a href="{% url 'messaging:inbox' %}"
+         class="inline-flex items-center gap-1.5 border border-outline-variant text-on-surface text-xs font-bold px-3 py-2 rounded-xl hover:bg-surface-container transition-colors">
+        <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+        الصندوق
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Messages Panel ── -->
+  <div class="gpanel flex-1 flex flex-col overflow-hidden anim-up d2">
+
+    <!-- Message List -->
+    <div class="msg-list" id="msg-list">
+      {% for message in thread_messages %}
+
+        <!-- Date divider when date changes -->
+        {% ifchanged message.created_at|date:"Y-m-d" %}
+          <div class="date-divider">{{ message.created_at|date:"Y-m-d" }}</div>
+        {% endifchanged %}
+
+        <div class="msg-bubble {% if message.sender == user %}mine{% else %}theirs{% endif %}"
+             style="animation-delay: {{ forloop.counter0|add:1 }}00ms">
+          <span class="sender-name">{{ message.sender.get_full_name|default:message.sender.email }}</span>
+          <div class="bubble-body">
+            {% if message.body %}
+              <p class="whitespace-pre-line leading-relaxed">{{ message.body }}</p>
+            {% endif %}
+            {% if message.attachment %}
+              <a href="{{ message.attachment.url }}" class="attach-chip" target="_blank" rel="noopener">
+                <span class="material-symbols-outlined text-[13px]">attach_file</span>
+                تحميل المرفق
+              </a>
+            {% endif %}
+          </div>
+          <div class="bubble-meta">
+            <span>{{ message.created_at|date:"H:i" }}</span>
+            {% if message.sender == user %}
+              <span class="material-symbols-outlined text-[12px]">done_all</span>
+            {% endif %}
+          </div>
         </div>
 
-        <!-- Message Reply box form -->
-        <div class="col-span-1 lg:col-span-4 bg-surface border border-outline-variant/50 rounded-2xl p-6 shadow-sm">
-            <h3 class="font-bold text-primary mb-3 flex items-center gap-2 border-b border-outline-variant/30 pb-2 text-sm">
-                <span class="material-symbols-outlined text-[18px]">send</span> إرسال رسالة جديدة
-            </h3>
-            <form method="post" enctype="multipart/form-data" class="flex flex-col gap-4">
-                {% csrf_token %}
-                {% for field in form %}
-                    <div class="flex flex-col gap-1 text-xs">
-                        <label class="font-semibold text-on-surface mb-1">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.help_text %}
-                            <span class="text-[10px] text-on-surface-variant opacity-80 mt-0.5">{{ field.help_text }}</span>
-                        {% endif %}
-                        {% for error in field.errors %}
-                            <span class="text-error text-[10px] font-bold">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-                <button type="submit" class="w-full btn btn-primary py-2.5 text-xs font-semibold">إرسال الرسالة</button>
-            </form>
+      {% empty %}
+        <div class="empty-chat">
+          <div class="w-16 h-16 rounded-2xl bg-primary/8 flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-[36px]">chat_bubble</span>
+          </div>
+          <p class="font-bold text-on-surface text-sm">لا توجد رسائل بعد</p>
+          <p class="text-xs text-on-surface-variant text-center max-w-xs">ابدأ المحادثة بكتابة رسالتك في الأسفل.</p>
         </div>
+      {% endfor %}
+
+      <!-- Anchor for scroll-to-bottom -->
+      <div id="chat-bottom"></div>
     </div>
-</section>
+
+    <!-- ── Compose Bar ── -->
+    <div class="compose-bar border-t border-outline-variant/30">
+      <form method="post" enctype="multipart/form-data" id="compose-form">
+        {% csrf_token %}
+        {% for field in form %}
+          {% if field.name == 'body' %}
+            <textarea
+              id="compose-textarea"
+              name="{{ field.html_name }}"
+              class="compose-textarea"
+              placeholder="اكتب رسالتك هنا..."
+              rows="2"
+            >{{ field.value|default:'' }}</textarea>
+            {% for error in field.errors %}
+              <p class="text-xs text-red-500 mt-1">{{ error }}</p>
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+
+        <div class="flex items-center gap-2">
+          <!-- Attachment -->
+          <label class="attach-btn" title="إرفاق ملف">
+            <span class="material-symbols-outlined text-[20px]">attach_file</span>
+            {% for field in form %}
+              {% if field.name == 'attachment' %}
+                <input type="file" name="{{ field.html_name }}" id="attach-input" class="sr-only"
+                       accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                       onchange="showFileName(this)">
+              {% endif %}
+            {% endfor %}
+          </label>
+          <!-- File name display -->
+          <span class="file-label-display" id="file-name-display">
+            <span class="material-symbols-outlined text-[13px] text-primary">description</span>
+            <span id="file-name-text"></span>
+          </span>
+
+          <!-- Spacer -->
+          <div class="flex-1"></div>
+
+          <!-- Send -->
+          <button type="submit" class="send-btn" id="send-btn">
+            <span class="material-symbols-outlined text-[18px]">send</span>
+            إرسال
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── Scroll to bottom on load ── */
+  const bottom = document.getElementById('chat-bottom');
+  if (bottom) bottom.scrollIntoView({ behavior: 'instant' });
+
+  /* ── Auto-resize textarea ── */
+  const ta = document.getElementById('compose-textarea');
+  if (ta) {
+    ta.addEventListener('input', () => {
+      ta.style.height = 'auto';
+      ta.style.height = Math.min(ta.scrollHeight, 160) + 'px';
+    });
+    /* Ctrl+Enter to submit */
+    ta.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        document.getElementById('compose-form').requestSubmit();
+      }
+    });
+  }
+
+  /* ── Show attachment file name ── */
+  window.showFileName = function (input) {
+    const display = document.getElementById('file-name-display');
+    const nameEl  = document.getElementById('file-name-text');
+    if (input.files && input.files[0]) {
+      nameEl.textContent = input.files[0].name;
+      display.classList.add('visible');
+    } else {
+      display.classList.remove('visible');
+    }
+  };
+
+  /* ── Ripple on send button ── */
+  const sendBtn = document.getElementById('send-btn');
+  if (sendBtn) {
+    sendBtn.addEventListener('click', e => {
+      const r = document.createElement('span');
+      Object.assign(r.style, {
+        position: 'absolute', borderRadius: '50%',
+        background: 'rgba(255,255,255,.3)',
+        width: '100px', height: '100px',
+        top: (e.offsetY - 50) + 'px',
+        left: (e.offsetX - 50) + 'px',
+        transform: 'scale(0)',
+        animation: 'ripple .5s linear',
+        pointerEvents: 'none',
+      });
+      sendBtn.appendChild(r);
+      r.addEventListener('animationend', () => r.remove());
+    });
+  }
+
+  /* ── Magnetic hover on send button ── */
+  if (window.matchMedia('(hover:hover) and (pointer:fine)').matches && sendBtn) {
+    sendBtn.addEventListener('mousemove', e => {
+      const rect = sendBtn.getBoundingClientRect();
+      const x = (e.clientX - rect.left - rect.width  / 2) * .1;
+      const y = (e.clientY - rect.top  - rect.height / 2) * .1;
+      sendBtn.style.transform = `translate(${x}px,${y}px) translateY(-1px)`;
+    });
+    sendBtn.addEventListener('mouseleave', () => { sendBtn.style.transform = ''; });
+  }
+
+  /* ── Add ripple keyframe dynamically ── */
+  const style = document.createElement('style');
+  style.textContent = `@keyframes ripple { to { transform: scale(4); opacity: 0; } }`;
+  document.head.appendChild(style);
+})();
+</script>
 {% endblock %}
