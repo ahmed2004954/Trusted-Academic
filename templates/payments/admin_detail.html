@@ -1,39 +1,173 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load i18n %}
 
 {% block title %}تفاصيل الدفع - منصة الدروس الخصوصية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>تفاصيل الدفع</h1>
-    <div class="status-card">
-        <p><strong>الحجز:</strong> #{{ payment.booking.pk }}</p>
-        <p><strong>الطالب:</strong> {{ payment.booking.student.get_full_name }} ({{ payment.booking.student.email }})</p>
-        <p><strong>المدرس:</strong> {{ payment.booking.teacher.user.get_full_name }}</p>
-        <p><strong>المادة:</strong> {{ payment.booking.subject.name }} - {{ payment.booking.grade_level.name }}</p>
-        <p><strong>المبلغ:</strong> {{ payment.amount }} {{ payment.currency }}</p>
-        <p><strong>طريقة الدفع:</strong> {{ payment.get_payment_method_display }}</p>
-        <p><strong>الحالة:</strong> {{ payment.get_payment_status_display }}</p>
-        <p><strong>مرجع العملية:</strong> {{ payment.transaction_reference|default:'-' }}</p>
+<div class="pt-4 pb-xl px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto w-full text-right">
+    <div class="max-w-4xl mx-auto space-y-6" dir="rtl">
+    
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-on-surface mb-2">تفاصيل الدفع</h1>
+            <p class="text-on-surface-variant font-medium">مراجعة بيانات عملية الدفع وإيصال التحويل للحجز #{{ payment.booking.pk }}</p>
+        </div>
+        <a href="{% url 'payments:admin_pending' %}" class="flex items-center gap-2 px-4 py-2 bg-surface-container-low border border-outline-variant/60 rounded-xl text-on-surface hover:bg-surface-container-high transition-colors font-medium">
+            <span class="material-symbols-outlined text-[20px] rtl:-scale-x-100">arrow_forward</span>
+            رجوع للقائمة
+        </a>
+    </div>
+
+    <!-- Data Card -->
+    <div class="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl p-6 md:p-8 shadow-sm">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
+            
+            <div class="space-y-1">
+                <span class="text-sm font-medium text-on-surface-variant">رقم الحجز</span>
+                <p class="text-lg font-bold text-on-surface">#{{ payment.booking.pk }}</p>
+            </div>
+
+            <div class="space-y-1">
+                <span class="text-sm font-medium text-on-surface-variant">الطالب</span>
+                <p class="text-lg font-bold text-on-surface">{{ payment.booking.student.get_full_name }}</p>
+                <p class="text-sm text-on-surface-variant/80 font-medium" dir="ltr">{{ payment.booking.student.email }}</p>
+            </div>
+
+            <div class="space-y-1">
+                <span class="text-sm font-medium text-on-surface-variant">المدرس</span>
+                <p class="text-lg font-bold text-on-surface">{{ payment.booking.teacher.user.get_full_name }}</p>
+            </div>
+
+            <div class="space-y-1">
+                <span class="text-sm font-medium text-on-surface-variant">المادة / المرحلة</span>
+                <p class="text-lg font-bold text-on-surface">{{ payment.booking.subject.name }} - {{ payment.booking.grade_level.name }}</p>
+            </div>
+
+            <div class="space-y-1">
+                <span class="text-sm font-medium text-on-surface-variant">المبلغ</span>
+                <p class="text-xl font-bold text-primary">{{ payment.amount }} <span class="text-sm">{{ payment.currency }}</span></p>
+            </div>
+
+            <div class="space-y-1">
+                <span class="text-sm font-medium text-on-surface-variant">طريقة الدفع</span>
+                <p class="text-lg font-bold text-on-surface">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-surface-container-highest border border-outline-variant/30 text-sm">
+                        {{ payment.get_payment_method_display }}
+                    </span>
+                </p>
+            </div>
+
+            <div class="space-y-1">
+                <span class="text-sm font-medium text-on-surface-variant">مرجع العملية</span>
+                <p class="text-lg font-bold text-on-surface" dir="ltr">{{ payment.transaction_reference|default:'-' }}</p>
+            </div>
+            
+            <div class="space-y-1">
+                <span class="text-sm font-medium text-on-surface-variant">الحالة</span>
+                <div>
+                    {% if payment.payment_status == 'awaiting_verification' %}
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20 text-sm font-bold">
+                            <span class="material-symbols-outlined text-[16px]">pending</span>
+                            بانتظار المراجعة
+                        </span>
+                    {% elif payment.payment_status == 'verified' %}
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-sm font-bold">
+                            <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                            مكتمل
+                        </span>
+                    {% elif payment.payment_status == 'rejected' %}
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 text-red-500 border border-red-500/20 text-sm font-bold">
+                            <span class="material-symbols-outlined text-[16px]">error</span>
+                            مرفوض
+                        </span>
+                    {% else %}
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-highest border border-outline-variant/30 text-sm font-bold">
+                            {{ payment.get_payment_status_display }}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if payment.rejection_reason %}
+                <div class="space-y-1 md:col-span-2 mt-4">
+                    <span class="text-sm font-medium text-error">سبب الرفض</span>
+                    <p class="text-lg font-bold text-on-surface bg-error/5 p-4 rounded-xl border border-error/20">{{ payment.rejection_reason }}</p>
+                </div>
+            {% endif %}
+        </div>
+        
         {% if payment.receipt_image %}
-            <p><a class="btn btn-secondary" href="{{ payment.receipt_image.url }}" target="_blank" rel="noopener">فتح الإيصال</a></p>
-        {% endif %}
-        {% if payment.rejection_reason %}
-            <p><strong>سبب الرفض:</strong> {{ payment.rejection_reason }}</p>
+            <div class="mt-8 pt-6 border-t border-outline-variant/30">
+                <h3 class="text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">receipt_long</span>
+                    إيصال الدفع المرفق
+                </h3>
+                <div class="bg-surface-container-low border border-outline-variant/50 rounded-2xl p-4 overflow-hidden max-w-lg relative group">
+                    <img src="{{ payment.receipt_image.url }}" alt="إيصال الدفع" class="w-full h-auto object-cover max-h-[500px] rounded-xl">
+                    <a href="{{ payment.receipt_image.url }}" target="_blank" rel="noopener" class="absolute inset-4 rounded-xl bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white font-bold backdrop-blur-sm z-10">
+                        <span class="material-symbols-outlined">open_in_new</span>
+                        فتح الإيصال في نافذة جديدة
+                    </a>
+                </div>
+            </div>
         {% endif %}
     </div>
 
     {% if payment.payment_status == 'awaiting_verification' %}
-        <form method="post" action="{% url 'payments:admin_approve' payment.pk %}" class="inline-form">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary">قبول الدفع وتأكيد الحجز</button>
-        </form>
-        <form method="post" action="{% url 'payments:admin_reject' payment.pk %}" class="form-card">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-secondary">رفض الدفع</button>
-        </form>
-    {% endif %}
+        <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 md:p-8 shadow-sm">
+            <h3 class="text-xl font-bold text-on-surface mb-6 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">admin_panel_settings</span>
+                إجراءات الإدارة
+            </h3>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+                
+                <!-- Approve -->
+                <div class="bg-primary/5 border border-primary/20 rounded-2xl p-6 flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-primary/20 text-primary rounded-full flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-3xl">task_alt</span>
+                    </div>
+                    <h4 class="text-lg font-bold text-on-surface mb-2">قبول الدفع</h4>
+                    <p class="text-sm text-on-surface-variant mb-6">سيتم تأكيد الدفع وإبلاغ الطالب والمدرس باعتماد الحجز.</p>
+                    
+                    <form method="post" action="{% url 'payments:admin_approve' payment.pk %}" class="w-full mt-auto">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-on-primary rounded-xl font-bold transition-all hover:scale-[1.02] shadow-md shadow-primary/20">
+                            <span class="material-symbols-outlined">check_circle</span>
+                            قبول الدفع وتأكيد الحجز
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Reject -->
+                <div class="bg-error/5 border border-error/20 rounded-2xl p-6 flex flex-col items-start h-full">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-error/20 text-error rounded-full flex items-center justify-center">
+                            <span class="material-symbols-outlined text-2xl">block</span>
+                        </div>
+                        <h4 class="text-lg font-bold text-error">رفض الدفع</h4>
+                    </div>
+                    <p class="text-sm text-on-surface-variant mb-4">في حال كان الإيصال غير صالح. يجب كتابة سبب الرفض بوضوح لإبلاغ الطالب.</p>
+                    
+                    <form method="post" action="{% url 'payments:admin_reject' payment.pk %}" class="w-full flex flex-col gap-4 mt-auto admin-form">
+                        {% csrf_token %}
+                        <div class="flex flex-col gap-2">
+                            <label for="{{ form.rejection_reason.id_for_label }}" class="text-sm font-bold text-on-surface">سبب الرفض</label>
+                            {{ form.rejection_reason }}
+                            {% if form.rejection_reason.errors %}
+                                <p class="text-sm text-error font-medium">{{ form.rejection_reason.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-error hover:bg-error/90 text-on-error rounded-xl font-bold transition-all hover:scale-[1.02] shadow-md shadow-error/20 mt-2">
+                            <span class="material-symbols-outlined">close</span>
+                            رفض الدفع
+                        </button>
+                    </form>
+                </div>
 
-    <a class="btn btn-secondary" href="{% url 'payments:admin_pending' %}">رجوع لقائمة المراجعة</a>
-</section>
+            </div>
+        </div>
+    {% endif %}
+    </div>
+</div>
 {% endblock %}
