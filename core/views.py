@@ -54,9 +54,9 @@ def contact(request):
                 [settings.DEFAULT_FROM_EMAIL],
                 fail_silently=True,
             )
-            messages.success(request, _('Your message has been sent. We will get back to you soon.'))
+            messages.success(request, _('تم إرسال رسالتك بنجاح. سنتواصل معك قريباً.'))
             return redirect('core:contact')
-        messages.error(request, _('Please fill in all fields.'))
+        messages.error(request, _('يرجى ملء جميع الحقول.'))
     return render(request, 'core/contact.html')
 
 

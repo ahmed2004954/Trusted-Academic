@@ -106,15 +106,15 @@ def review_teacher(request, profile_id):
             if action == 'approve':
                 profile.approve(notes)
                 record_audit_log(request.user, 'teacher.approve', profile, {'notes': notes})
-                messages.success(request, _('Teacher profile approved.'))
+                messages.success(request, _('تمت الموافقة على الملف الشخصي للمعلم.'))
             elif action == 'reject':
                 profile.reject(notes)
                 record_audit_log(request.user, 'teacher.reject', profile, {'notes': notes})
-                messages.success(request, _('Teacher profile rejected.'))
+                messages.success(request, _('تم رفض الملف الشخصي للمعلم.'))
             elif action == 'suspend':
                 profile.suspend(notes)
                 record_audit_log(request.user, 'teacher.suspend', profile, {'notes': notes})
-                messages.success(request, _('Teacher profile suspended.'))
+                messages.success(request, _('تم تعليق الملف الشخصي للمعلم.'))
             return redirect('adminpanel:review_teacher', profile_id=profile.pk)
     else:
         form = TeacherReviewForm(instance=profile)
@@ -225,9 +225,9 @@ def add_subject(request):
         name = request.POST.get('name', '').strip()
         if name:
             Subject.objects.create(name=name)
-            messages.success(request, _('Subject created successfully.'))
+            messages.success(request, _('تم إضافة المادة بنجاح.'))
             return redirect('adminpanel:manage_subjects')
-        messages.error(request, _('Subject name is required.'))
+        messages.error(request, _('اسم المادة مطلوب.'))
     return redirect('adminpanel:manage_subjects')
 
 
@@ -239,7 +239,7 @@ def edit_subject(request, subject_id):
         subject.name = request.POST.get('name', subject.name).strip()
         subject.is_active = request.POST.get('is_active') == 'on'
         subject.save()
-        messages.success(request, _('Subject updated successfully.'))
+        messages.success(request, _('تم تحديث المادة بنجاح.'))
     return redirect('adminpanel:manage_subjects')
 
 
@@ -248,7 +248,7 @@ def delete_subject(request, subject_id):
     from subjects.models import Subject
     if request.method == 'POST':
         Subject.objects.filter(pk=subject_id).delete()
-        messages.success(request, _('Subject deleted.'))
+        messages.success(request, _('تم حذف المادة بنجاح.'))
     return redirect('adminpanel:manage_subjects')
 
 
@@ -261,9 +261,9 @@ def add_grade_level(request):
         order = request.POST.get('order', 0)
         if name:
             GradeLevel.objects.create(name=name, category=category, order=order)
-            messages.success(request, _('Grade level created successfully.'))
+            messages.success(request, _('تم إضافة المرحلة الدراسية بنجاح.'))
             return redirect('adminpanel:manage_subjects')
-        messages.error(request, _('Grade level name is required.'))
+        messages.error(request, _('اسم المرحلة الدراسية مطلوب.'))
     return redirect('adminpanel:manage_subjects')
 
 
@@ -277,7 +277,7 @@ def edit_grade_level(request, gl_id):
         gl.order = request.POST.get('order', gl.order)
         gl.is_active = request.POST.get('is_active') == 'on'
         gl.save()
-        messages.success(request, _('Grade level updated successfully.'))
+        messages.success(request, _('تم تحديث المرحلة الدراسية بنجاح.'))
     return redirect('adminpanel:manage_subjects')
 
 
@@ -299,9 +299,9 @@ def add_pricing_range(request):
                 min_price=min_price,
                 max_price=max_price,
             )
-            messages.success(request, _('Pricing range created successfully.'))
+            messages.success(request, _('تم إضافة النطاق السعري بنجاح.'))
             return redirect('adminpanel:manage_subjects')
-        messages.error(request, _('All fields are required.'))
+        messages.error(request, _('جميع الحقول مطلوبة.'))
     return redirect('adminpanel:manage_subjects')
 
 
@@ -314,7 +314,7 @@ def edit_pricing_range(request, pr_id):
         pr.max_price = request.POST.get('max_price', pr.max_price)
         pr.is_active = request.POST.get('is_active') == 'on'
         pr.save()
-        messages.success(request, _('Pricing range updated successfully.'))
+        messages.success(request, _('تم تحديث النطاق السعري بنجاح.'))
     return redirect('adminpanel:manage_subjects')
 
 
@@ -323,7 +323,7 @@ def delete_grade_level(request, gl_id):
     from subjects.models import GradeLevel
     if request.method == 'POST':
         GradeLevel.objects.filter(pk=gl_id).delete()
-        messages.success(request, _('Grade level deleted successfully.'))
+        messages.success(request, _('تم حذف المرحلة الدراسية بنجاح.'))
     return redirect('adminpanel:manage_subjects')
 
 
@@ -332,6 +332,6 @@ def delete_pricing_range(request, pr_id):
     from teachers.models import PlatformPricingRange
     if request.method == 'POST':
         PlatformPricingRange.objects.filter(pk=pr_id).delete()
-        messages.success(request, _('Pricing range deleted successfully.'))
+        messages.success(request, _('تم حذف النطاق السعري بنجاح.'))
     return redirect('adminpanel:manage_subjects')
 

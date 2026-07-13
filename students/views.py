@@ -78,7 +78,7 @@ def linking_code(request):
     if request.method == 'POST':
         profile.linking_code = ''
         profile.generate_linking_code()
-        messages.success(request, _('Linking code generated.'))
+        messages.success(request, _('تم إنشاء كود الربط بنجاح.'))
         return redirect('students:linking_code')
     if not profile.linking_code:
         profile.generate_linking_code()

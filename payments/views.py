@@ -94,7 +94,7 @@ def payment_instructions(request, booking_pk):
         student=request.user,
     )
     if booking.booking_status not in PAYABLE_STATUSES:
-        messages.error(request, _('This booking is not ready for payment.'))
+        messages.error(request, _('هذا الحجز غير جاهز للدفع.'))
         return redirect('bookings:student_detail', pk=booking.pk)
 
     payment = _get_or_create_payment(booking)
@@ -110,7 +110,7 @@ def payment_instructions(request, booking_pk):
                 payment.save()
                 booking.booking_status = Booking.BookingStatus.AWAITING_RECEIPT_VERIFICATION
                 booking.save(update_fields=['booking_status', 'updated_at'])
-            messages.success(request, _('Receipt uploaded. We will verify it shortly.'))
+            messages.success(request, _('تم رفع الإيصال. سنقوم بمراجعته قريباً.'))
             return redirect('payments:history')
     else:
         form = PaymentReceiptForm(instance=payment)
@@ -182,7 +182,7 @@ def approve_payment(request, payment_pk):
         _('Payment approved'),
         _('Your payment has been approved.\n\n') + _booking_summary(payment.booking),
     )
-    messages.success(request, _('Payment approved and booking confirmed.'))
+    messages.success(request, _('تمت الموافقة على الدفع وتأكيد الحجز بنجاح.'))
     return redirect('payments:admin_pending')
 
 
@@ -222,7 +222,7 @@ def reject_payment(request, payment_pk):
         _('Your payment receipt was rejected. Reason: %(reason)s\n\n') % {'reason': payment.rejection_reason}
         + _booking_summary(payment.booking),
     )
-    messages.success(request, _('Payment rejected and booking returned to payable status.'))
+    messages.success(request, _('تم رفض الدفع وإعادة الحجز لحالة الدفع.'))
     return redirect('payments:admin_pending')
 
 
@@ -247,7 +247,7 @@ def wallet_dashboard(request):
                 form.add_error('amount', _('Withdrawal amount exceeds available wallet balance.'))
             else:
                 withdrawal.save()
-                messages.success(request, _('Withdrawal request submitted.'))
+                messages.success(request, _('تم تقديم طلب السحب بنجاح.'))
                 return redirect('payments:wallet')
     else:
         form = WithdrawalRequestForm()
@@ -315,5 +315,5 @@ def process_withdrawal(request, withdrawal_pk, action):
         return redirect('payments:admin_withdrawal_detail', withdrawal_pk=withdrawal.pk)
 
     _send_withdrawal_email(withdrawal)
-    messages.success(request, _('Withdrawal request updated.'))
+    messages.success(request, _('تم تحديث طلب السحب بنجاح.'))
     return redirect('payments:admin_withdrawal_detail', withdrawal_pk=withdrawal.pk)

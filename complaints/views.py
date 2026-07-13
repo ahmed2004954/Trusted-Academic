@@ -106,7 +106,7 @@ def complaint_create(request, booking_pk):
                 form.add_error(None, exc)
             else:
                 send_complaint_created_email(complaint)
-                messages.success(request, _('Complaint submitted.'))
+                messages.success(request, _('تم تقديم الشكوى بنجاح.'))
                 return redirect('complaints:detail', pk=complaint.pk)
     else:
         form = ComplaintCreateForm(booking=booking, user=request.user)
@@ -157,7 +157,7 @@ def staff_complaint_detail(request, pk):
             else:
                 if old_status != complaint.status:
                     send_complaint_status_email(complaint)
-                messages.success(request, _('Complaint updated.'))
+                messages.success(request, _('تم تحديث الشكوى بنجاح.'))
                 return redirect('complaints:staff_detail', pk=complaint.pk)
     else:
         form = ComplaintStaffUpdateForm(instance=complaint)

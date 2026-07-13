@@ -84,6 +84,6 @@ def profile_view(request):
             student_profile.grade_level = GradeLevel.objects.filter(pk=grade_id).first() if grade_id else None
             student_profile.school_name = request.POST.get('school_name', student_profile.school_name)
             student_profile.save()
-        messages.success(request, _('Profile updated successfully.'))
+        messages.success(request, _('تم تحديث الملف الشخصي بنجاح.'))
         return redirect('accounts:profile')
     return render(request, 'accounts/profile.html', context)

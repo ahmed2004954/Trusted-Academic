@@ -21,10 +21,10 @@ def create_review(request, booking_pk):
         student=request.user,
     )
     if booking.booking_status != Booking.BookingStatus.COMPLETED:
-        messages.error(request, _('You can review a lesson only after it is completed.'))
+        messages.error(request, _('يمكنك تقييم الحصة فقط بعد انتهائها.'))
         return redirect('bookings:student_detail', pk=booking.pk)
     if hasattr(booking, 'review'):
-        messages.error(request, _('You have already reviewed this lesson.'))
+        messages.error(request, _('لقد قمت بتقييم هذه الحصة مسبقاً.'))
         return redirect('bookings:student_detail', pk=booking.pk)
 
     if request.method == 'POST':
@@ -39,7 +39,7 @@ def create_review(request, booking_pk):
             except ValidationError as exc:
                 form.add_error(None, exc)
             else:
-                messages.success(request, _('Thank you for reviewing your lesson.'))
+                messages.success(request, _('شكراً لك على تقييم حصتك.'))
                 return redirect('bookings:student_detail', pk=booking.pk)
     else:
         form = ReviewForm()

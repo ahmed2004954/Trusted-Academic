@@ -33,7 +33,7 @@ def create_report(request, booking_pk):
         booking_status=Booking.BookingStatus.COMPLETED,
     )
     if hasattr(booking, 'report'):
-        messages.info(request, _('A report already exists for this booking.'))
+        messages.info(request, _('يوجد تقرير بالفعل لهذا الحجز.'))
         return redirect('reports:detail', pk=booking.report.pk)
 
     if request.method == 'POST':
@@ -46,7 +46,7 @@ def create_report(request, booking_pk):
             report.save()
             report.sent_to_parent_email = send_report_email(report)
             report.save(update_fields=['sent_to_parent_email'])
-            messages.success(request, _('Post-lesson report created.'))
+            messages.success(request, _('تم إنشاء تقرير ما بعد الحصة بنجاح.'))
             return redirect('reports:detail', pk=report.pk)
     else:
         form = ReportCreateForm()

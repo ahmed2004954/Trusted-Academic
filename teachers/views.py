@@ -175,7 +175,7 @@ def setup_profile(request):
         form = TeacherProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
-            messages.success(request, _('Your teacher profile has been saved.'))
+            messages.success(request, _('تم حفظ الملف الشخصي للمعلم بنجاح.'))
             return redirect('teachers:my_status')
     else:
         form = TeacherProfileForm(instance=profile)
@@ -193,7 +193,7 @@ def upload_certificate(request):
             certificate = form.save(commit=False)
             certificate.teacher_profile = profile
             certificate.save()
-            messages.success(request, _('Certificate uploaded successfully.'))
+            messages.success(request, _('تم رفع الشهادة بنجاح.'))
             return redirect('teachers:upload_certificate')
     else:
         form = TeacherCertificateForm()
@@ -231,7 +231,7 @@ def add_subject(request):
         form = TeacherSubjectForm(request.POST, instance=teacher_subject)
         if form.is_valid():
             form.save()
-            messages.success(request, _('Subject offering saved successfully.'))
+            messages.success(request, _('تم حفظ عرض المادة بنجاح.'))
             return redirect('teachers:manage_subjects')
     else:
         form = TeacherSubjectForm()
@@ -247,7 +247,7 @@ def edit_subject(request, pk):
         form = TeacherSubjectForm(request.POST, instance=teacher_subject)
         if form.is_valid():
             form.save()
-            messages.success(request, _('Subject offering updated successfully.'))
+            messages.success(request, _('تم تحديث عرض المادة بنجاح.'))
             return redirect('teachers:manage_subjects')
     else:
         form = TeacherSubjectForm(instance=teacher_subject)
@@ -265,7 +265,7 @@ def delete_subject(request, pk):
     teacher_subject = get_object_or_404(TeacherSubject, pk=pk, teacher_profile=profile)
     if request.method == 'POST':
         teacher_subject.delete()
-        messages.success(request, _('Subject offering deleted successfully.'))
+        messages.success(request, _('تم حذف عرض المادة بنجاح.'))
         return redirect('teachers:manage_subjects')
 
     return render(
@@ -294,7 +294,7 @@ def add_availability(request):
         form = AvailabilitySlotForm(request.POST, instance=availability_slot)
         if form.is_valid():
             form.save()
-            messages.success(request, _('Availability slot saved successfully.'))
+            messages.success(request, _('تم حفظ موعد الإتاحة بنجاح.'))
             return redirect('teachers:manage_availability')
     else:
         form = AvailabilitySlotForm()
@@ -310,7 +310,7 @@ def edit_availability(request, pk):
         form = AvailabilitySlotForm(request.POST, instance=availability_slot)
         if form.is_valid():
             form.save()
-            messages.success(request, _('Availability slot updated successfully.'))
+            messages.success(request, _('تم تحديث موعد الإتاحة بنجاح.'))
             return redirect('teachers:manage_availability')
     else:
         form = AvailabilitySlotForm(instance=availability_slot)
@@ -328,7 +328,7 @@ def delete_availability(request, pk):
     availability_slot = get_object_or_404(AvailabilitySlot, pk=pk, teacher_profile=profile)
     if request.method == 'POST':
         availability_slot.delete()
-        messages.success(request, _('Availability slot deleted successfully.'))
+        messages.success(request, _('تم حذف موعد الإتاحة بنجاح.'))
         return redirect('teachers:manage_availability')
 
     return render(

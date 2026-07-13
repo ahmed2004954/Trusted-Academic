@@ -5,72 +5,167 @@
 
 {% block content %}
 <style>
-    /* Styling overrides and micro-animations */
+    /* Premium Styling Overrides & Micro-animations */
     .tab-btn {
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        position: relative;
+        transition: color 0.25s ease;
+    }
+    .tab-btn::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: #004532;
+        transform: scaleX(0);
+        transform-origin: bottom right;
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .tab-btn.active {
         color: #004532;
-        border-color: #004532;
-        background-color: rgba(0, 69, 50, 0.05);
+    }
+    .tab-btn.active::after {
+        transform: scaleX(1);
+        transform-origin: bottom left;
     }
     .card-hover {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: transform, box-shadow;
     }
     .card-hover:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px -5px rgba(0, 69, 50, 0.08), 0 8px 10px -6px rgba(0, 69, 50, 0.08);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px -5px rgba(0, 69, 50, 0.1), 0 8px 16px -6px rgba(0, 69, 50, 0.1);
     }
-    input[type="text"], input[type="number"], select {
+    
+    /* Scoped Input fields for Add Forms */
+    .admin-form input[type="text"], 
+    .admin-form input[type="number"], 
+    .admin-form select {
         width: 100%;
         background-color: #ffffff;
         border: 1px solid #bec9c2;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        font-family: 'IBM Plex Sans Arabic', sans-serif;
+        font-size: 14px;
+        color: #1a1c1a;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .admin-form input:focus, 
+    .admin-form select:focus {
+        border-color: #004532;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 69, 50, 0.15);
+    }
+    
+    /* Scoped Inline Editing fields in lists */
+    .edit-row-input {
+        background-color: transparent;
+        border: 1px solid rgba(190, 201, 194, 0.45);
         border-radius: 0.5rem;
-        padding: 0.65rem 0.75rem;
+        padding: 0.5rem 0.75rem;
         font-family: 'IBM Plex Sans Arabic', sans-serif;
         font-size: 14px;
         color: #1a1c1a;
         transition: all 0.2s ease;
     }
-    input:focus, select:focus {
-        border-color: #004532;
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(0, 69, 50, 0.15);
+    .edit-row-input:hover {
+        border-color: #bec9c2;
+        background-color: rgba(250, 249, 246, 0.7);
     }
+    .edit-row-input:focus {
+        border-color: #004532;
+        background-color: #ffffff;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 69, 50, 0.1);
+    }
+    
+    /* Custom Toggle Switch */
+    .status-toggle {
+        display: none;
+    }
+    .toggle-track {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        background-color: #bec9c2;
+        border-radius: 9999px;
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        cursor: pointer;
+    }
+    .toggle-track::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 20px;
+        height: 20px;
+        background-color: #ffffff;
+        border-radius: 9999px;
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .status-toggle:checked + .toggle-track {
+        background-color: #004532;
+    }
+    .status-toggle:checked + .toggle-track::after {
+        transform: translateX(-20px);
+    }
+    .toggle-track:hover {
+        box-shadow: 0 0 0 3px rgba(0, 69, 50, 0.1);
+    }
+
+    /* Badges */
     .badge {
         display: inline-flex;
         align-items: center;
-        gap: 0.25rem;
-        padding: 0.25rem 0.75rem;
+        padding: 0.25rem 0.65rem;
         border-radius: 9999px;
-        font-size: 12px;
-        font-weight: 600;
+        font-size: 11px;
+        font-weight: 700;
         transition: all 0.2s ease;
     }
     .badge-active {
-        background-color: rgba(0, 69, 50, 0.1);
+        background-color: rgba(0, 69, 50, 0.08);
         color: #004532;
     }
     .badge-inactive {
-        background-color: rgba(186, 26, 26, 0.1);
+        background-color: rgba(186, 26, 26, 0.08);
         color: #ba1a1a;
     }
-    /* Simple fade-in animation for content switching */
+    
+    /* Animation settings */
     .tab-content {
         display: none;
-        animation: fadeIn 0.3s ease-in-out forwards;
+        will-change: opacity, transform;
     }
     .tab-content.active {
         display: block;
+        animation: fadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
     @keyframes fadeIn {
         from {
             opacity: 0;
-            transform: translateY(8px);
+            transform: translateY(10px);
         }
         to {
             opacity: 1;
             transform: translateY(0);
+        }
+    }
+
+    /* Respect accessibility motion settings */
+    @media (prefers-reduced-motion: reduce) {
+        .tab-btn::after,
+        .card-hover,
+        .toggle-track::after,
+        .edit-row-input,
+        .tab-content.active {
+            transition: none !important;
+            animation: none !important;
+            transform: none !important;
         }
     }
 </style>
@@ -83,7 +178,7 @@
             <h1 class="font-headline-lg text-headline-lg text-on-background font-bold">إدارة المواد والمراحل والتسعير</h1>
             <p class="font-body-md text-body-md text-on-surface-variant mt-xs">اضبط وتتبع قائمة المواد الدراسية، المراحل التعليمية المتاحة، ونطاقات التسعير المخصصة لكل مادة ومرحلة.</p>
         </div>
-        <a href="{% url 'adminpanel:dashboard' %}" class="inline-flex items-center gap-2 border border-outline-variant text-on-surface px-md py-2.5 rounded-xl font-label-md font-bold hover:bg-surface-container transition-all hover-lift">
+        <a href="{% url 'adminpanel:dashboard' %}" class="min-h-[44px] inline-flex items-center gap-2 border border-outline-variant text-on-surface px-md py-2.5 rounded-xl font-label-md font-bold hover:bg-surface-container transition-all hover-lift">
             <span class="material-symbols-outlined text-[18px]">arrow_back</span>
             العودة للوحة التحكم
         </a>
@@ -119,124 +214,114 @@
         <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm card-hover flex items-center justify-between">
             <div>
                 <p class="font-label-sm text-outline font-bold text-on-surface-variant">نطاقات أسعار الحصص</p>
-                <h2 class="font-headline-lg text-primary font-bold mt-2">{{ pricing_ranges|length }}</h2>
+                <h2 class="font-headline-lg text-on-secondary-container font-bold mt-2">{{ pricing_ranges|length }}</h2>
                 <p class="font-label-sm text-on-surface-variant/80 mt-1">حدود تسعيرية مقيدة للمعلمين</p>
             </div>
-            <div class="bg-primary/10 w-14 h-14 rounded-full flex items-center justify-center">
-                <span class="material-symbols-outlined text-primary text-[32px] icon-fill">payments</span>
+            <div class="bg-secondary-container/10 w-14 h-14 rounded-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-on-secondary-container text-[32px] icon-fill">payments</span>
             </div>
         </div>
     </section>
 
     <!-- Navigation Tabs -->
-    <div class="border-b border-outline-variant/30 mb-8 flex flex-wrap gap-2">
-        <button onclick="switchTab('subjects-tab')" id="subjects-tab-btn" class="tab-btn active px-6 py-3 border-b-2 border-transparent font-title-lg font-bold text-on-surface-variant hover:text-primary rounded-t-xl flex items-center gap-2">
+    <div class="border-b border-outline-variant/30 mb-8 flex flex-wrap gap-2" role="tablist">
+        <button onclick="switchTab('subjects-tab')" id="subjects-tab-btn" class="tab-btn active px-6 py-3 border-b-2 border-transparent font-title-lg font-bold text-on-surface-variant hover:text-primary rounded-t-xl flex items-center gap-2" role="tab" aria-selected="true" aria-controls="subjects-tab">
             <span class="material-symbols-outlined text-[20px]">menu_book</span>
-            المواد الدراسية
+            <span>المواد الدراسية</span>
+            <span class="bg-primary/10 text-primary text-xs px-2.5 py-0.5 rounded-full font-bold transition-colors">{{ subjects|length }}</span>
         </button>
-        <button onclick="switchTab('grades-tab')" id="grades-tab-btn" class="tab-btn px-6 py-3 border-b-2 border-transparent font-title-lg font-bold text-on-surface-variant hover:text-primary rounded-t-xl flex items-center gap-2">
+        <button onclick="switchTab('grades-tab')" id="grades-tab-btn" class="tab-btn px-6 py-3 border-b-2 border-transparent font-title-lg font-bold text-on-surface-variant hover:text-primary rounded-t-xl flex items-center gap-2" role="tab" aria-selected="false" aria-controls="grades-tab">
             <span class="material-symbols-outlined text-[20px]">school</span>
-            المراحل التعليمية
+            <span>المراحل التعليمية</span>
+            <span class="bg-secondary/10 text-secondary text-xs px-2.5 py-0.5 rounded-full font-bold transition-colors">{{ grade_levels|length }}</span>
         </button>
-        <button onclick="switchTab('pricing-tab')" id="pricing-tab-btn" class="tab-btn px-6 py-3 border-b-2 border-transparent font-title-lg font-bold text-on-surface-variant hover:text-primary rounded-t-xl flex items-center gap-2">
+        <button onclick="switchTab('pricing-tab')" id="pricing-tab-btn" class="tab-btn px-6 py-3 border-b-2 border-transparent font-title-lg font-bold text-on-surface-variant hover:text-primary rounded-t-xl flex items-center gap-2" role="tab" aria-selected="false" aria-controls="pricing-tab">
             <span class="material-symbols-outlined text-[20px]">payments</span>
-            حدود التسعير
+            <span>حدود التسعير</span>
+            <span class="bg-secondary-container/20 text-on-secondary-container text-xs px-2.5 py-0.5 rounded-full font-bold transition-colors">{{ pricing_ranges|length }}</span>
         </button>
     </div>
 
     <!-- TAB CONTENTS -->
     
     <!-- Tab 1: Subjects -->
-    <div id="subjects-tab" class="tab-content active space-y-6">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <!-- Add Form -->
-            <div class="lg:col-span-4 bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm">
-                <h3 class="font-title-lg font-bold text-on-surface mb-4 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">add_box</span>
-                    إضافة مادة جديدة
-                </h3>
-                <form method="post" action="{% url 'adminpanel:add_subject' %}" class="space-y-4">
-                    {% csrf_token %}
-                    <div>
-                        <label class="block font-label-md text-on-surface-variant mb-2 font-bold">اسم المادة الدراسية</label>
-                        <input type="text" name="name" placeholder="مثال: الرياضيات، الفيزياء، اللغة العربية" required class="focus:ring-2">
-                    </div>
-                    <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-md py-3 rounded-xl font-label-md font-bold hover:bg-surface-tint transition-all active:scale-95 shadow-sm">
-                        <span class="material-symbols-outlined text-[20px]">add</span>
-                        إضافة مادة
-                    </button>
-                </form>
+    <div id="subjects-tab" class="tab-content active space-y-6" role="tabpanel" aria-labelledby="subjects-tab-btn">
+        <!-- Add Form (Full Width) -->
+        <div class="bg-primary/[0.01] border-t-4 border-t-primary border-x border-b border-outline-variant/60 rounded-2xl p-5 shadow-sm admin-form">
+            <form method="post" action="{% url 'adminpanel:add_subject' %}" class="flex flex-col md:flex-row md:items-end gap-4">
+                {% csrf_token %}
+                <div class="flex-grow">
+                    <label class="block font-label-md text-on-surface-variant mb-2 font-bold">اسم المادة الدراسية</label>
+                    <input type="text" name="name" placeholder="مثال: الرياضيات، الفيزياء، اللغة العربية" required>
+                </div>
+                <button type="submit" class="min-h-[44px] inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-8 py-3 rounded-xl font-label-md font-bold hover:bg-surface-tint transition-all active:scale-[0.97] shadow-sm whitespace-nowrap">
+                    <span class="material-symbols-outlined text-[20px]">add</span>
+                    إضافة مادة
+                </button>
+            </form>
+        </div>
+
+        <!-- List and Search (Full Width) -->
+        <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm space-y-4">
+            <!-- Search bar -->
+            <div class="relative">
+                <span class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-on-surface-variant/70">
+                    <span class="material-symbols-outlined">search</span>
+                </span>
+                <input type="text" id="subject-search" oninput="filterSubjects()" placeholder="ابحث عن مادة..." class="w-full pr-12 pl-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest text-on-surface text-sm focus:border-primary focus:ring-2 focus:ring-primary/20">
             </div>
 
-            <!-- List and Search -->
-            <div class="lg:col-span-8 space-y-4">
-                <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm space-y-4">
-                    <!-- Search bar -->
-                    <div class="relative">
-                        <span class="absolute inset-y-0 right-3 flex items-center pr-3 pointer-events-none text-on-surface-variant/70">
-                            <span class="material-symbols-outlined">search</span>
-                        </span>
-                        <input type="text" id="subject-search" oninput="filterSubjects()" placeholder="ابحث عن مادة..." class="w-full pr-10 pl-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest text-on-surface text-sm focus:border-primary focus:ring-2 focus:ring-primary/20">
-                    </div>
+            <!-- Card List Container -->
+            <div class="space-y-3">
+                <!-- Desktop Header (hidden on mobile) -->
+                <div class="hidden md:grid md:grid-cols-12 gap-4 px-6 py-2 border-b border-outline-variant/30 text-on-surface-variant font-label-md font-bold">
+                    <div class="col-span-6">اسم المادة</div>
+                    <div class="col-span-3 text-center">الحالة</div>
+                    <div class="col-span-3 text-left">الإجراءات</div>
+                </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-right border-collapse">
-                            <thead>
-                                <tr class="border-b border-outline-variant/30 text-on-surface-variant font-label-md">
-                                    <th class="py-3 px-4 font-bold">اسم المادة</th>
-                                    <th class="py-3 px-4 font-bold">الحالة</th>
-                                    <th class="py-3 px-4 font-bold text-left">الإجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="subject-table-body">
-                                {% for subject in subjects %}
-                                <tr class="border-b border-outline-variant/20 hover:bg-surface-container-low transition-colors subject-row" data-name="{{ subject.name|lower }}">
-                                    <form method="post" action="{% url 'adminpanel:edit_subject' subject_id=subject.pk %}">
-                                        {% csrf_token %}
-                                        <td class="py-4 px-4">
-                                            <input type="text" name="name" value="{{ subject.name }}" required class="bg-transparent border border-transparent hover:border-outline-variant focus:bg-white focus:border-primary py-1 px-2 rounded w-full font-body-md transition-all">
-                                        </td>
-                                        <td class="py-4 px-4">
-                                            <div class="flex items-center gap-4">
-                                                <label class="inline-flex items-center gap-2 cursor-pointer">
-                                                    <input type="checkbox" name="is_active" {% if subject.is_active %}checked{% endif %} class="rounded accent-primary text-primary focus:ring-primary w-4 h-4">
-                                                    <span class="badge {% if subject.is_active %}badge-active{% else %}badge-inactive{% endif %}">
-                                                        {% if subject.is_active %}نشطة{% else %}غير نشطة{% endif %}
-                                                    </span>
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td class="py-4 px-4 text-left">
-                                            <div class="flex items-center justify-end gap-2">
-                                                <button type="submit" class="inline-flex items-center gap-1 border border-outline-variant text-on-surface px-3 py-1.5 rounded-lg font-label-sm font-bold hover:bg-surface-container transition-all active:scale-95">
-                                                    <span class="material-symbols-outlined text-[16px] text-primary">save</span>
-                                                    حفظ
-                                                </button>
-                                                <button type="button" onclick="confirmDelete('{{ subject.name }}', '{% url 'adminpanel:delete_subject' subject_id=subject.pk %}')" class="inline-flex items-center gap-1 border border-error/30 text-error px-3 py-1.5 rounded-lg font-label-sm font-bold hover:bg-error/5 transition-all active:scale-95">
-                                                    <span class="material-symbols-outlined text-[16px]">delete</span>
-                                                    حذف
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </form>
-                                </tr>
-                                {% empty %}
-                                <tr id="subject-empty-state">
-                                    <td colspan="3" class="py-8 text-center text-on-surface-variant font-body-md">
-                                        <div class="flex flex-col items-center gap-2">
-                                            <span class="material-symbols-outlined text-4xl text-outline-variant">menu_book</span>
-                                            لا توجد مواد مضافة بعد.
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                                <tr id="subject-no-results" class="hidden">
-                                    <td colspan="3" class="py-8 text-center text-on-surface-variant font-body-md">
-                                        لا توجد نتائج تطابق بحثك.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <!-- Rows -->
+                <div class="space-y-3" id="subject-list-container">
+                    {% for subject in subjects %}
+                    <form method="post" action="{% url 'adminpanel:edit_subject' subject_id=subject.pk %}" class="bg-white border border-outline-variant/40 rounded-xl p-4 flex flex-col md:grid md:grid-cols-12 gap-4 items-center subject-row transition-all duration-200 hover:shadow-sm" data-name="{{ subject.name|lower }}">
+                        {% csrf_token %}
+                        <div class="col-span-12 md:col-span-6 w-full">
+                            <label class="block text-xs font-bold text-on-surface-variant mb-1 md:hidden">اسم المادة</label>
+                            <input type="text" name="name" value="{{ subject.name }}" required class="edit-row-input w-full">
+                        </div>
+                        <div class="col-span-12 md:col-span-3 w-full flex items-center justify-start md:justify-center">
+                            <label class="block text-xs font-bold text-on-surface-variant mb-1 md:hidden ml-4">الحالة</label>
+                            <div class="flex items-center gap-2">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="is_active" {% if subject.is_active %}checked{% endif %} class="status-toggle">
+                                    <div class="toggle-track"></div>
+                                </label>
+                                <span class="badge {% if subject.is_active %}badge-active{% else %}badge-inactive{% endif %} mr-2 select-none">
+                                    {% if subject.is_active %}نشطة{% else %}غير نشطة{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-span-12 md:col-span-3 w-full flex items-center justify-end gap-2">
+                            <button type="submit" class="flex-grow md:flex-grow-0 min-h-[44px] inline-flex items-center justify-center gap-1.5 border border-outline-variant text-on-surface px-4 py-2.5 rounded-xl font-label-md font-bold hover:bg-surface-container transition-all active:scale-[0.97]">
+                                <span class="material-symbols-outlined text-[18px] text-primary">save</span>
+                                حفظ
+                            </button>
+                            <button type="button" onclick="confirmDelete('{{ subject.name }}', '{% url 'adminpanel:delete_subject' subject_id=subject.pk %}')" class="flex-grow md:flex-grow-0 min-h-[44px] inline-flex items-center justify-center gap-1.5 border border-error/30 text-error px-4 py-2.5 rounded-xl font-label-md font-bold hover:bg-error/5 transition-all active:scale-[0.97]">
+                                <span class="material-symbols-outlined text-[18px]">delete</span>
+                                حذف
+                            </button>
+                        </div>
+                    </form>
+                    {% empty %}
+                    <div id="subject-empty-state" class="py-8 text-center text-on-surface-variant font-body-md bg-white border border-outline-variant/40 rounded-xl">
+                        <div class="flex flex-col items-center gap-2">
+                            <span class="material-symbols-outlined text-4xl text-outline-variant">menu_book</span>
+                            لا توجد مواد مضافة بعد.
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div id="subject-no-results" class="hidden py-8 text-center text-on-surface-variant font-body-md bg-white border border-outline-variant/40 rounded-xl">
+                        لا توجد نتائج تطابق بحثك.
                     </div>
                 </div>
             </div>
@@ -244,128 +329,119 @@
     </div>
 
     <!-- Tab 2: Grade Levels -->
-    <div id="grades-tab" class="tab-content space-y-6">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <!-- Add Form -->
-            <div class="lg:col-span-4 bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm">
-                <h3 class="font-title-lg font-bold text-on-surface mb-4 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">add_box</span>
-                    إضافة مرحلة جديدة
-                </h3>
-                <form method="post" action="{% url 'adminpanel:add_grade_level' %}" class="space-y-4">
-                    {% csrf_token %}
-                    <div>
-                        <label class="block font-label-md text-on-surface-variant mb-2 font-bold">اسم المرحلة</label>
-                        <input type="text" name="name" placeholder="مثال: الصف الأول الثانوي" required class="focus:ring-2">
-                    </div>
-                    <div>
-                        <label class="block font-label-md text-on-surface-variant mb-2 font-bold">القسم الدراسي</label>
-                        <select name="category" required class="focus:ring-2">
-                            <option value="primary">ابتدائي</option>
-                            <option value="preparatory">إعدادي</option>
-                            <option value="secondary" selected>ثانوي</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-label-md text-on-surface-variant mb-2 font-bold">ترتيب الظهور</label>
-                        <input type="number" name="order" min="0" value="0" placeholder="الترتيب الرقمي في القوائم" class="focus:ring-2">
-                    </div>
-                    <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-md py-3 rounded-xl font-label-md font-bold hover:bg-surface-tint transition-all active:scale-95 shadow-sm">
-                        <span class="material-symbols-outlined text-[20px]">add</span>
-                        إضافة مرحلة
-                    </button>
-                </form>
+    <div id="grades-tab" class="tab-content space-y-6" role="tabpanel" aria-labelledby="grades-tab-btn">
+        <!-- Add Form (Full Width) -->
+        <div class="bg-primary/[0.01] border-t-4 border-t-secondary border-x border-b border-outline-variant/60 rounded-2xl p-5 shadow-sm admin-form">
+            <form method="post" action="{% url 'adminpanel:add_grade_level' %}" class="flex flex-col md:flex-row md:items-end gap-4">
+                {% csrf_token %}
+                <div class="flex-grow">
+                    <label class="block font-label-md text-on-surface-variant mb-2 font-bold">اسم المرحلة</label>
+                    <input type="text" name="name" placeholder="مثال: الصف الأول الثانوي" required>
+                </div>
+                <div class="w-full md:w-48">
+                    <label class="block font-label-md text-on-surface-variant mb-2 font-bold">القسم الدراسي</label>
+                    <select name="category" required>
+                        <option value="primary">ابتدائي</option>
+                        <option value="preparatory">إعدادي</option>
+                        <option value="secondary" selected>ثانوي</option>
+                    </select>
+                </div>
+                <div class="w-full md:w-32">
+                    <label class="block font-label-md text-on-surface-variant mb-2 font-bold">ترتيب الظهور</label>
+                    <input type="number" name="order" min="0" value="0" placeholder="0">
+                </div>
+                <button type="submit" class="min-h-[44px] inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-8 py-3 rounded-xl font-label-md font-bold hover:bg-surface-tint transition-all active:scale-[0.97] shadow-sm whitespace-nowrap">
+                    <span class="material-symbols-outlined text-[20px]">add</span>
+                    إضافة مرحلة
+                </button>
+            </form>
+        </div>
+
+        <!-- List and Search (Full Width) -->
+        <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm space-y-4">
+            <!-- Search and filters -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <div class="relative flex-grow">
+                    <span class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-on-surface-variant/70">
+                        <span class="material-symbols-outlined">search</span>
+                    </span>
+                    <input type="text" id="grade-search" oninput="filterGrades()" placeholder="ابحث عن مرحلة..." class="w-full pr-12 pl-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest text-on-surface text-sm focus:border-primary focus:ring-2 focus:ring-primary/20">
+                </div>
+                <div class="w-full sm:w-48">
+                    <select id="grade-filter-category" onchange="filterGrades()" class="w-full py-2.5 rounded-xl border border-outline-variant text-sm focus:border-primary">
+                        <option value="">كل الأقسام</option>
+                        <option value="primary">ابتدائي</option>
+                        <option value="preparatory">إعدادي</option>
+                        <option value="secondary">ثانوي</option>
+                    </select>
+                </div>
             </div>
 
-            <!-- List and Search -->
-            <div class="lg:col-span-8 space-y-4">
-                <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm space-y-4">
-                    <!-- Search and filters -->
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <div class="relative flex-grow">
-                            <span class="absolute inset-y-0 right-3 flex items-center pr-3 pointer-events-none text-on-surface-variant/70">
-                                <span class="material-symbols-outlined">search</span>
-                            </span>
-                            <input type="text" id="grade-search" oninput="filterGrades()" placeholder="ابحث عن مرحلة..." class="w-full pr-10 pl-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest text-on-surface text-sm focus:border-primary focus:ring-2 focus:ring-primary/20">
+            <!-- Card List Container -->
+            <div class="space-y-3">
+                <!-- Desktop Header (hidden on mobile) -->
+                <div class="hidden md:grid md:grid-cols-12 gap-4 px-6 py-2 border-b border-outline-variant/30 text-on-surface-variant font-label-md font-bold">
+                    <div class="col-span-4">اسم المرحلة</div>
+                    <div class="col-span-2">القسم</div>
+                    <div class="col-span-1 text-center">الترتيب</div>
+                    <div class="col-span-2 text-right pr-4">نشطة</div>
+                    <div class="col-span-3 text-left">الإجراءات</div>
+                </div>
+
+                <!-- Rows -->
+                <div class="space-y-3" id="grade-list-container">
+                    {% for gl in grade_levels %}
+                    <form method="post" action="{% url 'adminpanel:edit_grade_level' gl_id=gl.pk %}" class="bg-white border border-outline-variant/40 rounded-xl p-4 flex flex-col md:grid md:grid-cols-12 gap-4 items-center grade-row transition-all duration-200 hover:shadow-sm" data-name="{{ gl.name|lower }}" data-category="{{ gl.category }}">
+                        {% csrf_token %}
+                        <div class="col-span-12 md:col-span-4 w-full">
+                            <label class="block text-xs font-bold text-on-surface-variant mb-1 md:hidden">اسم المرحلة</label>
+                            <input type="text" name="name" value="{{ gl.name }}" required class="edit-row-input w-full">
                         </div>
-                        <div class="w-full sm:w-48">
-                            <select id="grade-filter-category" onchange="filterGrades()" class="w-full py-2.5 rounded-xl border border-outline-variant text-sm focus:border-primary">
-                                <option value="">كل الأقسام</option>
-                                <option value="primary">ابتدائي</option>
-                                <option value="preparatory">إعدادي</option>
-                                <option value="secondary">ثانوي</option>
+                        <div class="col-span-12 md:col-span-2 w-full">
+                            <label class="block text-xs font-bold text-on-surface-variant mb-1 md:hidden">القسم</label>
+                            <select name="category" required class="edit-row-input w-full">
+                                <option value="primary" {% if gl.category == 'primary' %}selected{% endif %}>ابتدائي</option>
+                                <option value="preparatory" {% if gl.category == 'preparatory' %}selected{% endif %}>إعدادي</option>
+                                <option value="secondary" {% if gl.category == 'secondary' %}selected{% endif %}>ثانوي</option>
                             </select>
                         </div>
+                        <div class="col-span-6 md:col-span-1 w-full">
+                            <label class="block text-xs font-bold text-on-surface-variant mb-1 md:hidden text-center">الترتيب</label>
+                            <input type="number" name="order" value="{{ gl.order }}" min="0" class="edit-row-input w-full text-center">
+                        </div>
+                        <div class="col-span-6 md:col-span-2 w-full flex items-center justify-start gap-2">
+                            <label class="block text-xs font-bold text-on-surface-variant mb-1 md:hidden ml-4">نشطة</label>
+                            <div class="flex items-center gap-2">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="is_active" {% if gl.is_active %}checked{% endif %} class="status-toggle">
+                                    <div class="toggle-track"></div>
+                                </label>
+                                <span class="badge {% if gl.is_active %}badge-active{% else %}badge-inactive{% endif %} mr-2 select-none">
+                                    {% if gl.is_active %}نشطة{% else %}غير نشطة{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-span-12 md:col-span-3 w-full flex items-center justify-end gap-2">
+                            <button type="submit" class="flex-grow md:flex-grow-0 min-h-[44px] inline-flex items-center justify-center gap-1.5 border border-outline-variant text-on-surface px-3 py-2.5 rounded-xl font-label-md font-bold hover:bg-surface-container transition-all active:scale-[0.97]">
+                                <span class="material-symbols-outlined text-[18px] text-primary">save</span>
+                                حفظ
+                            </button>
+                            <button type="button" onclick="confirmDelete('{{ gl.name }}', '{% url 'adminpanel:delete_grade_level' gl_id=gl.pk %}')" class="flex-grow md:flex-grow-0 min-h-[44px] inline-flex items-center justify-center gap-1.5 border border-error/30 text-error px-3 py-2.5 rounded-xl font-label-md font-bold hover:bg-error/5 transition-all active:scale-[0.97]">
+                                <span class="material-symbols-outlined text-[18px]">delete</span>
+                                حذف
+                            </button>
+                        </div>
+                    </form>
+                    {% empty %}
+                    <div id="grade-empty-state" class="py-8 text-center text-on-surface-variant font-body-md bg-white border border-outline-variant/40 rounded-xl">
+                        <div class="flex flex-col items-center gap-2">
+                            <span class="material-symbols-outlined text-4xl text-outline-variant">school</span>
+                            لا توجد مراحل مضافة بعد.
+                        </div>
                     </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-right border-collapse">
-                            <thead>
-                                <tr class="border-b border-outline-variant/30 text-on-surface-variant font-label-md">
-                                    <th class="py-3 px-4 font-bold">اسم المرحلة</th>
-                                    <th class="py-3 px-4 font-bold">القسم</th>
-                                    <th class="py-3 px-4 font-bold">الترتيب</th>
-                                    <th class="py-3 px-4 font-bold">الحالة</th>
-                                    <th class="py-3 px-4 font-bold text-left">الإجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="grade-table-body">
-                                {% for gl in grade_levels %}
-                                <tr class="border-b border-outline-variant/20 hover:bg-surface-container-low transition-colors grade-row" data-name="{{ gl.name|lower }}" data-category="{{ gl.category }}">
-                                    <form method="post" action="{% url 'adminpanel:edit_grade_level' gl_id=gl.pk %}">
-                                        {% csrf_token %}
-                                        <td class="py-4 px-4">
-                                            <input type="text" name="name" value="{{ gl.name }}" required class="bg-transparent border border-transparent hover:border-outline-variant focus:bg-white focus:border-primary py-1 px-2 rounded w-full font-body-md transition-all">
-                                        </td>
-                                        <td class="py-4 px-4">
-                                            <select name="category" required class="bg-transparent border border-transparent hover:border-outline-variant focus:bg-white focus:border-primary py-1 px-2 rounded w-full font-body-md transition-all">
-                                                <option value="primary" {% if gl.category == 'primary' %}selected{% endif %}>ابتدائي</option>
-                                                <option value="preparatory" {% if gl.category == 'preparatory' %}selected{% endif %}>إعدادي</option>
-                                                <option value="secondary" {% if gl.category == 'secondary' %}selected{% endif %}>ثانوي</option>
-                                            </select>
-                                        </td>
-                                        <td class="py-4 px-4 w-24">
-                                            <input type="number" name="order" value="{{ gl.order }}" min="0" class="bg-transparent border border-transparent hover:border-outline-variant focus:bg-white focus:border-primary py-1 px-2 rounded w-full text-center font-body-md transition-all">
-                                        </td>
-                                        <td class="py-4 px-4">
-                                            <label class="inline-flex items-center gap-2 cursor-pointer">
-                                                <input type="checkbox" name="is_active" {% if gl.is_active %}checked{% endif %} class="rounded accent-primary text-primary focus:ring-primary w-4 h-4">
-                                                <span class="badge {% if gl.is_active %}badge-active{% else %}badge-inactive{% endif %}">
-                                                    {% if gl.is_active %}نشطة{% else %}غير نشطة{% endif %}
-                                                </span>
-                                            </label>
-                                        </td>
-                                        <td class="py-4 px-4 text-left">
-                                            <div class="flex items-center justify-end gap-2">
-                                                <button type="submit" class="inline-flex items-center gap-1 border border-outline-variant text-on-surface px-3 py-1.5 rounded-lg font-label-sm font-bold hover:bg-surface-container transition-all active:scale-95">
-                                                    <span class="material-symbols-outlined text-[16px] text-primary">save</span>
-                                                    حفظ
-                                                </button>
-                                                <button type="button" onclick="confirmDelete('{{ gl.name }}', '{% url 'adminpanel:delete_grade_level' gl_id=gl.pk %}')" class="inline-flex items-center gap-1 border border-error/30 text-error px-3 py-1.5 rounded-lg font-label-sm font-bold hover:bg-error/5 transition-all active:scale-95">
-                                                    <span class="material-symbols-outlined text-[16px]">delete</span>
-                                                    حذف
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </form>
-                                </tr>
-                                {% empty %}
-                                <tr id="grade-empty-state">
-                                    <td colspan="5" class="py-8 text-center text-on-surface-variant font-body-md">
-                                        <div class="flex flex-col items-center gap-2">
-                                            <span class="material-symbols-outlined text-4xl text-outline-variant">school</span>
-                                            لا توجد مراحل مضافة بعد.
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                                <tr id="grade-no-results" class="hidden">
-                                    <td colspan="5" class="py-8 text-center text-on-surface-variant font-body-md">
-                                        لا توجد نتائج تطابق بحثك.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    {% endfor %}
+                    <div id="grade-no-results" class="hidden py-8 text-center text-on-surface-variant font-body-md bg-white border border-outline-variant/40 rounded-xl">
+                        لا توجد نتائج تطابق بحثك.
                     </div>
                 </div>
             </div>
@@ -373,153 +449,143 @@
     </div>
 
     <!-- Tab 3: Pricing Ranges -->
-    <div id="pricing-tab" class="tab-content space-y-6">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <!-- Add Form -->
-            <div class="lg:col-span-4 bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm">
-                <h3 class="font-title-lg font-bold text-on-surface mb-4 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">add_box</span>
-                    إضافة نطاق سعري جديد
-                </h3>
-                <form method="post" action="{% url 'adminpanel:add_pricing_range' %}" class="space-y-4">
-                    {% csrf_token %}
-                    <div>
-                        <label class="block font-label-md text-on-surface-variant mb-2 font-bold">المادة الدراسية</label>
-                        <select name="subject" required class="focus:ring-2">
-                            <option value="">اختر المادة</option>
-                            {% for subject in subjects %}
-                                <option value="{{ subject.pk }}">{{ subject.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-label-md text-on-surface-variant mb-2 font-bold">المرحلة الدراسية</label>
-                        <select name="grade_level" required class="focus:ring-2">
-                            <option value="">اختر المرحلة</option>
-                            {% for gl in grade_levels %}
-                                <option value="{{ gl.pk }}">{{ gl.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-label-md text-on-surface-variant mb-2 font-bold">نوع الحصة</label>
-                        <select name="lesson_type" required class="focus:ring-2">
-                            <option value="">اختر نوع الحصة</option>
-                            {% for value, label in lesson_types %}
-                                <option value="{{ value }}">{{ label }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block font-label-md text-on-surface-variant mb-2 font-bold">الحد الأدنى (ج.م)</label>
-                            <input type="number" name="min_price" step="1" min="0" placeholder="أقل سعر" required class="focus:ring-2">
-                        </div>
-                        <div>
-                            <label class="block font-label-md text-on-surface-variant mb-2 font-bold">الحد الأقصى (ج.م)</label>
-                            <input type="number" name="max_price" step="1" min="0" placeholder="أعلى سعر" required class="focus:ring-2">
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-md py-3 rounded-xl font-label-md font-bold hover:bg-surface-tint transition-all active:scale-95 shadow-sm">
-                        <span class="material-symbols-outlined text-[20px]">add</span>
-                        إضافة النطاق السعري
-                    </button>
-                </form>
+    <div id="pricing-tab" class="tab-content space-y-6" role="tabpanel" aria-labelledby="pricing-tab-btn">
+        <!-- Add Form (Full Width) -->
+        <div class="bg-primary/[0.01] border-t-4 border-t-on-secondary-container border-x border-b border-outline-variant/60 rounded-2xl p-5 shadow-sm admin-form">
+            <form method="post" action="{% url 'adminpanel:add_pricing_range' %}" class="flex flex-col md:flex-row md:flex-wrap md:items-end gap-4">
+                {% csrf_token %}
+                <div class="flex-grow min-w-[160px]">
+                    <label class="block font-label-md text-on-surface-variant mb-2 font-bold">المادة الدراسية</label>
+                    <select name="subject" required>
+                        <option value="">اختر المادة</option>
+                        {% for subject in subjects %}
+                            <option value="{{ subject.pk }}">{{ subject.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="flex-grow min-w-[160px]">
+                    <label class="block font-label-md text-on-surface-variant mb-2 font-bold">المرحلة الدراسية</label>
+                    <select name="grade_level" required>
+                        <option value="">اختر المرحلة</option>
+                        {% for gl in grade_levels %}
+                            <option value="{{ gl.pk }}">{{ gl.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="w-full md:w-44">
+                    <label class="block font-label-md text-on-surface-variant mb-2 font-bold">نوع الحصة</label>
+                    <select name="lesson_type" required>
+                        <option value="">اختر نوع الحصة</option>
+                        {% for value, label in lesson_types %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="w-full md:w-32">
+                    <label class="block font-label-md text-on-surface-variant mb-2 font-bold">الحد الأدنى (ج.م)</label>
+                    <input type="number" name="min_price" step="1" min="0" placeholder="أقل سعر" required>
+                </div>
+                <div class="w-full md:w-32">
+                    <label class="block font-label-md text-on-surface-variant mb-2 font-bold">الحد الأقصى (ج.م)</label>
+                    <input type="number" name="max_price" step="1" min="0" placeholder="أعلى سعر" required>
+                </div>
+                <button type="submit" class="min-h-[44px] inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-8 py-3 rounded-xl font-label-md font-bold hover:bg-surface-tint transition-all active:scale-[0.97] shadow-sm whitespace-nowrap">
+                    <span class="material-symbols-outlined text-[20px]">add</span>
+                    إضافة النطاق السعري
+                </button>
+            </form>
+        </div>
+
+        <!-- List and Search (Full Width) -->
+        <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm space-y-4">
+            <!-- Search and filters -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <div class="relative flex-grow">
+                    <span class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-on-surface-variant/70">
+                        <span class="material-symbols-outlined">search</span>
+                    </span>
+                    <input type="text" id="pricing-search" oninput="filterPricing()" placeholder="ابحث باسم المادة أو المرحلة..." class="w-full pr-12 pl-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest text-on-surface text-sm focus:border-primary focus:ring-2 focus:ring-primary/20">
+                </div>
+                <div class="w-full sm:w-48">
+                    <select id="pricing-filter-type" onchange="filterPricing()" class="w-full py-2.5 rounded-xl border border-outline-variant text-sm focus:border-primary">
+                        <option value="">كل أنواع الحصص</option>
+                        {% for value, label in lesson_types %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
 
-            <!-- List and Search -->
-            <div class="lg:col-span-8 space-y-4">
-                <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm space-y-4">
-                    <!-- Search and filters -->
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <div class="relative flex-grow">
-                            <span class="absolute inset-y-0 right-3 flex items-center pr-3 pointer-events-none text-on-surface-variant/70">
-                                <span class="material-symbols-outlined">search</span>
-                            </span>
-                            <input type="text" id="pricing-search" oninput="filterPricing()" placeholder="ابحث باسم المادة أو المرحلة..." class="w-full pr-10 pl-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest text-on-surface text-sm focus:border-primary focus:ring-2 focus:ring-primary/20">
+            <!-- Card List Container -->
+            <div class="space-y-3">
+                <!-- Desktop Header (hidden on mobile) -->
+                <div class="hidden md:grid md:grid-cols-12 gap-4 px-6 py-2 border-b border-outline-variant/30 text-on-surface-variant font-label-md font-bold">
+                    <div class="col-span-3">المادة والمرحلة</div>
+                    <div class="col-span-2">نوع الحصة</div>
+                    <div class="col-span-1 text-center">الحد الأدنى</div>
+                    <div class="col-span-1 text-center">الحد الأقصى</div>
+                    <div class="col-span-2 text-right pr-4">نشط</div>
+                    <div class="col-span-3 text-left">الإجراءات</div>
+                </div>
+
+                <!-- Rows -->
+                <div class="space-y-3" id="pricing-list-container">
+                    {% for pr in pricing_ranges %}
+                    <form method="post" action="{% url 'adminpanel:edit_pricing_range' pr_id=pr.pk %}" class="bg-white border border-outline-variant/40 rounded-xl p-4 flex flex-col md:grid md:grid-cols-12 gap-4 items-center pricing-row transition-all duration-200 hover:shadow-sm" data-search="{{ pr.subject.name|lower }} {{ pr.grade_level.name|lower }}" data-type="{{ pr.lesson_type }}">
+                        {% csrf_token %}
+                        <div class="col-span-12 md:col-span-3 w-full">
+                            <label class="block text-xs font-bold text-on-surface-variant mb-1 md:hidden">المادة والمرحلة</label>
+                            <div class="font-body-md font-bold text-on-surface pr-1 md:pr-0">{{ pr.subject.name }} - {{ pr.grade_level.name }}</div>
                         </div>
-                        <div class="w-full sm:w-48">
-                            <select id="pricing-filter-type" onchange="filterPricing()" class="w-full py-2.5 rounded-xl border border-outline-variant text-sm focus:border-primary">
-                                <option value="">كل أنواع الحصص</option>
-                                {% for value, label in lesson_types %}
-                                    <option value="{{ value }}">{{ label }}</option>
-                                {% endfor %}
-                            </select>
+                        <div class="col-span-12 md:col-span-2 w-full">
+                            <label class="block text-xs font-bold text-on-surface-variant mb-1 md:hidden">نوع الحصة</label>
+                            <div class="font-body-md text-on-surface-variant pr-1 md:pr-0">{{ pr.get_lesson_type_display }}</div>
+                        </div>
+                        <div class="col-span-6 md:col-span-1 w-full">
+                            <label class="block text-xs font-bold text-on-surface-variant mb-1 md:hidden text-center">الحد الأدنى</label>
+                            <div class="relative flex items-center justify-center">
+                                <input type="number" name="min_price" value="{{ pr.min_price|floatformat:0 }}" required class="edit-row-input w-full text-center">
+                            </div>
+                        </div>
+                        <div class="col-span-6 md:col-span-1 w-full">
+                            <label class="block text-xs font-bold text-on-surface-variant mb-1 md:hidden text-center">الحد الأقصى</label>
+                            <div class="relative flex items-center justify-center">
+                                <input type="number" name="max_price" value="{{ pr.max_price|floatformat:0 }}" required class="edit-row-input w-full text-center">
+                            </div>
+                        </div>
+                        <div class="col-span-6 md:col-span-2 w-full flex items-center justify-start gap-2">
+                            <label class="block text-xs font-bold text-on-surface-variant mb-1 md:hidden ml-4">نشط</label>
+                            <div class="flex items-center gap-2">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="is_active" {% if pr.is_active %}checked{% endif %} class="status-toggle">
+                                    <div class="toggle-track"></div>
+                                </label>
+                                <span class="badge {% if pr.is_active %}badge-active{% else %}badge-inactive{% endif %} mr-2 select-none font-bold">
+                                    {% if pr.is_active %}نشط{% else %}غير نشط{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-span-12 md:col-span-3 w-full flex items-center justify-end gap-2">
+                            <button type="submit" class="flex-grow md:flex-grow-0 min-h-[44px] inline-flex items-center justify-center gap-1 border border-outline-variant text-on-surface px-3 py-2.5 rounded-xl font-label-sm font-bold hover:bg-surface-container transition-all active:scale-[0.97]">
+                                <span class="material-symbols-outlined text-[16px] text-primary">save</span>
+                                حفظ
+                            </button>
+                            <button type="button" onclick="confirmDelete('{{ pr.subject.name }} - {{ pr.grade_level.name }} ({{ pr.get_lesson_type_display }})', '{% url 'adminpanel:delete_pricing_range' pr_id=pr.pk %}')" class="flex-grow md:flex-grow-0 min-h-[44px] inline-flex items-center justify-center gap-1 border border-error/30 text-error px-3 py-2.5 rounded-xl font-label-sm font-bold hover:bg-error/5 transition-all active:scale-[0.97]">
+                                <span class="material-symbols-outlined text-[16px]">delete</span>
+                                حذف
+                            </button>
+                        </div>
+                    </form>
+                    {% empty %}
+                    <div id="pricing-empty-state" class="py-8 text-center text-on-surface-variant font-body-md bg-white border border-outline-variant/40 rounded-xl">
+                        <div class="flex flex-col items-center gap-2">
+                            <span class="material-symbols-outlined text-4xl text-outline-variant">payments</span>
+                            لا توجد نطاقات أسعار مضافة بعد.
                         </div>
                     </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-right border-collapse">
-                            <thead>
-                                <tr class="border-b border-outline-variant/30 text-on-surface-variant font-label-md">
-                                    <th class="py-3 px-4 font-bold">المادة والمرحلة</th>
-                                    <th class="py-3 px-4 font-bold">نوع الحصة</th>
-                                    <th class="py-3 px-4 font-bold text-center">الحد الأدنى</th>
-                                    <th class="py-3 px-4 font-bold text-center">الحد الأقصى</th>
-                                    <th class="py-3 px-4 font-bold">الحالة</th>
-                                    <th class="py-3 px-4 font-bold text-left">الإجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pricing-table-body">
-                                {% for pr in pricing_ranges %}
-                                <tr class="border-b border-outline-variant/20 hover:bg-surface-container-low transition-colors pricing-row" data-search="{{ pr.subject.name|lower }} {{ pr.grade_level.name|lower }}" data-type="{{ pr.lesson_type }}">
-                                    <form method="post" action="{% url 'adminpanel:edit_pricing_range' pr_id=pr.pk %}">
-                                        {% csrf_token %}
-                                        <td class="py-4 px-4 font-body-md font-bold text-on-surface">
-                                            {{ pr.subject.name }} - {{ pr.grade_level.name }}
-                                        </td>
-                                        <td class="py-4 px-4 font-body-md text-on-surface-variant">
-                                            {{ pr.get_lesson_type_display }}
-                                        </td>
-                                        <td class="py-4 px-4 w-28 text-center">
-                                            <div class="relative inline-flex items-center">
-                                                <input type="number" name="min_price" value="{{ pr.min_price|floatformat:0 }}" required class="border border-outline-variant hover:border-primary focus:border-primary py-1.5 px-2 rounded w-full text-center font-body-md transition-all">
-                                            </div>
-                                        </td>
-                                        <td class="py-4 px-4 w-28 text-center">
-                                            <div class="relative inline-flex items-center">
-                                                <input type="number" name="max_price" value="{{ pr.max_price|floatformat:0 }}" required class="border border-outline-variant hover:border-primary focus:border-primary py-1.5 px-2 rounded w-full text-center font-body-md transition-all">
-                                            </div>
-                                        </td>
-                                        <td class="py-4 px-4">
-                                            <label class="inline-flex items-center gap-2 cursor-pointer">
-                                                <input type="checkbox" name="is_active" {% if pr.is_active %}checked{% endif %} class="rounded accent-primary text-primary focus:ring-primary w-4 h-4">
-                                                <span class="badge {% if pr.is_active %}badge-active{% else %}badge-inactive{% endif %}">
-                                                    {% if pr.is_active %}نشط{% else %}غير نشط{% endif %}
-                                                </span>
-                                            </label>
-                                        </td>
-                                        <td class="py-4 px-4 text-left">
-                                            <div class="flex items-center justify-end gap-2">
-                                                <button type="submit" class="inline-flex items-center gap-1 border border-outline-variant text-on-surface px-3 py-1.5 rounded-lg font-label-sm font-bold hover:bg-surface-container transition-all active:scale-95">
-                                                    <span class="material-symbols-outlined text-[16px] text-primary">save</span>
-                                                    حفظ
-                                                </button>
-                                                <button type="button" onclick="confirmDelete('{{ pr.subject.name }} - {{ pr.grade_level.name }} ({{ pr.get_lesson_type_display }})', '{% url 'adminpanel:delete_pricing_range' pr_id=pr.pk %}')" class="inline-flex items-center gap-1 border border-error/30 text-error px-3 py-1.5 rounded-lg font-label-sm font-bold hover:bg-error/5 transition-all active:scale-95">
-                                                    <span class="material-symbols-outlined text-[16px]">delete</span>
-                                                    حذف
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </form>
-                                </tr>
-                                {% empty %}
-                                <tr id="pricing-empty-state">
-                                    <td colspan="6" class="py-8 text-center text-on-surface-variant font-body-md">
-                                        <div class="flex flex-col items-center gap-2">
-                                            <span class="material-symbols-outlined text-4xl text-outline-variant">payments</span>
-                                            لا توجد نطاقات أسعار مضافة بعد.
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                                <tr id="pricing-no-results" class="hidden">
-                                    <td colspan="6" class="py-8 text-center text-on-surface-variant font-body-md">
-                                        لا توجد نتائج تطابق بحثك.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    {% endfor %}
+                    <div id="pricing-no-results" class="hidden py-8 text-center text-on-surface-variant font-body-md bg-white border border-outline-variant/40 rounded-xl">
+                        لا توجد نتائج تطابق بحثك.
                     </div>
                 </div>
             </div>
@@ -528,13 +594,13 @@
 </main>
 
 <!-- CONFIRMATION MODAL -->
-<div id="delete-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm transition-all duration-300">
+<div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/40 backdrop-blur-sm transition-all duration-300" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="bg-surface-container-lowest border border-outline-variant/60 w-full max-w-md rounded-2xl p-6 shadow-xl transform scale-95 opacity-0 transition-all duration-300" id="delete-modal-card">
         <div class="flex items-center gap-3 mb-4 text-error">
             <div class="bg-error/10 w-12 h-12 rounded-full flex items-center justify-center">
                 <span class="material-symbols-outlined text-[28px]">warning</span>
             </div>
-            <h4 class="font-title-lg font-bold">تأكيد عملية الحذف</h4>
+            <h4 id="modal-title" class="font-title-lg font-bold">تأكيد عملية الحذف</h4>
         </div>
         <p class="font-body-md text-on-surface-variant mb-6 leading-relaxed">
             هل أنت متأكد من رغبتك في حذف <span id="delete-target-name" class="font-bold text-on-surface"></span>؟ 
@@ -544,11 +610,11 @@
         <div class="flex justify-end gap-3 flex-row-reverse">
             <form id="delete-form" method="post" action="" class="m-0">
                 {% csrf_token %}
-                <button type="submit" class="px-5 py-2.5 rounded-xl bg-error text-on-error font-label-md font-bold hover:bg-error-container hover:shadow-lg transition-all active:scale-95">
+                <button type="submit" class="min-h-[44px] px-6 py-2.5 rounded-xl bg-error text-on-error font-label-md font-bold hover:opacity-90 hover:shadow-lg transition-all active:scale-[0.97]">
                     تأكيد الحذف
                 </button>
             </form>
-            <button onclick="closeDeleteModal()" class="px-5 py-2.5 rounded-xl border border-outline-variant text-on-surface font-label-md font-bold hover:bg-surface-container transition-colors">
+            <button onclick="closeDeleteModal()" class="min-h-[44px] px-6 py-2.5 rounded-xl border border-outline-variant text-on-surface font-label-md font-bold hover:bg-surface-container transition-colors">
                 إلغاء
             </button>
         </div>
@@ -565,6 +631,7 @@
         // Deactivate all buttons
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.classList.remove('active');
+            btn.setAttribute('aria-selected', 'false');
         });
         
         // Show target tab and activate button
@@ -573,6 +640,7 @@
         if (activeTab && activeBtn) {
             activeTab.classList.add('active');
             activeBtn.classList.add('active');
+            activeBtn.setAttribute('aria-selected', 'true');
             // Save last tab in localStorage
             localStorage.setItem('activeSubjectsTab', tabId);
         }
@@ -586,19 +654,49 @@
         }
 
         // Dynamically style status text in checkboxes on state change
-        document.querySelectorAll('input[type="checkbox"][name="is_active"]').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const badge = this.nextElementSibling;
-                if (this.checked) {
-                    badge.textContent = badge.textContent.includes('نشطة') ? 'نشطة' : 'نشط';
-                    badge.className = 'badge badge-active';
-                } else {
-                    badge.textContent = badge.textContent.includes('نشطة') ? 'غير نشطة' : 'غير نشط';
-                    badge.className = 'badge badge-inactive';
+        document.querySelectorAll('.status-toggle').forEach(toggle => {
+            // Initial styling sync
+            syncToggleBadge(toggle);
+
+            toggle.addEventListener('change', function() {
+                syncToggleBadge(this);
+            });
+        });
+
+        // Pricing min vs max validation on submit
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const minInput = this.querySelector('input[name="min_price"]');
+                const maxInput = this.querySelector('input[name="max_price"]');
+                if (minInput && maxInput) {
+                    const min = parseFloat(minInput.value);
+                    const max = parseFloat(maxInput.value);
+                    if (min > max) {
+                        e.preventDefault();
+                        alert('عذراً، يجب أن يكون الحد الأقصى للسعر أكبر من أو يساوي الحد الأدنى.');
+                    }
                 }
             });
         });
     });
+
+    function syncToggleBadge(toggle) {
+        // Find the badge (which is a sibling span in the row hierarchy)
+        const row = toggle.closest('form') || toggle.closest('div');
+        if (row) {
+            const badge = row.querySelector('.badge');
+            if (badge) {
+                const isSubjectOrGrade = badge.textContent.includes('نشطة') || badge.textContent.includes('غير نشطة');
+                if (toggle.checked) {
+                    badge.textContent = isSubjectOrGrade ? 'نشطة' : 'نشط';
+                    badge.className = 'badge badge-active mr-2 select-none';
+                } else {
+                    badge.textContent = isSubjectOrGrade ? 'غير نشطة' : 'غير نشط';
+                    badge.className = 'badge badge-inactive mr-2 select-none';
+                }
+            }
+        }
+    }
 
     // Client-side search filters
     function filterSubjects() {
@@ -611,10 +709,10 @@
         rows.forEach(row => {
             const name = row.getAttribute('data-name');
             if (name.includes(query)) {
-                row.classList.remove('hidden');
+                row.style.setProperty('display', 'flex', 'important');
                 visibleCount++;
             } else {
-                row.classList.add('hidden');
+                row.style.setProperty('display', 'none', 'important');
             }
         });
 
@@ -644,10 +742,10 @@
             const matchesCategory = categoryFilter === "" || category === categoryFilter;
 
             if (matchesSearch && matchesCategory) {
-                row.classList.remove('hidden');
+                row.style.setProperty('display', 'flex', 'important');
                 visibleCount++;
             } else {
-                row.classList.add('hidden');
+                row.style.setProperty('display', 'none', 'important');
             }
         });
 
@@ -677,10 +775,10 @@
             const matchesType = typeFilter === "" || type === typeFilter;
 
             if (matchesSearch && matchesType) {
-                row.classList.remove('hidden');
+                row.style.setProperty('display', 'flex', 'important');
                 visibleCount++;
             } else {
-                row.classList.add('hidden');
+                row.style.setProperty('display', 'none', 'important');
             }
         });
 

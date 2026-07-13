@@ -69,7 +69,7 @@ def booking_create(request, teacher_pk):
             except ValidationError as exc:
                 form.add_error(None, exc)
             else:
-                messages.success(request, _('Booking request created successfully.'))
+                messages.success(request, _('تم إنشاء طلب الحجز بنجاح.'))
                 return redirect('bookings:student_detail', pk=booking.pk)
     else:
         form = BookingCreateForm(teacher=teacher, student=request.user, initial_offering=initial_offering)
@@ -100,7 +100,7 @@ def parent_booking_create(request, teacher_pk, student_pk):
             except ValidationError as exc:
                 form.add_error(None, exc)
             else:
-                messages.success(request, _('Booking request created for linked student.'))
+                messages.success(request, _('تم إنشاء طلب حجز للطالب المرتبط بنجاح.'))
                 return redirect('parents:student_booking_history', student_pk=link.student_id)
     else:
         form = BookingCreateForm(teacher=teacher, student=link.student, parent=request.user, initial_offering=initial_offering)
@@ -173,7 +173,7 @@ def teacher_attendance_code(request, pk):
         teacher=profile,
     )
     if not booking.can_use_attendance_code():
-        messages.error(request, _('Attendance code is available only during the lesson attendance window.'))
+        messages.error(request, _('كود الحضور متاح فقط خلال فترة حضور الحصة.'))
         return redirect('bookings:teacher_detail', pk=booking.pk)
     return render(request, 'bookings/teacher_attendance_code.html', {'booking': booking})
 
@@ -192,10 +192,10 @@ def student_confirm_attendance(request, pk):
         except ValidationError as exc:
             messages.error(request, exc.messages[0] if hasattr(exc, 'messages') else str(exc))
         else:
-            messages.success(request, _('Attendance confirmed and lesson completed.'))
+            messages.success(request, _('تم تأكيد الحضور وانهاء الحصة.'))
             return redirect('bookings:student_detail', pk=booking.pk)
     elif not booking.can_use_attendance_code():
-        messages.error(request, _('Attendance can only be confirmed during the lesson attendance window.'))
+        messages.error(request, _('يمكن تأكيد الحضور فقط خلال فترة حضور الحصة.'))
         return redirect('bookings:student_detail', pk=booking.pk)
     return render(request, 'bookings/student_confirm_attendance.html', {'booking': booking})
 
@@ -216,7 +216,7 @@ def student_cancel_booking(request, pk):
             except ValidationError as exc:
                 form.add_error(None, exc)
             else:
-                messages.success(request, _('Booking cancelled. Refund amount has been recorded.'))
+                messages.success(request, _('تم إلغاء الحجز. تم تسجيل مبلغ الاسترداد.'))
                 return redirect('bookings:student_detail', pk=booking.pk)
     else:
         form = BookingCancellationForm()
@@ -242,7 +242,7 @@ def student_reschedule_booking(request, pk):
             except ValidationError as exc:
                 form.add_error(None, exc)
             else:
-                messages.success(request, _('Booking rescheduled.'))
+                messages.success(request, _('تم إعادة جدولة الحجز.'))
                 return redirect('bookings:student_detail', pk=booking.pk)
     else:
         form = BookingRescheduleForm()
@@ -265,7 +265,7 @@ def teacher_cancel_booking(request, pk):
             except ValidationError as exc:
                 form.add_error(None, exc)
             else:
-                messages.success(request, _('Booking cancelled and teacher violation recorded.'))
+                messages.success(request, _('تم إلغاء الحجز وتسجيل مخالفة للمعلم.'))
                 return redirect('bookings:teacher_detail', pk=booking.pk)
     else:
         form = BookingCancellationForm()
@@ -292,7 +292,7 @@ def teacher_reschedule_booking(request, pk):
             except ValidationError as exc:
                 form.add_error(None, exc)
             else:
-                messages.success(request, _('Booking rescheduled and teacher violation recorded.'))
+                messages.success(request, _('تم إعادة جدولة الحجز وتسجيل مخالفة للمعلم.'))
                 return redirect('bookings:teacher_detail', pk=booking.pk)
     else:
         form = BookingRescheduleForm()
@@ -308,10 +308,10 @@ def teacher_booking_action(request, pk, action):
     try:
         if action == 'accept':
             booking.accept_by_teacher()
-            messages.success(request, _('Booking request accepted.'))
+            messages.success(request, _('تم قبول طلب الحجز.'))
         elif action == 'reject':
             booking.reject_by_teacher(request.POST.get('reason', '').strip())
-            messages.success(request, _('Booking request rejected.'))
+            messages.success(request, _('تم رفض طلب الحجز.'))
         else:
             raise PermissionDenied
     except ValidationError as exc:

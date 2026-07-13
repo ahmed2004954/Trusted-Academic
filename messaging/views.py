@@ -79,7 +79,7 @@ def thread_detail(request, pk):
             message.sender = request.user
             message.save()
             notify_other_participants(message)
-            messages.success(request, _('Message sent.'))
+            messages.success(request, _('تم إرسال الرسالة بنجاح.'))
             return redirect('messaging:thread_detail', pk=thread.pk)
     else:
         form = MessageForm()

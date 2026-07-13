@@ -53,7 +53,7 @@ def create_student(request):
         if form.is_valid():
             student = form.save()
             ParentStudentLink.objects.get_or_create(parent=profile, student=student)
-            messages.success(request, _('Managed student account created and linked.'))
+            messages.success(request, _('تم إنشاء حساب الطالب وربطه بنجاح.'))
             return redirect('parents:dashboard')
     else:
         form = ManagedStudentCreateForm()
@@ -71,7 +71,7 @@ def link_student(request):
                 form.add_error('linking_code', _('No student was found for this code.'))
             else:
                 ParentStudentLink.objects.get_or_create(parent=profile, student=student_profile.user)
-                messages.success(request, _('Student linked successfully.'))
+                messages.success(request, _('تم ربط حساب الطالب بنجاح.'))
                 return redirect('parents:dashboard')
     else:
         form = LinkStudentForm()
