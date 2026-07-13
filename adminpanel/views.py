@@ -316,3 +316,22 @@ def edit_pricing_range(request, pr_id):
         pr.save()
         messages.success(request, _('Pricing range updated successfully.'))
     return redirect('adminpanel:manage_subjects')
+
+
+@staff_member_required
+def delete_grade_level(request, gl_id):
+    from subjects.models import GradeLevel
+    if request.method == 'POST':
+        GradeLevel.objects.filter(pk=gl_id).delete()
+        messages.success(request, _('Grade level deleted successfully.'))
+    return redirect('adminpanel:manage_subjects')
+
+
+@staff_member_required
+def delete_pricing_range(request, pr_id):
+    from teachers.models import PlatformPricingRange
+    if request.method == 'POST':
+        PlatformPricingRange.objects.filter(pk=pr_id).delete()
+        messages.success(request, _('Pricing range deleted successfully.'))
+    return redirect('adminpanel:manage_subjects')
+
