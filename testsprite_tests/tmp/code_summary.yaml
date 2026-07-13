@@ -1,0 +1,79 @@
+version: "2"
+type: backend
+tech_stack:
+  - Python
+  - Django
+  - SQLite
+  - Django Templates
+features:
+  - name: Account Management
+    description: User authentication, registration, profiles.
+    files:
+      - accounts/views.py
+      - accounts/models.py
+    endpoints:
+      - method: GET
+        path: /accounts/login/
+        description: Show login page
+        auth_required: false
+      - method: POST
+        path: /accounts/login/
+        description: Process login
+        auth_required: false
+      - method: GET
+        path: /accounts/register/
+        description: Show registration page
+        auth_required: false
+      - method: POST
+        path: /accounts/register/
+        description: Register a new user
+        auth_required: false
+      - method: GET
+        path: /accounts/profile/
+        description: View or edit user profile
+        auth_required: true
+  - name: Teacher Profiles
+    description: Manage teacher bio, subjects, availability, and certificates.
+    files:
+      - teachers/views.py
+      - teachers/models.py
+    endpoints:
+      - method: GET
+        path: /teachers/
+        description: View list of approved teachers
+        auth_required: false
+      - method: GET
+        path: /teachers/<id>/
+        description: View detailed teacher profile
+        auth_required: false
+      - method: GET
+        path: /teachers/dashboard/
+        description: Teacher dashboard
+        auth_required: true
+      - method: GET
+        path: /teachers/profile/setup/
+        description: Setup teacher profile
+        auth_required: true
+  - name: Bookings
+    description: Booking tutoring lessons, cancellation, and attendance confirmation.
+    files:
+      - bookings/views.py
+      - bookings/models.py
+    endpoints:
+      - method: GET
+        path: /bookings/
+        description: View student booking list
+        auth_required: true
+      - method: POST
+        path: /bookings/create/<teacher_id>/
+        description: Create a booking with a teacher
+        auth_required: true
+      - method: GET
+        path: /bookings/<id>/
+        description: View booking details
+        auth_required: true
+      - method: POST
+        path: /bookings/<id>/cancel/
+        description: Cancel a booking
+        auth_required: true
+known_limitations: []

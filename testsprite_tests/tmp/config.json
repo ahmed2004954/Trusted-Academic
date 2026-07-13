@@ -1,0 +1,20 @@
+{
+  "status": "commited",
+  "type": "backend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:8000",
+  "backendAuthType": "basic token",
+  "backendUsername": "admin@example.com",
+  "backendPassword": "Testpass123!",
+  "executionArgs": {
+    "projectName": "trust acadmy",
+    "projectPath": "c:/Users/h7304/Desktop/trust acadmy",
+    "testIds": [],
+    "additionalInstruction": "",
+    "serverMode": "development",
+    "envs": {
+      "API_KEY": "sk-user-WafQaNASmdDhmDU-6e-VHng17Mo19Z19p9JP9kav0A6SRqS8qsZQk5m8QGKi4GzxfBq9sCkmWbIB8UYSEvfqHyxDDCNoqbVAwCw0GGBTBED0BTzWfsV5d9nMArP1BIByp10"
+    }
+  },
+  "serverPort": 53637
+}
