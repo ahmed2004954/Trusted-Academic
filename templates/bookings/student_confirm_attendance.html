@@ -1,21 +1,56 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}تأكيد الحضور - منصة الدروس الخصوصية{% endblock %}
+{% block title %}تأكيد الحضور - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>تأكيد حضور الحصة</h1>
-    <div class="status-card">
-        <p><strong>المدرس:</strong> {{ booking.teacher.user.get_full_name }}</p>
-        <p><strong>المادة:</strong> {{ booking.subject.name }} - {{ booking.grade_level.name }}</p>
-        <p><strong>الموعد:</strong> {{ booking.scheduled_start|date:'Y-m-d H:i' }} - {{ booking.scheduled_end|date:'H:i' }}</p>
+<main class="min-h-[80vh] flex items-center justify-center py-12 px-margin-mobile md:px-margin-desktop text-right" dir="rtl">
+    <div class="w-full max-w-md flex flex-col gap-6">
+        <!-- Header -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 text-center ambient-shadow">
+            <div class="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-[32px] icon-fill">verified</span>
+            </div>
+            <h1 class="font-headline-md text-headline-md text-on-surface mb-2">تأكيد حضور الحصة</h1>
+            <p class="font-body-md text-body-md text-on-surface-variant">الرجاء إدخال كود الحضور الذي شاركه معك المعلم لتأكيد حضورك الحصة بنجاح.</p>
+        </div>
+
+        <!-- Booking Details & Form -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 ambient-shadow">
+            <div class="space-y-3 mb-6 bg-surface-container/50 p-4 rounded-xl text-sm">
+                <div class="flex justify-between items-center">
+                    <span class="text-on-surface-variant">المعلم:</span>
+                    <span class="font-bold text-on-surface">{{ booking.teacher.user.get_full_name }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-on-surface-variant">المادة:</span>
+                    <span class="font-bold text-on-surface">{{ booking.subject.name }} - {{ booking.grade_level.name }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-on-surface-variant">الموعد:</span>
+                    <span class="font-bold text-on-surface text-xs">{{ booking.scheduled_start|date:'Y-m-d H:i' }} - {{ booking.scheduled_end|date:'H:i' }}</span>
+                </div>
+            </div>
+
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                <div class="space-y-1.5">
+                    <label for="attendance_code" class="block font-label-md text-label-md text-on-surface">كود الحضور</label>
+                    <input id="attendance_code" name="attendance_code" class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-center font-mono font-bold tracking-widest text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" placeholder="ادخل الكود هنا" maxlength="20" required>
+                </div>
+                
+                <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-bold py-3 px-6 rounded-xl hover:bg-primary-container hover:scale-[1.01] active:scale-[0.99] transition-all">
+                    <span class="material-symbols-outlined text-[20px]">check_circle</span>
+                    تأكيد الحضور
+                </button>
+            </form>
+        </div>
+
+        <a class="inline-flex items-center justify-center gap-2 bg-transparent text-on-surface border border-outline-variant px-5 py-2.5 rounded-xl font-label-md hover:bg-surface-container transition-colors w-full" href="{% url 'bookings:student_detail' booking.pk %}">
+            <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+            رجوع للحجز
+        </a>
     </div>
-    <form method="post" class="form-card">
-        {% csrf_token %}
-        <label for="attendance_code">كود الحضور</label>
-        <input id="attendance_code" name="attendance_code" class="form-control" maxlength="20" required>
-        <button type="submit" class="btn btn-primary">تأكيد الحضور</button>
-    </form>
-    <a class="btn btn-secondary" href="{% url 'bookings:student_detail' booking.pk %}">رجوع للحجز</a>
-</section>
+</main>
 {% endblock %}
+

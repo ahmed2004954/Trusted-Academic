@@ -1,28 +1,74 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}حالة اعتماد المدرس - منصة الدروس الخصوصية{% endblock %}
+{% block title %}حالة اعتماد المدرس - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content dashboard">
-    <h1>حالة اعتماد البروفايل</h1>
+<main class="min-h-[80vh] flex items-center justify-center py-12 px-margin-mobile md:px-margin-desktop text-right" dir="rtl">
+    <div class="w-full max-w-lg flex flex-col gap-6">
+        
+        <!-- Status Card -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-8 ambient-shadow space-y-6 text-center">
+            
+            {% if profile.approval_status == 'approved' %}
+                <div class="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">
+                    <span class="material-symbols-outlined text-[36px] icon-fill">verified</span>
+                </div>
+            {% elif profile.approval_status == 'pending' %}
+                <div class="w-16 h-16 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center mx-auto">
+                    <span class="material-symbols-outlined text-[36px] icon-fill text-secondary">pending_actions</span>
+                </div>
+            {% else %}
+                <div class="w-16 h-16 rounded-full bg-error-container text-on-error-container flex items-center justify-center mx-auto">
+                    <span class="material-symbols-outlined text-[36px] icon-fill">cancel</span>
+                </div>
+            {% endif %}
 
-    <div class="status-card status-{{ profile.approval_status }}">
-        <h2>{{ profile.get_approval_status_display }}</h2>
-        {% if profile.approval_status == 'pending' %}
-            <p>طلبك قيد المراجعة. يمكنك تحديث بياناتك أو إضافة شهادات أثناء الانتظار.</p>
-        {% elif profile.approval_status == 'approved' %}
-            <p>تم اعتماد بروفايلك. ستظهر في البحث العام عند بناء Sprint 4.</p>
-        {% else %}
-            <p>لا يمكن عرض بروفايلك للعامة حالياً. راجع ملاحظات الإدارة وحدّث بياناتك عند الحاجة.</p>
-        {% endif %}
+            <div>
+                <h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">حالة اعتماد الحساب</h1>
+                <span class="inline-flex items-center gap-1 font-bold text-sm px-4 py-1.5 rounded-full 
+                    {% if profile.approval_status == 'approved' %} bg-primary/10 text-primary
+                    {% elif profile.approval_status == 'pending' %} bg-secondary-fixed text-on-secondary-fixed
+                    {% else %} bg-error-container text-on-error-container {% endif %}">
+                    {{ profile.get_approval_status_display }}
+                </span>
+            </div>
 
-        {% if profile.verification_notes %}
-            <p><strong>ملاحظات الإدارة:</strong> {{ profile.verification_notes }}</p>
-        {% endif %}
+            <div class="text-sm text-on-surface-variant leading-relaxed">
+                {% if profile.approval_status == 'pending' %}
+                    <p>طلب الانضمام الخاص بك قيد المراجعة حالياً من قبل الإدارة. يمكنك تحديث بياناتك أو إضافة شهادات/مؤهلات أخرى لتعزيز ملفك أثناء فترة الانتظار.</p>
+                {% elif profile.approval_status == 'approved' %}
+                    <p>تهانينا! تم اعتماد حسابك بنجاح وهو الآن متاح للظهور والبحث العام للطلاب وأولياء الأمور على المنصة.</p>
+                {% else %}
+                    <p>ملفك غير معتمد للبحث العام في الوقت الحالي. يرجى مراجعة ملاحظات الإدارة أدناه وتحديث بياناتك لإعادة تقديم الطلب.</p>
+                {% endif %}
+            </div>
+
+            {% if profile.verification_notes %}
+                <div class="bg-surface-container border border-outline-variant rounded-xl p-4 text-right text-xs">
+                    <strong class="text-on-surface block mb-1">ملاحظات الإدارة:</strong>
+                    <p class="text-on-surface-variant leading-relaxed">{{ profile.verification_notes }}</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-3">
+            <a class="flex-1 inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-bold py-3 px-6 rounded-xl hover:bg-primary-container transition-all" href="{% url 'teachers:setup_profile' %}">
+                <span class="material-symbols-outlined text-[20px]">edit</span>
+                تحديث البروفايل
+            </a>
+            <a class="flex-1 inline-flex items-center justify-center gap-2 bg-transparent text-on-surface border border-outline-variant px-5 py-3 rounded-xl font-label-md hover:bg-surface-container transition-colors" href="{% url 'teachers:upload_certificate' %}">
+                <span class="material-symbols-outlined text-[20px]">workspace_premium</span>
+                إضافة شهادة
+            </a>
+        </div>
+
+        <a class="inline-flex items-center justify-center gap-2 bg-transparent text-on-surface border border-outline-variant px-5 py-2.5 rounded-xl font-label-md hover:bg-surface-container transition-colors w-full" href="{% url 'teachers:dashboard' %}">
+            <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+            العودة للوحة المدرس
+        </a>
     </div>
-
-    <a class="btn btn-primary" href="{% url 'teachers:setup_profile' %}">تحديث البروفايل</a>
-    <a class="btn" href="{% url 'teachers:upload_certificate' %}">إضافة شهادة</a>
-    <a class="btn" href="{% url 'teachers:dashboard' %}">العودة للوحة المدرس</a>
-</section>
+</main>
 {% endblock %}
+

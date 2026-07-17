@@ -1,0 +1,393 @@
+[
+  {
+    "id": "TC001",
+    "title": "Create a lesson booking with a teacher",
+    "description": "A logged-in student or parent can create a booking from a teacher profile and see confirmation that the booking was created.",
+    "category": "Bookings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /accounts/login/"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open an approved teacher profile"
+      },
+      {
+        "type": "action",
+        "description": "Create a booking with a valid lesson time and slot details"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the booking is created"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a booking confirmation is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Register and reach the correct dashboard",
+    "description": "A new student can register with valid details and is taken to the appropriate authenticated dashboard after account creation.",
+    "category": "Account Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /accounts/register/"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the registration form with valid student details"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify account creation succeeds"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on the appropriate dashboard"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Log in and reach the role dashboard",
+    "description": "An existing user can log in with valid credentials and is redirected to their role-specific dashboard.",
+    "category": "Account Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /accounts/login/"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify authentication succeeds"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on the role dashboard"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Browse approved teachers and open a teacher profile",
+    "description": "A visitor can view the public teacher list, open an approved teacher profile, and see the profile details they need to evaluate the teacher.",
+    "category": "Teacher Profiles",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /teachers/"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify approved teachers are displayed"
+      },
+      {
+        "type": "action",
+        "description": "Open an approved teacher profile"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify detailed teacher profile information is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Cancel an existing booking",
+    "description": "A logged-in student or parent can cancel a cancellable booking and see the booking status update afterward.",
+    "category": "Bookings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /accounts/login/"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the bookings page"
+      },
+      {
+        "type": "action",
+        "description": "Open a cancellable booking"
+      },
+      {
+        "type": "action",
+        "description": "Cancel the booking"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a cancellation confirmation is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated booking status is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "View booking list and open booking details",
+    "description": "A logged-in student or parent can see their bookings in the list and open an existing booking to review its schedule and status.",
+    "category": "Bookings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /accounts/login/"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the bookings page"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing booking"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify booking details are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the booking status is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Set up a teacher profile and await approval",
+    "description": "An authenticated teacher can complete profile setup and see confirmation that the profile is pending admin review before becoming publicly visible.",
+    "category": "Teacher Profiles",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /accounts/login/"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the teacher profile setup page"
+      },
+      {
+        "type": "action",
+        "description": "Complete the teacher profile setup form with valid information"
+      },
+      {
+        "type": "action",
+        "description": "Submit the teacher profile setup form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify profile setup completion is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a pending review state is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Manage account profile and return to the dashboard",
+    "description": "An authenticated user can open their profile page, make profile changes, and return to the appropriate dashboard after saving.",
+    "category": "Account Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /accounts/login/"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the profile page"
+      },
+      {
+        "type": "action",
+        "description": "Update the profile information with valid changes"
+      },
+      {
+        "type": "action",
+        "description": "Save the profile changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the profile update succeeds"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user is returned to the role dashboard"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC009",
+    "title": "Show booking conflict validation for overlapping lesson times",
+    "description": "A logged-in student or parent who tries to create an overlapping booking sees a validation error and the booking is not created.",
+    "category": "Bookings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /accounts/login/"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open an approved teacher profile"
+      },
+      {
+        "type": "action",
+        "description": "Create a booking with an overlapping lesson time"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a booking validation error is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the conflicting booking is not created"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC010",
+    "title": "Keep non-approved teacher profiles hidden publicly",
+    "description": "A visitor cannot open a teacher profile that is not approved and sees a hidden or not found response instead.",
+    "category": "Teacher Profiles",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /teachers/"
+      },
+      {
+        "type": "action",
+        "description": "Open a teacher profile that is not approved"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the teacher profile is not publicly accessible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a hidden or not found response is shown"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC011",
+    "title": "Prevent access to profile pages without signing in",
+    "description": "An unauthenticated visitor who tries to open the profile area is blocked from viewing protected account information.",
+    "category": "Account Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /accounts/profile/"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify access is restricted"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a login prompt or access denied state is shown"
+      }
+    ],
+    "priority": "Low"
+  }
+]

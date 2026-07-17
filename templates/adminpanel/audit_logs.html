@@ -1,23 +1,54 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}سجل تدقيق الإدارة - منصة الدروس الخصوصية{% endblock %}
+{% block title %}سجل تدقيق الإدارة - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content dashboard">
-    <h1>سجل تدقيق الإدارة</h1>
+<main class="flex-grow pt-4 pb-xl px-margin-mobile md:px-margin-desktop w-full max-w-[1440px] mx-auto text-right">
+    <header class="mb-lg border-b border-outline-variant/30 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="font-headline-lg text-headline-lg text-on-surface mb-1">سجل تدقيق الإدارة</h1>
+            <p class="font-body-md text-body-md text-on-surface-variant">تتبع كل الإجراءات والقرارات الحساسة التي تمت على المنصة من قبل الطاقم الإداري.</p>
+        </div>
+        <a class="inline-flex items-center gap-2 bg-transparent text-on-surface border border-outline-variant px-4 py-2 rounded-xl font-label-md hover:bg-surface-container transition-colors" href="{% url 'adminpanel:dashboard' %}">
+            <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+            العودة للوحة الإدارة
+        </a>
+    </header>
 
-    <ul class="item-list">
-        {% for log in logs %}
-            <li>
-                <strong>{{ log.created_at }} - {{ log.action }}</strong>
-                <span>{{ log.actor|default:'system' }} - {{ log.target_label }}</span>
-                {% if log.target_url %}<a class="btn" href="{{ log.target_url }}">فتح الهدف</a>{% endif %}
-            </li>
-        {% empty %}
-            <li>لا توجد سجلات تدقيق بعد.</li>
-        {% endfor %}
-    </ul>
-
-    <a class="btn" href="{% url 'adminpanel:dashboard' %}">العودة للوحة الإدارة</a>
-</section>
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 ambient-shadow">
+        {% if logs %}
+            <div class="flex flex-col divide-y divide-outline-variant/50">
+                {% for log in logs %}
+                    <div class="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-3">
+                                <span class="font-bold text-on-surface text-sm">{{ log.action }}</span>
+                                <span class="text-xs text-on-surface-variant font-medium bg-surface-container px-2.5 py-1 rounded-full flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">person</span>
+                                    بواسطة: {{ log.actor|default:'النظام' }}
+                                </span>
+                            </div>
+                            <p class="text-xs text-on-surface-variant">
+                                <strong>الهدف:</strong> {{ log.target_label }}
+                            </p>
+                            <p class="text-[11px] text-on-surface-variant/80">
+                                {{ log.created_at|date:'Y-m-d H:i:s' }}
+                            </p>
+                        </div>
+                        {% if log.target_url %}
+                            <a class="inline-flex items-center gap-1 bg-primary text-on-primary px-4 py-1.5 rounded-lg text-xs font-semibold hover:bg-primary-container transition-colors" href="{{ log.target_url }}">
+                                <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+                                فتح الهدف
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            {% include 'partials/_empty_state.html' with icon='history' title='لا توجد سجلات تدقيق بعد' desc='لم يتم تسجيل أي إجراءات إدارية بعد.' %}
+        {% endif %}
+    </div>
+</main>
 {% endblock %}
+

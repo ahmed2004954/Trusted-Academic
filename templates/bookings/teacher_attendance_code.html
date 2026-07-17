@@ -1,16 +1,55 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}كود الحضور - منصة الدروس الخصوصية{% endblock %}
+{% block title %}كود الحضور - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>كود الحضور</h1>
-    <div class="status-card">
-        <p><strong>الحجز:</strong> {{ booking.student.get_full_name }} - {{ booking.subject.name }}</p>
-        <p><strong>الموعد:</strong> {{ booking.scheduled_start|date:'Y-m-d H:i' }} - {{ booking.scheduled_end|date:'H:i' }}</p>
-        <p><strong>الكود:</strong> <span class="attendance-code">{{ booking.attendance_code }}</span></p>
-        <p class="muted">شارك هذا الكود مع الطالب لتأكيد حضور الحصة.</p>
+<main class="min-h-[80vh] flex items-center justify-center py-12 px-margin-mobile md:px-margin-desktop text-right" dir="rtl">
+    <div class="w-full max-w-md flex flex-col gap-6">
+        <!-- Header & Code Card -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 text-center ambient-shadow space-y-6">
+            <div class="w-16 h-16 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center mx-auto">
+                <span class="material-symbols-outlined text-[32px] icon-fill text-secondary">vpn_key</span>
+            </div>
+            
+            <div>
+                <h1 class="font-headline-md text-headline-md text-on-surface mb-2">كود حضور الحصة</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant">شارك هذا الكود مع الطالب أثناء الحصة ليتمكن من تأكيد الحضور ونقل المستحقات لمحفظتك.</p>
+            </div>
+
+            <!-- Big Code Display -->
+            <div class="bg-surface-container border border-outline-variant rounded-2xl p-6">
+                <div class="font-mono text-3xl font-black tracking-widest text-primary select-all mb-2">
+                    {{ booking.attendance_code }}
+                </div>
+                <p class="text-xs text-on-surface-variant flex items-center justify-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">info</span>
+                    انقر نقراً مزدوجاً لتحديد الكود ونسخه
+                </p>
+            </div>
+
+            <!-- Booking details -->
+            <div class="border-t border-outline-variant/50 pt-4 space-y-2 text-xs text-right">
+                <div class="flex justify-between">
+                    <span class="text-on-surface-variant">الحجز:</span>
+                    <span class="font-bold text-on-surface">{{ booking.student.get_full_name }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-on-surface-variant">المادة:</span>
+                    <span class="font-bold text-on-surface">{{ booking.subject.name }} - {{ booking.grade_level.name }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-on-surface-variant">الموعد:</span>
+                    <span class="font-bold text-on-surface">{{ booking.scheduled_start|date:'Y-m-d H:i' }} - {{ booking.scheduled_end|date:'H:i' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <a class="inline-flex items-center justify-center gap-2 bg-transparent text-on-surface border border-outline-variant px-5 py-2.5 rounded-xl font-label-md hover:bg-surface-container transition-colors w-full" href="{% url 'bookings:teacher_detail' booking.pk %}">
+            <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+            رجوع للحجز
+        </a>
     </div>
-    <a class="btn btn-secondary" href="{% url 'bookings:teacher_detail' booking.pk %}">رجوع للحجز</a>
-</section>
+</main>
 {% endblock %}
+

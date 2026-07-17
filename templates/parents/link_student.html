@@ -1,16 +1,55 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}ربط طالب موجود - منصة الدروس الخصوصية{% endblock %}
+{% block title %}ربط طالب موجود - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>ربط طالب موجود</h1>
-    <p>أدخل كود الربط الذي يظهر في لوحة الطالب.</p>
-    <form method="post" class="form-card">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">ربط الطالب</button>
-        <a class="btn btn-secondary" href="{% url 'parents:dashboard' %}">رجوع</a>
-    </form>
-</section>
+<main class="min-h-[80vh] flex items-center justify-center py-12 px-margin-mobile md:px-margin-desktop text-right" dir="rtl">
+    <div class="w-full max-w-md flex flex-col gap-6">
+        <!-- Header -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 text-center ambient-shadow">
+            <div class="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-[32px] icon-fill">link</span>
+            </div>
+            <h1 class="font-headline-md text-headline-md text-on-surface mb-2">ربط طالب موجود</h1>
+            <p class="font-body-md text-body-md text-on-surface-variant">قم بربط حساب ابنك الموجود مسبقاً عبر إدخال كود الربط الظاهر في لوحة التحكم الخاصة بحسابه.</p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 ambient-shadow">
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                    <div class="space-y-1.5">
+                        <label for="{{ field.id_for_label }}" class="block font-label-md text-label-md text-on-surface">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <p class="text-xs text-on-surface-variant/80">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <p class="text-xs text-error font-medium flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">error</span>
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                
+                <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-bold py-3 px-6 rounded-xl hover:bg-primary-container hover:scale-[1.01] active:scale-[0.99] transition-all">
+                    <span class="material-symbols-outlined text-[20px]">link</span>
+                    ربط الطالب
+                </button>
+            </form>
+        </div>
+
+        <a class="inline-flex items-center justify-center gap-2 bg-transparent text-on-surface border border-outline-variant px-5 py-2.5 rounded-xl font-label-md hover:bg-surface-container transition-colors w-full" href="{% url 'parents:dashboard' %}">
+            <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+            رجوع
+        </a>
+    </div>
+</main>
 {% endblock %}
+

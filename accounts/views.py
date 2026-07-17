@@ -16,7 +16,7 @@ def login_view(request):
         if form.is_valid():
             email = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            user = authenticate(request, email=email, password=password)
+            user = authenticate(request, username=email, password=password)
             if user is not None:
                 login(request, user)
                 return redirect('core:dashboard')
@@ -42,7 +42,7 @@ def register_view(request, role=None):
         form = UserRegistrationForm(request.POST, initial=initial)
         if form.is_valid():
             user = form.save()
-            login(request, user)
+            login(request, user, backend='accounts.backends.EmailBackend')
             return redirect('core:dashboard')
     else:
         form = UserRegistrationForm(initial=initial)

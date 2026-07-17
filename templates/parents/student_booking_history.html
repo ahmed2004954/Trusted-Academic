@@ -1,28 +1,77 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}سجل حجوزات الطالب - منصة الدروس الخصوصية{% endblock %}
+{% block title %}سجل حجوزات الطالب - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>سجل حجوزات {{ student.get_full_name }}</h1>
-    <p>لإنشاء حجز جديد لهذا الطالب، اختر مدرساً من صفحة المدرسين ثم استخدم رابط حجز ولي الأمر عند توفره.</p>
-    {% for booking in bookings %}
-        <div class="status-card">
-            <p><strong>المدرس:</strong> {{ booking.teacher.user.get_full_name }}</p>
-            <p><strong>المادة:</strong> {{ booking.subject.name }} - {{ booking.grade_level.name }}</p>
-            <p><strong>الموعد:</strong> {{ booking.scheduled_start|date:'Y-m-d H:i' }}</p>
-            <p><strong>الحالة:</strong> {{ booking.get_booking_status_display }}</p>
-            <a class="btn btn-secondary" href="{% url 'messaging:booking_thread' booking.pk %}">رسائل الحجز</a>
-            {% if booking.pk in complaint_booking_ids %}
-                <a class="btn btn-primary" href="{% url 'complaints:create' booking.pk %}">فتح شكوى</a>
-            {% endif %}
-            {% if booking.report %}
-                <a class="btn btn-primary" href="{% url 'reports:detail' booking.report.pk %}">عرض التقرير</a>
-            {% endif %}
+<main class="flex-grow pt-4 pb-xl px-margin-mobile md:px-margin-desktop w-full max-w-[1440px] mx-auto text-right" dir="rtl">
+    <!-- Header -->
+    <header class="border-b border-outline-variant/30 pb-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="font-headline-lg text-headline-lg text-on-surface mb-1">سجل حجوزات {{ student.get_full_name }}</h1>
+            <p class="font-body-md text-body-md text-on-surface-variant">لطلب حجز حصة جديدة، يرجى تصفح المعلمين واختيار موعد مناسب.</p>
         </div>
-    {% empty %}
-        <p>لا توجد حجوزات لهذا الطالب.</p>
-    {% endfor %}
-    <a class="btn btn-secondary" href="{% url 'parents:dashboard' %}">رجوع</a>
-</section>
+        <a class="inline-flex items-center gap-2 bg-transparent text-on-surface border border-outline-variant px-4 py-2 rounded-xl font-label-md hover:bg-surface-container transition-colors" href="{% url 'parents:dashboard' %}">
+            <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+            رجوع للوحة التحكم
+        </a>
+    </header>
+
+    {% if bookings %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+            {% for booking in bookings %}
+                <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 ambient-shadow flex flex-col justify-between gap-4">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-start gap-2">
+                            <div>
+                                <h3 class="font-title-lg text-title-lg text-on-surface">{{ booking.subject.name }}</h3>
+                                <p class="text-xs text-on-surface-variant mt-0.5">{{ booking.grade_level.name }}</p>
+                            </div>
+                            <span class="bg-surface-container text-on-surface-variant px-3 py-1 rounded-full text-xs font-bold">
+                                #{{ booking.pk }}
+                            </span>
+                        </div>
+                        
+                        <div class="space-y-1.5 text-sm text-on-surface-variant">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]">person</span>
+                                <span>المعلم: <strong class="text-on-surface">{{ booking.teacher.user.get_full_name }}</strong></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]">calendar_month</span>
+                                <span>الموعد: <strong class="text-on-surface">{{ booking.scheduled_start|date:'Y-m-d H:i' }}</strong></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]">info</span>
+                                <span>الحالة: <strong class="text-on-surface">{{ booking.get_booking_status_display }}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-outline-variant/50 pt-4 flex flex-wrap gap-2">
+                        <a class="inline-flex items-center gap-1 bg-surface-container text-on-surface px-4 py-2 rounded-xl text-xs font-bold hover:bg-outline-variant/30 transition-colors" href="{% url 'messaging:booking_thread' booking.pk %}">
+                            <span class="material-symbols-outlined text-[16px]">chat</span>
+                            الرسائل
+                        </a>
+                        {% if booking.pk in complaint_booking_ids %}
+                            <a class="inline-flex items-center gap-1 bg-error/10 text-error px-4 py-2 rounded-xl text-xs font-bold hover:bg-error-container/20 transition-colors" href="{% url 'complaints:create' booking.pk %}">
+                                <span class="material-symbols-outlined text-[16px]">gavel</span>
+                                فتح شكوى
+                            </a>
+                        {% endif %}
+                        {% if booking.report %}
+                            <a class="inline-flex items-center gap-1 bg-primary text-on-primary px-4 py-2 rounded-xl text-xs font-bold hover:bg-primary-container transition-colors" href="{% url 'reports:detail' booking.report.pk %}">
+                                <span class="material-symbols-outlined text-[16px]">description</span>
+                                عرض التقرير
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        {% include 'partials/_empty_state.html' with icon='history' title='لا توجد حجوزات' desc='لم يتم تسجيل أي حجوزات سابقة أو قادمة لهذا الطالب بعد.' %}
+    {% endif %}
+</main>
 {% endblock %}
+

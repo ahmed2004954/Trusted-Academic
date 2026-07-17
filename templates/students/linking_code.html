@@ -1,18 +1,46 @@
-{% extends 'base.html' %}
+{% extends 'base_identity.html' %}
+{% load static %}
 
-{% block title %}كود ربط ولي الأمر - منصة الدروس الخصوصية{% endblock %}
+{% block title %}كود ربط ولي الأمر - ثقة أكاديمية{% endblock %}
 
 {% block content %}
-<section class="page-content">
-    <h1>كود ربط ولي الأمر</h1>
-    <div class="status-card">
-        <p>شارك هذا الكود مع ولي الأمر لربط حسابه بحسابك.</p>
-        <p><strong>الكود:</strong> {{ profile.linking_code }}</p>
+<main class="min-h-[80vh] flex items-center justify-center py-12 px-margin-mobile md:px-margin-desktop text-right" dir="rtl">
+    <div class="w-full max-w-md flex flex-col gap-6">
+        <!-- Header & Code Card -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 text-center ambient-shadow space-y-6">
+            <div class="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">
+                <span class="material-symbols-outlined text-[32px] icon-fill">link</span>
+            </div>
+            
+            <div>
+                <h1 class="font-headline-md text-headline-md text-on-surface mb-2">كود ربط ولي الأمر</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant">شارك هذا الكود مع ولي أمرك ليتمكن من ربط حسابه بحسابك والدفع بالنيابة عنك ومتابعة تقاريرك.</p>
+            </div>
+
+            <!-- Big Code Display -->
+            <div class="bg-surface-container border border-outline-variant rounded-2xl p-6">
+                <div class="font-mono text-3xl font-black tracking-widest text-primary select-all mb-2">
+                    {{ profile.linking_code }}
+                </div>
+                <p class="text-xs text-on-surface-variant flex items-center justify-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">info</span>
+                    انقر نقراً مزدوجاً لتحديد الكود ونسخه
+                </p>
+            </div>
+        </div>
+
+        <form method="post" class="flex flex-col sm:flex-row gap-3">
+            {% csrf_token %}
+            <button type="submit" class="flex-1 inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-bold py-3 px-6 rounded-xl hover:bg-primary-container transition-all">
+                <span class="material-symbols-outlined text-[20px]">refresh</span>
+                إنشاء كود جديد
+            </button>
+            <a class="flex-1 inline-flex items-center justify-center gap-2 bg-transparent text-on-surface border border-outline-variant px-5 py-3 rounded-xl font-label-md hover:bg-surface-container transition-colors" href="{% url 'students:dashboard' %}">
+                <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+                رجوع
+            </a>
+        </form>
     </div>
-    <form method="post" class="inline-form">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary">إنشاء كود جديد</button>
-        <a class="btn btn-secondary" href="{% url 'students:dashboard' %}">رجوع</a>
-    </form>
-</section>
+</main>
 {% endblock %}
+
