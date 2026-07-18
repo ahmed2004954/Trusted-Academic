@@ -1,8 +1,103 @@
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
 from core.test_helpers import create_offering, create_teacher, create_user
-from teachers.models import TeacherProfile
+from teachers.models import TeacherCertificate, TeacherProfile
+
+
+class TeacherProfileSetupTests(TestCase):
+    def test_teacher_can_setup_profile(self):
+        teacher_user = create_user('setup@example.com', role='teacher')
+        self.client.force_login(teacher_user)
+
+        response = self.client.post(reverse('teachers:setup_profile'), {
+            'headline': 'Physics tutor',
+            'bio': 'Ten years of experience teaching physics.',
+            'experience_years': 10,
+            'intro_video_url': '',
+            'booking_mode': 'automatic',
+        })
+
+        self.assertEqual(response.status_code, 302)
+        profile = TeacherProfile.objects.get(user=teacher_user)
+        self.assertEqual(profile.headline, 'Physics tutor')
+        self.assertEqual(profile.experience_years, 10)
+
+    def test_setup_profile_rejects_excessive_experience(self):
+        teacher_user = create_user('setup-bad@example.com', role='teacher')
+        self.client.force_login(teacher_user)
+
+        response = self.client.post(reverse('teachers:setup_profile'), {
+            'headline': 'Overqualified',
+            'bio': 'Impossible experience.',
+            'experience_years': 120,
+            'booking_mode': 'automatic',
+        })
+
+        self.assertEqual(response.status_code, 200)
+        profile = TeacherProfile.objects.get(user=teacher_user)
+        self.assertNotEqual(profile.experience_years, 120)
+
+    def test_setup_profile_requires_teacher_role(self):
+        student = create_user('setup-student@example.com', role='student')
+        self.client.force_login(student)
+
+        response = self.client.get(reverse('teachers:setup_profile'))
+
+        self.assertEqual(response.status_code, 403)
+
+
+class TeacherCertificateTests(TestCase):
+    def test_teacher_can_upload_certificate(self):
+        teacher_user = create_user('cert@example.com', role='teacher')
+        self.client.force_login(teacher_user)
+        upload = SimpleUploadedFile('cert.pdf', b'%PDF-1.4 fake', content_type='application/pdf')
+
+        response = self.client.post(reverse('teachers:upload_certificate'), {
+            'title': 'BSc Mathematics',
+            'issuing_organization': 'Cairo University',
+            'file': upload,
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(
+            TeacherCertificate.objects.filter(
+                teacher_profile__user=teacher_user, title='BSc Mathematics'
+            ).exists()
+        )
+
+    def test_certificate_upload_requires_teacher_role(self):
+        student = create_user('cert-student@example.com', role='student')
+        self.client.force_login(student)
+
+        response = self.client.get(reverse('teachers:upload_certificate'))
+
+        self.assertEqual(response.status_code, 403)
+
+
+class TeacherStatusTests(TestCase):
+    def test_pending_teacher_sees_status_page(self):
+        teacher = create_teacher(email='status@example.com', approved=False)
+        self.client.force_login(teacher.user)
+
+        response = self.client.get(reverse('teachers:my_status'))
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_teacher_dashboard_accessible(self):
+        teacher = create_teacher(email='dash@example.com')
+        self.client.force_login(teacher.user)
+
+        response = self.client.get(reverse('teachers:dashboard'))
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_status_requires_login(self):
+        response = self.client.get(reverse('teachers:my_status'))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/accounts/login/', response.url)
 
 
 class TeacherDiscoveryTests(TestCase):

@@ -141,3 +141,6 @@ media/*
 Thumbs.db
 
 testsprite_tests\tmp\config.json
+
+# MCP config (contains API keys)
+.mcp.json

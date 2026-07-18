@@ -42,6 +42,7 @@ def register_view(request, role=None):
         form = UserRegistrationForm(request.POST, initial=initial)
         if form.is_valid():
             user = form.save()
+            messages.success(request, _('تم إنشاء الحساب بنجاح! مرحباً بك في منصة ثقة الأكاديمية.'))
             login(request, user, backend='accounts.backends.EmailBackend')
             return redirect('core:dashboard')
     else:

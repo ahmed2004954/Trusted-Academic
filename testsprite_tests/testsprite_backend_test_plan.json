@@ -1,52 +1,7 @@
 [
   {
     "id": "TC001",
-    "title": "get accounts register page",
-    "description": "Verify that a GET request to /accounts/register/ returns the registration page successfully without requiring authentication."
-  },
-  {
-    "id": "TC002",
-    "title": "post accounts register with valid student details",
-    "description": "Verify that a POST request to /accounts/register/ with valid student registration details creates a new user account and redirects to the appropriate dashboard."
-  },
-  {
-    "id": "TC003",
-    "title": "get accounts login page",
-    "description": "Verify that a GET request to /accounts/login/ returns the login page successfully without requiring authentication."
-  },
-  {
-    "id": "TC004",
-    "title": "post accounts login with valid credentials",
-    "description": "Verify that a POST request to /accounts/login/ with valid user credentials authenticates the user and redirects to their role-specific dashboard."
-  },
-  {
-    "id": "TC005",
-    "title": "get accounts profile without authentication",
-    "description": "Verify that a GET request to /accounts/profile/ without authentication returns a 403 error or redirects to the login page."
-  },
-  {
-    "id": "TC006",
-    "title": "get teachers list approved only",
-    "description": "Verify that a GET request to /teachers/ returns a list of only approved teachers and excludes pending, rejected, or suspended teachers."
-  },
-  {
-    "id": "TC007",
-    "title": "get teacher profile approved teacher",
-    "description": "Verify that a GET request to /teachers/<id>/ for an approved teacher returns the detailed teacher profile successfully."
-  },
-  {
-    "id": "TC008",
-    "title": "get teacher profile pending rejected or suspended",
-    "description": "Verify that a GET request to /teachers/<id>/ for a pending, rejected, or suspended teacher returns a 404 error or hides the profile."
-  },
-  {
-    "id": "TC009",
-    "title": "post create booking with valid slot",
-    "description": "Verify that a POST request to /bookings/create/<teacher_id>/ with an authenticated student and valid non-overlapping slot creates a booking with pending payment or awaiting teacher acceptance status."
-  },
-  {
-    "id": "TC010",
-    "title": "post create booking with overlapping slot",
-    "description": "Verify that a POST request to /bookings/create/<teacher_id>/ with an overlapping slot request returns a validation error preventing conflicting bookings."
+    "title": "post accounts register user with valid data and role",
+    "description": "Test user registration endpoint POST /accounts/register/ with valid username, email, matching passwords, and a valid role. Verify successful registration and redirection to the appropriate role dashboard."
   }
 ]

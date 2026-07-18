@@ -1,79 +1,510 @@
 version: "2"
 type: backend
 tech_stack:
-  - Python
-  - Django
-  - SQLite
-  - Django Templates
+  - Python 3
+  - Django 5.2
+  - PostgreSQL
+  - Django Templates (server-rendered HTML)
+  - WhiteNoise
+  - Pillow
 features:
-  - name: Account Management
-    description: User authentication, registration, profiles.
+  - name: Authentication & Accounts
+    description: User registration for student, teacher, and parent roles, login, logout, and profile management.
     files:
+      - accounts/urls.py
       - accounts/views.py
-      - accounts/models.py
     endpoints:
       - method: GET
-        path: /accounts/login/
-        description: Show login page
+        path: /accounts/register/
+        description: Render the registration page.
         auth_required: false
+        response_schema:
+          "200": Registration HTML page
       - method: POST
-        path: /accounts/login/
-        description: Process login
+        path: /accounts/register/
+        description: Register a new user with a chosen role.
         auth_required: false
+        request_schema:
+          body:
+            username: string
+            email: string
+            password1: string
+            password2: string
+            role: string
+        response_schema:
+          "302": Redirect to role dashboard on success
+          "200": Registration page re-rendered with validation errors
       - method: GET
-        path: /accounts/register/
-        description: Show registration page
+        path: /accounts/register/{role}/
+        description: Render registration pre-set to a specific role (student, teacher, parent).
         auth_required: false
+        response_schema:
+          "200": Registration HTML page
+      - method: GET
+        path: /accounts/login/
+        description: Render the login page.
+        auth_required: false
+        response_schema:
+          "200": Login HTML page
       - method: POST
-        path: /accounts/register/
-        description: Register a new user
+        path: /accounts/login/
+        description: Authenticate a user and start a session.
         auth_required: false
+        request_schema:
+          body:
+            username: string
+            password: string
+        response_schema:
+          "302": Redirect to dashboard on success
+          "200": Login page re-rendered with errors
+      - method: GET
+        path: /accounts/logout/
+        description: Log out the current user.
+        auth_required: true
+        response_schema:
+          "302": Redirect to home
       - method: GET
         path: /accounts/profile/
-        description: View or edit user profile
+        description: View and edit the authenticated user's profile.
         auth_required: true
-  - name: Teacher Profiles
-    description: Manage teacher bio, subjects, availability, and certificates.
+        response_schema:
+          "200": Profile HTML page
+          "302": Redirect to login when unauthenticated
+  - name: Core Pages & Dashboard
+    description: Public marketing pages and role-based dashboard routing.
     files:
+      - core/urls.py
+      - core/views.py
+    endpoints:
+      - method: GET
+        path: /
+        description: Home page.
+        auth_required: false
+        response_schema:
+          "200": Home HTML page
+      - method: GET
+        path: /about/
+        description: About page.
+        auth_required: false
+        response_schema:
+          "200": About HTML page
+      - method: GET
+        path: /faq/
+        description: FAQ page.
+        auth_required: false
+        response_schema:
+          "200": FAQ HTML page
+      - method: GET
+        path: /contact/
+        description: Contact page.
+        auth_required: false
+        response_schema:
+          "200": Contact HTML page
+      - method: GET
+        path: /terms/
+        description: Terms of service page.
+        auth_required: false
+        response_schema:
+          "200": Terms HTML page
+      - method: GET
+        path: /privacy/
+        description: Privacy policy page.
+        auth_required: false
+        response_schema:
+          "200": Privacy HTML page
+      - method: GET
+        path: /dashboard/
+        description: Redirect to the role-specific dashboard.
+        auth_required: true
+        response_schema:
+          "302": Redirect to role dashboard
+    depends_on:
+      - Authentication & Accounts
+  - name: Teachers
+    description: Public teacher directory plus teacher self-service for profile, subjects, availability, certificates, and reviews.
+    files:
+      - teachers/urls.py
       - teachers/views.py
-      - teachers/models.py
     endpoints:
       - method: GET
         path: /teachers/
-        description: View list of approved teachers
+        description: List approved teachers.
         auth_required: false
+        response_schema:
+          "200": Teacher list HTML page
       - method: GET
-        path: /teachers/<id>/
-        description: View detailed teacher profile
+        path: /teachers/{pk}/
+        description: View a public teacher profile.
         auth_required: false
+        response_schema:
+          "200": Teacher detail HTML page
+          "404": Teacher not found
       - method: GET
         path: /teachers/dashboard/
-        description: Teacher dashboard
+        description: Teacher dashboard.
         auth_required: true
-      - method: GET
+        response_schema:
+          "200": Teacher dashboard HTML page
+      - method: POST
         path: /teachers/profile/setup/
-        description: Setup teacher profile
+        description: Set up or update teacher profile.
         auth_required: true
-  - name: Bookings
-    description: Booking tutoring lessons, cancellation, and attendance confirmation.
+        response_schema:
+          "302": Redirect on success
+      - method: POST
+        path: /teachers/certificates/upload/
+        description: Upload a teaching certificate for verification.
+        auth_required: true
+        response_schema:
+          "302": Redirect on success
+      - method: GET
+        path: /teachers/status/
+        description: View verification/approval status.
+        auth_required: true
+        response_schema:
+          "200": Status HTML page
+      - method: POST
+        path: /teachers/subjects/add/
+        description: Add a subject the teacher offers.
+        auth_required: true
+        response_schema:
+          "302": Redirect to manage subjects
+      - method: POST
+        path: /teachers/availability/add/
+        description: Add an availability slot.
+        auth_required: true
+        response_schema:
+          "302": Redirect to manage availability
+      - method: GET
+        path: /teachers/reviews/
+        description: View reviews received by the teacher.
+        auth_required: true
+        response_schema:
+          "200": Reviews HTML page
+    depends_on:
+      - Authentication & Accounts
+  - name: Students
+    description: Student dashboard and parent-linking code.
     files:
+      - students/urls.py
+      - students/views.py
+    endpoints:
+      - method: GET
+        path: /students/dashboard/
+        description: Student dashboard.
+        auth_required: true
+        response_schema:
+          "200": Student dashboard HTML page
+      - method: GET
+        path: /students/linking-code/
+        description: Show the code used to link a parent account.
+        auth_required: true
+        response_schema:
+          "200": Linking code HTML page
+    depends_on:
+      - Authentication & Accounts
+  - name: Parents
+    description: Parent dashboard, creating and linking child students, and viewing children's booking history.
+    files:
+      - parents/urls.py
+      - parents/views.py
+    endpoints:
+      - method: GET
+        path: /parents/dashboard/
+        description: Parent dashboard.
+        auth_required: true
+        response_schema:
+          "200": Parent dashboard HTML page
+      - method: POST
+        path: /parents/students/create/
+        description: Create a child student account.
+        auth_required: true
+        response_schema:
+          "302": Redirect on success
+      - method: POST
+        path: /parents/students/link/
+        description: Link an existing student via linking code.
+        auth_required: true
+        response_schema:
+          "302": Redirect on success
+      - method: GET
+        path: /parents/students/{student_pk}/bookings/
+        description: View a linked child's booking history.
+        auth_required: true
+        response_schema:
+          "200": Booking history HTML page
+    depends_on:
+      - Authentication & Accounts
+      - Students
+  - name: Bookings
+    description: Booking lessons, cancellation, rescheduling, and attendance confirmation for students, parents, and teachers.
+    files:
+      - bookings/urls.py
       - bookings/views.py
-      - bookings/models.py
     endpoints:
       - method: GET
         path: /bookings/
-        description: View student booking list
+        description: List the student's bookings.
         auth_required: true
+        response_schema:
+          "200": Booking list HTML page
       - method: POST
-        path: /bookings/create/<teacher_id>/
-        description: Create a booking with a teacher
+        path: /bookings/create/{teacher_pk}/
+        description: Create a booking with a teacher.
         auth_required: true
+        request_schema:
+          body:
+            subject: integer
+            date: string
+            time: string
+        response_schema:
+          "302": Redirect to booking detail on success
+          "200": Booking form re-rendered with errors
+      - method: POST
+        path: /bookings/parent/create/{teacher_pk}/{student_pk}/
+        description: Parent creates a booking on behalf of a child.
+        auth_required: true
+        response_schema:
+          "302": Redirect on success
       - method: GET
-        path: /bookings/<id>/
-        description: View booking details
+        path: /bookings/{pk}/
+        description: View booking detail.
         auth_required: true
+        response_schema:
+          "200": Booking detail HTML page
+          "404": Booking not found
       - method: POST
-        path: /bookings/<id>/cancel/
-        description: Cancel a booking
+        path: /bookings/{pk}/cancel/
+        description: Cancel a booking as a student.
         auth_required: true
-known_limitations: []
+        response_schema:
+          "302": Redirect on success
+      - method: POST
+        path: /bookings/{pk}/reschedule/
+        description: Reschedule a booking as a student.
+        auth_required: true
+        response_schema:
+          "302": Redirect on success
+      - method: POST
+        path: /bookings/{pk}/attendance/confirm/
+        description: Confirm attendance as a student.
+        auth_required: true
+        response_schema:
+          "302": Redirect on success
+      - method: GET
+        path: /bookings/teacher/
+        description: List the teacher's bookings.
+        auth_required: true
+        response_schema:
+          "200": Teacher booking list HTML page
+      - method: POST
+        path: /bookings/teacher/{pk}/{action}/
+        description: Teacher acts on a booking (accept, reject, complete).
+        auth_required: true
+        response_schema:
+          "302": Redirect on success
+    depends_on:
+      - Authentication & Accounts
+      - Teachers
+  - name: Payments & Wallet
+    description: Payment instructions, history, wallet, and admin verification of payments and withdrawals.
+    files:
+      - payments/urls.py
+      - payments/views.py
+    endpoints:
+      - method: GET
+        path: /payments/booking/{booking_pk}/
+        description: Payment instructions for a booking.
+        auth_required: true
+        response_schema:
+          "200": Payment instructions HTML page
+      - method: GET
+        path: /payments/history/
+        description: Payment history.
+        auth_required: true
+        response_schema:
+          "200": Payment history HTML page
+      - method: GET
+        path: /payments/wallet/
+        description: Wallet dashboard.
+        auth_required: true
+        response_schema:
+          "200": Wallet HTML page
+      - method: GET
+        path: /payments/admin/pending/
+        description: Admin list of pending payment verifications.
+        auth_required: true
+        response_schema:
+          "200": Pending verifications HTML page
+          "403": Non-admin access denied
+      - method: POST
+        path: /payments/admin/{payment_pk}/approve/
+        description: Admin approves a payment.
+        auth_required: true
+        response_schema:
+          "302": Redirect on success
+      - method: POST
+        path: /payments/admin/{payment_pk}/reject/
+        description: Admin rejects a payment.
+        auth_required: true
+        response_schema:
+          "302": Redirect on success
+    depends_on:
+      - Authentication & Accounts
+      - Bookings
+  - name: Reviews
+    description: Students leave reviews on completed bookings.
+    files:
+      - reviews/urls.py
+      - reviews/views.py
+    endpoints:
+      - method: POST
+        path: /reviews/booking/{booking_pk}/create/
+        description: Create a review for a completed booking.
+        auth_required: true
+        request_schema:
+          body:
+            rating: integer
+            comment: string
+        response_schema:
+          "302": Redirect on success
+          "200": Review form re-rendered with errors
+    depends_on:
+      - Bookings
+  - name: Reports
+    description: Lesson reports created by teachers and viewed by students/parents.
+    files:
+      - reports/urls.py
+      - reports/views.py
+    endpoints:
+      - method: GET
+        path: /reports/{pk}/
+        description: View a lesson report.
+        auth_required: true
+        response_schema:
+          "200": Report detail HTML page
+      - method: POST
+        path: /reports/bookings/{booking_pk}/create/
+        description: Create a lesson report for a booking.
+        auth_required: true
+        response_schema:
+          "302": Redirect on success
+    depends_on:
+      - Bookings
+  - name: Complaints
+    description: Users file complaints on bookings and staff resolve them.
+    files:
+      - complaints/urls.py
+      - complaints/views.py
+    endpoints:
+      - method: GET
+        path: /complaints/
+        description: List the user's complaints.
+        auth_required: true
+        response_schema:
+          "200": Complaint list HTML page
+      - method: POST
+        path: /complaints/booking/{booking_pk}/create/
+        description: File a complaint about a booking.
+        auth_required: true
+        response_schema:
+          "302": Redirect on success
+      - method: GET
+        path: /complaints/staff/
+        description: Staff complaint queue.
+        auth_required: true
+        response_schema:
+          "200": Staff queue HTML page
+          "403": Non-staff access denied
+    depends_on:
+      - Bookings
+  - name: Messaging
+    description: Booking-scoped messaging threads between students and teachers.
+    files:
+      - messaging/urls.py
+      - messaging/views.py
+    endpoints:
+      - method: GET
+        path: /messages/
+        description: Messaging inbox.
+        auth_required: true
+        response_schema:
+          "200": Inbox HTML page
+      - method: GET
+        path: /messages/booking/{booking_pk}/
+        description: View or start the message thread for a booking.
+        auth_required: true
+        response_schema:
+          "200": Thread HTML page
+      - method: GET
+        path: /messages/thread/{pk}/
+        description: View a message thread by id.
+        auth_required: true
+        response_schema:
+          "200": Thread detail HTML page
+    depends_on:
+      - Bookings
+  - name: Subjects
+    description: Public subject catalog and browse.
+    files:
+      - subjects/urls.py
+      - subjects/views.py
+    endpoints:
+      - method: GET
+        path: /subjects/
+        description: List subjects.
+        auth_required: false
+        response_schema:
+          "200": Subject list HTML page
+      - method: GET
+        path: /subjects/browse/
+        description: Browse subjects with teachers.
+        auth_required: false
+        response_schema:
+          "200": Subject browse HTML page
+  - name: Admin Panel
+    description: Staff dashboard for user management, teacher approval, booking monitoring, audit logs, and configuration of subjects, grade levels, and pricing.
+    files:
+      - adminpanel/urls.py
+      - adminpanel/views.py
+    endpoints:
+      - method: GET
+        path: /adminpanel/dashboard/
+        description: Admin dashboard.
+        auth_required: true
+        response_schema:
+          "200": Admin dashboard HTML page
+          "403": Non-staff access denied
+      - method: GET
+        path: /adminpanel/users/
+        description: List and manage users.
+        auth_required: true
+        response_schema:
+          "200": User list HTML page
+          "403": Non-staff access denied
+      - method: GET
+        path: /adminpanel/review/teachers/
+        description: List teachers pending approval.
+        auth_required: true
+        response_schema:
+          "200": Pending teachers HTML page
+          "403": Non-staff access denied
+      - method: POST
+        path: /adminpanel/review/teachers/{profile_id}/
+        description: Approve or reject a teacher profile.
+        auth_required: true
+        response_schema:
+          "302": Redirect on success
+      - method: GET
+        path: /adminpanel/audit-logs/
+        description: View audit logs.
+        auth_required: true
+        response_schema:
+          "200": Audit logs HTML page
+          "403": Non-staff access denied
+    depends_on:
+      - Authentication & Accounts
+known_limitations:
+  - issue: Teachers app has model changes without a generated migration.
+    location: teachers/models.py
+    impact: The teachers app models are out of sync with migrations; running with an unmigrated schema may cause errors.

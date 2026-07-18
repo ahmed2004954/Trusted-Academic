@@ -1,20 +1,20 @@
 {
   "status": "commited",
-  "type": "frontend",
+  "type": "backend",
   "scope": "codebase",
-  "localEndpoint": "http://localhost:8055",
+  "localEndpoint": "http://localhost:8000",
   "backendAuthType": "basic token",
   "backendUsername": "admin@example.com",
   "backendPassword": "Testpass123!",
   "executionArgs": {
     "projectName": "trust acadmy",
-    "projectPath": "c:/Users/h7304/Desktop/trust acadmy",
+    "projectPath": "C:\\Users\\h7304\\Desktop\\trust acadmy",
     "testIds": [],
-    "additionalInstruction": "Please use the following credentials for E2E logins:\n- Student-related tests (TC001, TC005, TC006, TC009) must fill email with \"demo.student@example.com\" and password with \"DemoPass123!\".\n- Teacher-related tests (TC007) must fill email with \"demo.teacher@example.com\" and password with \"DemoPass123!\".\n- General login/profile tests (TC003, TC008) must fill email with \"demo.student@example.com\" and password with \"DemoPass123!\".\n- Run the Playwright tests with concurrency = 1 (sequentially) to prevent SQLite database locks.",
+    "additionalInstruction": "Django server is running at http://127.0.0.1:8000 in DEBUG mode. Registration requires username, email, password1, password2, and role fields. CSRF token is required for POST forms (server-rendered Django).",
     "serverMode": "development",
     "envs": {
-      "API_KEY": "sk-user-WafQaNASmdDhmDU-6e-VHng17Mo19Z19p9JP9kav0A6SRqS8qsZQk5m8QGKi4GzxfBq9sCkmWbIB8UYSEvfqHyxDDCNoqbVAwCw0GGBTBED0BTzWfsV5d9nMArP1BIByp10"
+      "API_KEY": "sk-user-SqgqcxC4O97YVM2nNaJ5vIOtpA8mGeNBiabcHIHxYwHl9gyyoFTwyENyzkLdyzojVtQNfa_gjB2ioknp9hh_o03P4A-ehUMPi22FVeDzdADPSvtZKrVwNB0CLni2HFfzETw"
     }
   },
-  "serverPort": 64925
+  "serverPort": 52068
 }

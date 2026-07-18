@@ -1,11 +1,20 @@
+import io
 from decimal import Decimal
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from PIL import Image
+
+
+def _valid_png_bytes():
+    buffer = io.BytesIO()
+    Image.new('RGB', (1, 1), (255, 0, 0)).save(buffer, 'PNG')
+    return buffer.getvalue()
 
 from bookings.models import Booking
-from core.test_helpers import create_payment, create_teacher, create_test_booking, create_user
+from core.test_helpers import create_payment, create_student, create_teacher, create_test_booking, create_user
 from payments.models import Payment, Wallet, WithdrawalRequest
 from payments.services import complete_booking_with_attendance, get_or_create_wallet
 from reviews.models import Review
@@ -128,3 +137,92 @@ class WithdrawalRequestTests(TestCase):
         self.assertEqual(withdrawal.status, WithdrawalRequest.Status.REJECTED)
         self.assertEqual(wallet.available_balance, Decimal('200.00'))
         self.assertIsNone(withdrawal.balance_deducted_at)
+
+
+class PaymentInstructionsViewTests(TestCase):
+    def test_student_uploads_receipt_moves_booking_to_verification(self):
+        booking = create_test_booking(status=Booking.BookingStatus.PENDING_PAYMENT)
+        self.client.force_login(booking.student)
+        receipt = SimpleUploadedFile('receipt.png', _valid_png_bytes(), content_type='image/png')
+
+        response = self.client.post(
+            reverse('payments:instructions', args=[booking.pk]),
+            {'payment_method': 'vodafone_cash', 'receipt_image': receipt},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        booking.refresh_from_db()
+        self.assertEqual(booking.booking_status, Booking.BookingStatus.AWAITING_RECEIPT_VERIFICATION)
+        payment = Payment.objects.get(booking=booking)
+        self.assertEqual(payment.payment_status, Payment.PaymentStatus.AWAITING_VERIFICATION)
+
+    def test_payment_instructions_requires_student_role(self):
+        booking = create_test_booking(status=Booking.BookingStatus.PENDING_PAYMENT)
+        self.client.force_login(booking.teacher.user)
+
+        response = self.client.get(reverse('payments:instructions', args=[booking.pk]))
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_student_cannot_open_instructions_for_others_booking(self):
+        booking = create_test_booking(status=Booking.BookingStatus.PENDING_PAYMENT)
+        intruder = create_student(email='pay-intruder@example.com')
+        self.client.force_login(intruder)
+
+        response = self.client.get(reverse('payments:instructions', args=[booking.pk]))
+
+        self.assertEqual(response.status_code, 404)
+
+
+class PaymentHistoryAndWalletViewTests(TestCase):
+    def test_student_payment_history_lists_own_payments_only(self):
+        booking = create_test_booking(status=Booking.BookingStatus.AWAITING_RECEIPT_VERIFICATION)
+        create_payment(booking)
+        self.client.force_login(booking.student)
+
+        response = self.client.get(reverse('payments:history'))
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_payment_history_requires_student_role(self):
+        teacher = create_teacher(email='hist-teacher@example.com')
+        self.client.force_login(teacher.user)
+
+        response = self.client.get(reverse('payments:history'))
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_teacher_can_view_wallet(self):
+        teacher = create_teacher(email='wallet-view@example.com')
+        get_or_create_wallet(teacher)
+        self.client.force_login(teacher.user)
+
+        response = self.client.get(reverse('payments:wallet'))
+
+        self.assertEqual(response.status_code, 200)
+
+
+class PaymentAdminAuthorizationTests(TestCase):
+    def test_non_staff_cannot_access_pending_verifications(self):
+        student = create_student(email='verif-student@example.com')
+        self.client.force_login(student)
+
+        response = self.client.get(reverse('payments:admin_pending'))
+
+        # staff_member_required redirects non-staff to the admin login page.
+        self.assertEqual(response.status_code, 302)
+        self.assertNotIn('_pending', response.get('Location', ''))
+
+    def test_reject_payment_marks_failed(self):
+        booking = create_test_booking(status=Booking.BookingStatus.AWAITING_RECEIPT_VERIFICATION)
+        payment = create_payment(booking)
+        admin = create_user('reject-admin@example.com', role='admin', full_name='Admin', is_staff=True)
+        self.client.force_login(admin)
+
+        self.client.post(
+            reverse('payments:admin_reject', args=[payment.pk]),
+            {'rejection_reason': 'Receipt unreadable'},
+        )
+
+        payment.refresh_from_db()
+        self.assertEqual(payment.payment_status, Payment.PaymentStatus.FAILED)

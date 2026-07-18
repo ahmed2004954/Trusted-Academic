@@ -1,12 +1,12 @@
 {
     "env": {
-        "ANTHROPIC_API_KEY": "aero_live_W2P9l2M8slP1Ha7Z-nV6Knzxy1QpP3Ahnd5F-JZQzWs",
-        "ANTHROPIC_BASE_URL": "https://capi.aerolink.lat/",
+        "ANTHROPIC_API_KEY": "sk-T8yGl9iE5llvJd06W6RZfzBsdmX1D8cKLSl9Fb9R2lCxlH33",
+        "ANTHROPIC_BASE_URL": "https://agentrouter.org/",
         "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
     },
     "permissions": {
         "allow": [],
         "deny": []
     },
-    "apiKeyHelper": "echo 'aero_live_W2P9l2M8slP1Ha7Z-nV6Knzxy1QpP3Ahnd5F-JZQzWs'"
+    "apiKeyHelper": "echo 'sk-T8yGl9iE5llvJd06W6RZfzBsdmX1D8cKLSl9Fb9R2lCxlH33'"
 }

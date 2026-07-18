@@ -74,7 +74,7 @@ def dashboard(request):
 def linking_code(request):
     if request.user.role != 'student':
         raise PermissionDenied
-    profile, _ = StudentProfile.objects.get_or_create(user=request.user)
+    profile, _created = StudentProfile.objects.get_or_create(user=request.user)
     if request.method == 'POST':
         profile.linking_code = ''
         profile.generate_linking_code()

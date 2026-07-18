@@ -43,6 +43,9 @@
                         <span class="material-symbols-outlined text-on-surface-variant text-[20px]">lock</span>
                     </div>
                     <input class="block w-full pl-10 pr-10 py-3 bg-surface-bright border border-outline-variant rounded-lg text-on-background font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-colors" id="id_password" name="password" type="password" placeholder="••••••••">
+                    <button type="button" class="absolute inset-y-0 left-0 pl-3 flex items-center cursor-pointer" onclick="togglePassword('id_password', this)">
+                        <span class="material-symbols-outlined text-on-surface-variant text-[20px]">visibility_off</span>
+                    </button>
                 </div>
                 {% if form.password.errors %}<p class="font-label-sm text-label-sm text-error mt-xs">{{ form.password.errors|join:" / " }}</p>{% endif %}
             </div>
@@ -70,4 +73,20 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('.material-symbols-outlined');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.textContent = 'visibility';
+    } else {
+        input.type = 'password';
+        icon.textContent = 'visibility_off';
+    }
+}
+</script>
 {% endblock %}
